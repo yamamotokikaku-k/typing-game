@@ -8,7 +8,6 @@
     :root{
       --bg:#fff;
       --fg:#111;
-      --muted:#777;
       --red:#ff3b30;
       --blue:#007aff;
 
@@ -48,9 +47,41 @@
       flex-direction:column;
       align-items:center;
       justify-content:space-between;
-      padding:28px 18px 22px;
+      padding:22px 18px 22px;
       box-sizing:border-box;
       z-index:2; /* above canvas */
+    }
+
+    /* ultra-min mode toggle (no explanation text) */
+    .modes{
+      position:absolute;
+      top:14px;
+      left:14px;
+      display:flex;
+      gap:8px;
+      z-index:3;
+    }
+    .mode{
+      width:44px;
+      height:34px;
+      border-radius:999px;
+      border:1px solid #e7e7e7;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      font-size:18px;
+      color:#222;
+      user-select:none;
+      cursor:pointer;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+      opacity:0.85;
+    }
+    .mode.active{
+      border-color:#cfcfcf;
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
+      opacity:1;
     }
 
     .top{
@@ -89,9 +120,7 @@
     .r-blue{color:var(--blue);}
 
     /* subtle “pop” on correct */
-    .pop {
-      animation: pop 120ms ease-out;
-    }
+    .pop { animation: pop 120ms ease-out; }
     @keyframes pop {
       0%{ transform:scale(1); }
       40%{ transform:scale(1.08); }
@@ -192,18 +221,14 @@
     }
 
     /* idle space pulse (no text) */
-    .pulse{
-      animation: pulse 900ms ease-in-out infinite;
-    }
+    .pulse{ animation: pulse 900ms ease-in-out infinite; }
     @keyframes pulse{
       0%,100%{ box-shadow: 0 0 0 rgba(0,0,0,0); }
       50%{ box-shadow: 0 0 18px rgba(0,0,0,0.10); }
     }
 
     /* miss shake (key only) */
-    .shake{
-      animation: shake 120ms linear;
-    }
+    .shake{ animation: shake 120ms linear; }
     @keyframes shake{
       0%{ transform: translateX(0); }
       25%{ transform: translateX(-2px); }
@@ -212,8 +237,9 @@
       100%{ transform: translateX(0); }
     }
 
-    /* layout tightening on small screens */
     @media (max-width:560px){
+      .modes{ top:10px; left:10px; }
+      .mode{ width:40px; height:32px; font-size:17px; }
       .key{ height:44px; border-radius:10px; }
       .w-1{ width:44px; }
       .w-125{ width:56px; }
@@ -232,6 +258,12 @@
   <canvas id="fx"></canvas>
 
   <div class="wrap">
+    <!-- mode toggle: only kana labels -->
+    <div class="modes" id="modes">
+      <div class="mode active" data-mode="a">あ</div>
+      <div class="mode" data-mode="ka">か</div>
+    </div>
+
     <div class="top">
       <div id="kana"></div>
       <div id="romaji"></div>
@@ -243,51 +275,41 @@
 <script>
 (() => {
   /* -----------------------------
-     50音（試作：分岐なし固定）
+     問題プール（あ行/か行）
   ----------------------------- */
-  const QUESTIONS = [
-    {k:'あ', r:'A'}, {k:'い', r:'I'}, {k:'う', r:'U'}, {k:'え', r:'E'}, {k:'お', r:'O'},
-    {k:'か', r:'KA'}, {k:'き', r:'KI'}, {k:'く', r:'KU'}, {k:'け', r:'KE'}, {k:'こ', r:'KO'},
-    {k:'さ', r:'SA'}, {k:'し', r:'SHI'}, {k:'す', r:'SU'}, {k:'せ', r:'SE'}, {k:'そ', r:'SO'},
-    {k:'た', r:'TA'}, {k:'ち', r:'CHI'}, {k:'つ', r:'TSU'}, {k:'て', r:'TE'}, {k:'と', r:'TO'},
-    {k:'な', r:'NA'}, {k:'に', r:'NI'}, {k:'ぬ', r:'NU'}, {k:'ね', r:'NE'}, {k:'の', r:'NO'},
-    {k:'は', r:'HA'}, {k:'ひ', r:'HI'}, {k:'ふ', r:'FU'}, {k:'へ', r:'HE'}, {k:'ほ', r:'HO'},
-    {k:'ま', r:'MA'}, {k:'み', r:'MI'}, {k:'む', r:'MU'}, {k:'め', r:'ME'}, {k:'も', r:'MO'},
-    {k:'や', r:'YA'}, {k:'ゆ', r:'YU'}, {k:'よ', r:'YO'},
-    {k:'ら', r:'RA'}, {k:'り', r:'RI'}, {k:'る', r:'RU'}, {k:'れ', r:'RE'}, {k:'ろ', r:'RO'},
-    {k:'わ', r:'WA'}, {k:'を', r:'WO'}, {k:'ん', r:'N'},
-  ];
+  const POOLS = {
+    a:  [
+      {k:'あ', r:'A'}, {k:'い', r:'I'}, {k:'う', r:'U'}, {k:'え', r:'E'}, {k:'お', r:'O'},
+    ],
+    ka: [
+      {k:'か', r:'KA'}, {k:'き', r:'KI'}, {k:'く', r:'KU'}, {k:'け', r:'KE'}, {k:'こ', r:'KO'},
+    ],
+  };
 
   /* -----------------------------
      US配列キーボード（見た目）
-     （打鍵判定は letter / space のみ）
   ----------------------------- */
   const KBD_LAYOUT = [
-    // row 1
     [
       ['`','w-1','f-lp'], ['1','w-1','f-lp'], ['2','w-1','f-lr'], ['3','w-1','f-lm'], ['4','w-1','f-li'],
       ['5','w-1','f-li'], ['6','w-1','f-ri'], ['7','w-1','f-ri'], ['8','w-1','f-rm'], ['9','w-1','f-rr'],
       ['0','w-1','f-rp'], ['-','w-1','f-rp'], ['=','w-1','f-rp'], ['⌫','w-2','f-rp','Backspace']
     ],
-    // row 2
     [
       ['Tab','w-15','f-lp','Tab'], ['Q','w-1','f-lp'], ['W','w-1','f-lr'], ['E','w-1','f-lm'], ['R','w-1','f-li'],
       ['T','w-1','f-li'], ['Y','w-1','f-ri'], ['U','w-1','f-ri'], ['I','w-1','f-rm'], ['O','w-1','f-rr'],
       ['P','w-1','f-rp'], ['[','w-1','f-rp'], [']','w-1','f-rp'], ['\\','w-15','f-rp','Backslash']
     ],
-    // row 3
     [
       ['Caps','w-175','f-lp','CapsLock'], ['A','w-1','f-lp'], ['S','w-1','f-lr'], ['D','w-1','f-lm'], ['F','w-1','f-li'],
       ['G','w-1','f-li'], ['H','w-1','f-ri'], ['J','w-1','f-ri'], ['K','w-1','f-rm'], ['L','w-1','f-rr'],
       [';','w-1','f-rp'], ["'","w-1","f-rp"], ['Enter','w-225','f-rp','Enter']
     ],
-    // row 4
     [
       ['Shift','w-225','f-lp','ShiftLeft'], ['Z','w-1','f-lp'], ['X','w-1','f-lr'], ['C','w-1','f-lm'], ['V','w-1','f-li'],
       ['B','w-1','f-li'], ['N','w-1','f-ri'], ['M','w-1','f-ri'], [',','w-1','f-rm'], ['.','w-1','f-rr'],
       ['/','w-1','f-rp'], ['Shift','w-275','f-rp','ShiftRight']
     ],
-    // row 5
     [
       ['Ctrl','w-125','f-rp','ControlLeft'], ['Win','w-125','f-rp','MetaLeft'], ['Alt','w-125','f-rp','AltLeft'],
       ['Space','w-625','f-th','Space'],
@@ -296,9 +318,8 @@
   ];
 
   const kbdEl = document.getElementById('kbd');
-
-  /** key lookup by label (uppercase letters for A-Z) */
   const keyEls = new Map(); // keyLabel -> element
+
   function buildKeyboard(){
     kbdEl.innerHTML = '';
     for (const row of KBD_LAYOUT){
@@ -315,34 +336,59 @@
         key.appendChild(s);
         rowEl.appendChild(key);
 
-        // store for highlighting; letters use uppercase, space uses "Space"
         keyEls.set(label.toUpperCase(), key);
         if (label === 'Space') keyEls.set(' ', key);
       }
       kbdEl.appendChild(rowEl);
     }
   }
-
   buildKeyboard();
 
   /* -----------------------------
-     ゲーム状態
+     状態
   ----------------------------- */
   const kanaEl = document.getElementById('kana');
   const romajiEl = document.getElementById('romaji');
 
+  let mode = 'a';            // 'a' or 'ka'
   let started = false;
-  let idx = 0;                // question index (sequential)
-  let pos = 0;                // position within romaji
-  let combo = 0;              // continuous correct keystrokes (no misses)
-  let lastCorrectAt = 0;      // timestamp
-  let vowelStreak = 0;        // あいうえお連続クリア（問単位）
+
+  let pool = POOLS[mode];
+  let idx = 0;               // question index within pool
+  let pos = 0;               // position within romaji
+
+  let combo = 0;
+  let lastCorrectAt = 0;
+
+  // あいうえお演出（あ行練習の時だけ効く）
+  const VOWEL_RUN = ['あ','い','う','え','お'];
+  let vowelStreak = 0;
   let lastVowelAt = 0;
 
-  const VOWEL_RUN = ['あ','い','う','え','お'];
+  function setMode(next){
+    if (started) return; // プレイ中は切替不可（テキスト説明ゼロ維持のため）
+    mode = next;
+    pool = POOLS[mode];
+    idx = 0; pos = 0;
+    vowelStreak = 0; lastVowelAt = 0;
+    renderModeButtons();
+    setIdleUI(); // idleのまま見た目更新
+  }
+
+  function renderModeButtons(){
+    document.querySelectorAll('.mode').forEach(b=>{
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+  }
+
+  document.getElementById('modes').addEventListener('click', (e)=>{
+    const b = e.target.closest('.mode');
+    if (!b) return;
+    setMode(b.dataset.mode);
+  });
 
   /* -----------------------------
-     WebAudio: 自前効果音（ファイル不要）
+     WebAudio（効果音）
   ----------------------------- */
   let audioCtx = null;
   function ensureAudio(){
@@ -365,17 +411,13 @@
     let srcNode;
 
     if (noise){
-      // very short noise burst
       const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * dur));
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i=0;i<bufferSize;i++){
-        data[i] = (Math.random()*2-1) * 0.6;
-      }
+      for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * 0.6;
       const n = audioCtx.createBufferSource();
       n.buffer = buffer;
 
-      // simple filter to soften
       const f = audioCtx.createBiquadFilter();
       f.type = 'lowpass';
       f.frequency.setValueAtTime(900, t0);
@@ -399,13 +441,11 @@
   }
 
   function sfxCorrect(power=1){
-    // short bright “ping”
     const base = 740 + Math.min(8, power) * 35;
     beep({freq:base, dur:0.05, type:'triangle', gain:0.07});
   }
 
   function sfxMiss(){
-    // soft “thud” + tiny noise
     beep({freq:180, dur:0.07, type:'sine', gain:0.08, bend:-1});
     beep({dur:0.05, gain:0.035, noise:true});
   }
@@ -435,10 +475,8 @@
     const life  = 28 + p * 7;
 
     for (let b=0;b<bursts;b++){
-      const jitter = (Math.random()*2-1) * 18 * DPR;
-      const jitter2 = (Math.random()*2-1) * 12 * DPR;
-      const bx = x + jitter;
-      const by = y + jitter2;
+      const bx = x + (Math.random()*2-1) * 18 * DPR;
+      const by = y + (Math.random()*2-1) * 12 * DPR;
 
       for (let i=0;i<count;i++){
         const a = (Math.PI*2) * (i / count) + (Math.random()*0.15);
@@ -449,7 +487,6 @@
           vy: Math.sin(a)*v,
           life: life * (0.75 + Math.random()*0.55),
           maxLife: life,
-          // lightweight color drift: red/blue mix
           c: (Math.random() < 0.5) ? 'rgba(255,59,48,' : 'rgba(0,122,255,'
         });
       }
@@ -457,11 +494,10 @@
   }
 
   function fxTick(){
-    // fade (trail)
     ctx.fillStyle = 'rgba(255,255,255,0.20)';
     ctx.fillRect(0,0,W,H);
 
-    const g = 0.055 * DPR; // gravity
+    const g = 0.055 * DPR;
     for (let i = particles.length-1; i>=0; i--){
       const p = particles[i];
       p.vy += g;
@@ -483,36 +519,28 @@
 
     requestAnimationFrame(fxTick);
   }
-  // start with a clean white
   ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
   requestAnimationFrame(fxTick);
 
   function centerFirework(power, bursts=1){
-    // behind kana area: slightly above screen center
-    const x = W * 0.5;
-    const y = H * 0.40;
-    spawnFirework({x, y, power, bursts});
+    spawnFirework({x:W*0.5, y:H*0.40, power, bursts});
   }
 
   function barrageFinal(){
-    // “ババババババン！”: rapid small bursts + final big
-    const t0 = performance.now();
     const steps = 6;
     for (let i=0;i<steps;i++){
       setTimeout(() => centerFirework(4 + i, 1), i * 70);
-      // small per-burst tick (very light)
       setTimeout(() => sfxCorrect(3 + i), i * 70);
     }
     setTimeout(() => {
       centerFirework(10, 3);
-      // final “DON”
       beep({freq:140, dur:0.11, type:'sine', gain:0.11});
       beep({freq:260, dur:0.07, type:'triangle', gain:0.06});
     }, steps * 70 + 60);
   }
 
   /* -----------------------------
-     UI update helpers
+     UI helpers
   ----------------------------- */
   function clearHighlights(){
     for (const el of keyEls.values()){
@@ -532,12 +560,11 @@
   }
 
   function setQuestionUI(){
-    const q = QUESTIONS[idx];
+    const q = pool[idx];
     const r = q.r.toUpperCase();
     kanaEl.textContent = q.k;
 
     romajiEl.innerHTML = '';
-    // first char red, rest blue (even 3 letters)
     const first = document.createElement('span');
     first.className = 'r-red';
     first.textContent = r[0] || '';
@@ -551,10 +578,8 @@
       romajiEl.appendChild(second);
     }
 
-    // highlight keys
     clearHighlights();
 
-    // show all needed keys weakly (first red, rest blue)
     const need = r.split('');
     need.forEach((ch, i) => {
       const k = keyEls.get(ch);
@@ -563,7 +588,6 @@
       else k.classList.add('target-weak-blue');
     });
 
-    // current target strongly
     const current = need[pos] || '';
     const kcur = keyEls.get(current);
     if (kcur){
@@ -577,7 +601,6 @@
 
   function pop(el){
     el.classList.remove('pop');
-    // force reflow
     void el.offsetWidth;
     el.classList.add('pop');
   }
@@ -604,14 +627,14 @@
     idx = 0;
     pos = 0;
     combo = 0;
-    vowelStreak = 0;
     lastCorrectAt = 0;
+    vowelStreak = 0;
     lastVowelAt = 0;
     setQuestionUI();
   }
 
   function advanceQuestion(){
-    idx = (idx + 1) % QUESTIONS.length;
+    idx = (idx + 1) % pool.length;
     pos = 0;
     setQuestionUI();
   }
@@ -621,44 +644,39 @@
     const dt = lastCorrectAt ? (now - lastCorrectAt) : 9999;
     lastCorrectAt = now;
 
-    // speed bonus: fast chaining feels better
     if (dt < 350) combo += 2;
     else combo += 1;
 
-    // firework power grows with combo but capped
     const power = Math.max(1, Math.min(10, Math.floor(combo / 2)));
 
     sfxCorrect(power);
     pop(romajiEl);
 
-    // visual reward per correct keystroke: small, keep UI clean
     if (pos > 0) centerFirework(Math.max(1, Math.min(6, power)), 1);
 
-    // move position
     pos++;
 
-    const r = QUESTIONS[idx].r.toUpperCase();
+    const r = pool[idx].r.toUpperCase();
     if (pos >= r.length){
-      // question cleared -> bigger reward
-      const qKana = QUESTIONS[idx].k;
+      const qKana = pool[idx].k;
 
-      // vowel run ladder: あいうえお を「問」で連続クリアしたら最後ババババババン！
-      const expectedVowel = VOWEL_RUN[vowelStreak] || null;
-      const dtV = lastVowelAt ? (now - lastVowelAt) : 9999;
+      // あ行の時だけ「あいうえお」演出
+      if (mode === 'a'){
+        const expected = VOWEL_RUN[vowelStreak] || null;
+        const dtV = lastVowelAt ? (now - lastVowelAt) : 9999;
 
-      if (qKana === expectedVowel && dtV < 2000){
-        vowelStreak++;
-      } else if (qKana === VOWEL_RUN[0]) {
-        vowelStreak = 1;
+        if (qKana === expected && dtV < 2000) vowelStreak++;
+        else if (qKana === VOWEL_RUN[0]) vowelStreak = 1;
+        else vowelStreak = 0;
+
+        lastVowelAt = now;
       } else {
         vowelStreak = 0;
       }
-      lastVowelAt = now;
 
-      // scale up per question clear
       centerFirework(Math.max(2, Math.min(9, power + 2)), 2);
 
-      if (vowelStreak >= 5){
+      if (mode === 'a' && vowelStreak >= 5){
         vowelStreak = 0;
         barrageFinal();
       }
@@ -676,8 +694,6 @@
     sfxMiss();
     shakeKey(keyEl);
     if (navigator.vibrate) navigator.vibrate(20);
-
-    // slight “look here” strengthening: re-apply current highlight
     setQuestionUI();
   }
 
@@ -685,11 +701,12 @@
      Key handling (no input box)
   ----------------------------- */
   function normalizeKey(ev){
-    // letters: a-z -> A-Z
     if (ev.key && ev.key.length === 1){
       const ch = ev.key;
       if (/[a-z]/i.test(ch)) return ch.toUpperCase();
       if (ch === ' ') return ' ';
+      // mode shortcuts (idle only): 1 => あ, 2 => か
+      if (!started && (ch === '1' || ch === '2')) return ch;
     }
     if (ev.code === 'Space') return ' ';
     return null;
@@ -699,10 +716,14 @@
     const k = normalizeKey(ev);
     if (!k) return;
 
-    // prevent page scroll on space
     if (k === ' ') ev.preventDefault();
 
-    // visual press if we have that key
+    // idle shortcuts for mode (no text)
+    if (!started && (k === '1' || k === '2')){
+      setMode(k === '1' ? 'a' : 'ka');
+      return;
+    }
+
     const keyEl = (k === ' ') ? keyEls.get(' ') : keyEls.get(k);
     pressVisual(keyEl);
 
@@ -710,7 +731,6 @@
       if (k === ' '){
         ensureAudio();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        // tiny “start” tick (no text)
         beep({freq:520, dur:0.05, type:'triangle', gain:0.06});
         clearHighlights();
         startGame();
@@ -718,7 +738,7 @@
       return;
     }
 
-    const r = QUESTIONS[idx].r.toUpperCase();
+    const r = pool[idx].r.toUpperCase();
     const expected = r[pos] || '';
 
     if (k === expected){
@@ -731,8 +751,9 @@
   window.addEventListener('keydown', onKeyDown, {passive:false});
 
   /* -----------------------------
-     Initial UI (no text)
+     Initial UI
   ----------------------------- */
+  renderModeButtons();
   setIdleUI();
 
 })();
