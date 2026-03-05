@@ -3,1069 +3,805 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ローマ字タイピング（こども）</title>
+  <title>５０音タイピング</title>
   <style>
     :root{
       --bg:#ffffff;
       --fg:#111;
-      --muted:#666;
-      --line:#e8e8e8;
+      --muted:#6b7280;
+      --line:#e5e7eb;
 
-      --red:#ff3b30;
-      --blue:#007aff;
-      --ok:#2ecc71;
+      --red:#ef4444;
+      --blue:#3b82f6;
 
-      --zone1:#ffe6e6; /* L pinky */
-      --zone2:#fff2d9; /* L ring */
-      --zone3:#fffbd9; /* L middle */
-      --zone4:#e8f7ff; /* L index */
-      --zone5:#e8fff1; /* R index */
-      --zone6:#eef1ff; /* R middle */
-      --zone7:#f3e8ff; /* R ring */
-      --zone8:#ffe8f6; /* R pinky */
+      /* finger zone colors (soft) */
+      --lp:#fde2e2; /* left pinky */
+      --lr:#fff1cc; /* left ring */
+      --lm:#e7f7d8; /* left middle */
+      --li:#d7f5f0; /* left index */
+      --ri:#dbeafe; /* right index */
+      --rm:#e9d5ff; /* right middle */
+      --rr:#ffe4f1; /* right ring */
+      --rp:#ffe7d6; /* right pinky */
+      --th:#e5e7eb; /* thumbs */
     }
 
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
       background:var(--bg);
       color:var(--fg);
-    }
-
-    .wrap{
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 14px 14px 18px;
-    }
-
-    /* Top controls (small) */
-    .topbar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:10px;
-      padding-bottom:10px;
-      border-bottom:1px solid var(--line);
-    }
-    .controls{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    select, button{
-      font:inherit;
-      border:1px solid var(--line);
-      background:#fff;
-      padding:8px 10px;
-      border-radius:10px;
-    }
-    button{
-      cursor:pointer;
-      user-select:none;
-    }
-    button.primary{
-      border-color:#d8d8d8;
-    }
-    .hint{
-      color:var(--muted);
-      font-size:12px;
-      white-space:nowrap;
-    }
-
-    /* Main display */
-    .stage{
-      display:grid;
-      gap:10px;
-      margin-top:8px;
-    }
-
-    .kana{
-      text-align:center;
-      font-size:72px;
-      line-height:1.05;
-      font-weight:800;
-      letter-spacing: 0.02em;
-      margin: 6px 0 0;
-    }
-    @media (max-width:520px){
-      .kana{font-size:56px}
-    }
-
-    .romaji{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin: 2px 0 0;
-      min-height: 64px;
-    }
-    .letter{
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      border: 2px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:28px;
-      font-weight:800;
-      letter-spacing:0.02em;
-      background:#fff;
-    }
-    .letter.cur{
-      border-color: color-mix(in srgb, var(--red) 55%, #fff);
-      background: color-mix(in srgb, var(--red) 12%, #fff);
-      color: var(--red);
-    }
-    .letter.next{
-      border-color: color-mix(in srgb, var(--blue) 55%, #fff);
-      background: color-mix(in srgb, var(--blue) 10%, #fff);
-      color: var(--blue);
-    }
-    .letter.done{
-      border-color: color-mix(in srgb, var(--ok) 55%, #fff);
-      background: color-mix(in srgb, var(--ok) 10%, #fff);
-      color: var(--ok);
-    }
-
-    /* Finger signs */
-    .fingers{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:2px;
-      min-height: 44px;
-    }
-    .fingerCard{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:8px 10px;
-      min-width: 210px;
-      background:#fff;
-    }
-    .dot{
-      width:14px;height:14px;border-radius:999px;
-      flex:0 0 auto;
-    }
-    .dot.red{background:var(--red)}
-    .dot.blue{background:var(--blue)}
-    .fingerText{
-      font-size:14px;
-      font-weight:700;
-    }
-    .fingerSub{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:2px;
-      font-weight:600;
-    }
-    .fingerCol{
-      display:flex;
-      flex-direction:column;
-      line-height:1.15;
-    }
-
-    /* Row stars */
-    .rowbar{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:6px;
-      padding-top:10px;
-      border-top:1px solid var(--line);
-    }
-    .rowchip{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:6px 10px;
-      background:#fff;
-      font-size:12px;
-      color:#222;
-      user-select:none;
-    }
-    .star{
-      font-size:14px;
-      color:#bbb;
-      line-height:1;
-    }
-    .star.cleared{color:#ffcc00}
-    .rowchip.active{
-      border-color:#cfcfcf;
-      box-shadow: 0 0 0 2px #f3f3f3 inset;
-      font-weight:800;
-    }
-
-    /* Keyboard */
-    .kbdWrap{
-      margin-top: 8px;
-    }
-
-    .kbd{
-      position:relative;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px 14px 12px;
-      background:#fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
       overflow:hidden;
     }
 
-    /* Background finger zones (columns) */
-    .zones{
-      position:absolute;
-      inset:0;
-      display:grid;
-      grid-template-columns: 1fr 1fr 1fr 1.35fr 1.35fr 1fr 1fr 1fr;
-      opacity:0.55;
+    /* fireworks canvas */
+    #fx{
+      position:fixed; inset:0;
       pointer-events:none;
     }
-    .z1{background:var(--zone1)}
-    .z2{background:var(--zone2)}
-    .z3{background:var(--zone3)}
-    .z4{background:var(--zone4)}
-    .z5{background:var(--zone5)}
-    .z6{background:var(--zone6)}
-    .z7{background:var(--zone7)}
-    .z8{background:var(--zone8)}
 
-    .keys{
-      position:relative;
+    .wrap{
+      height:100vh;
       display:flex;
       flex-direction:column;
-      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+      padding:18px 14px 14px;
+      gap:10px;
     }
-    .row{
-      display:flex;
-      justify-content:center;
-      gap:6px;
-      flex-wrap:nowrap;
-    }
-    .key{
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
-      border: 2px solid var(--line);
+
+    .top{
+      width:min(900px, 100%);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:800;
-      letter-spacing:0.02em;
-      background:#fff;
-      user-select:none;
-      font-size:14px;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:6px 0 0;
     }
-    .key.wide{width: 74px}
-    .key.space{width: 320px}
-    @media (max-width:520px){
-      .key{width: 38px; height: 42px; border-radius:10px}
-      .key.wide{width: 62px}
-      .key.space{width: 240px}
+    .pillbar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .pill{
+      border:1px solid var(--line);
+      background:#fff;
+      color:#111;
+      padding:10px 12px;
+      border-radius:999px;
+      font-size:14px;
+      line-height:1;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pill[aria-pressed="true"]{
+      border-color:#111;
     }
 
-    .key.cur{
-      border-color: color-mix(in srgb, var(--red) 70%, #fff);
-      background: color-mix(in srgb, var(--red) 12%, #fff);
-      color: var(--red);
+    .center{
+      width:min(900px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:14px;
+      margin-top:6px;
+      flex:1;
+      min-height:0;
     }
-    .key.next{
-      border-color: color-mix(in srgb, var(--blue) 70%, #fff);
-      background: color-mix(in srgb, var(--blue) 10%, #fff);
-      color: var(--blue);
+
+    .kana{
+      font-size:120px;
+      font-weight:800;
+      letter-spacing:0.02em;
+      line-height:1;
+      text-align:center;
+      margin:0;
+    }
+
+    .roma{
+      display:flex;
+      align-items:baseline;
+      justify-content:center;
+      gap:10px;
+      font-weight:800;
+      font-size:46px;
+      letter-spacing:0.06em;
+      line-height:1.1;
+      user-select:none;
+      min-height:56px;
+    }
+    .roma .c{
+      display:inline-block;
+      padding:2px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .roma .c.red{ border-color: color-mix(in srgb, var(--red) 55%, #fff); }
+    .roma .c.blue{ border-color: color-mix(in srgb, var(--blue) 55%, #fff); }
+    .roma .c.red{ color:var(--red); }
+    .roma .c.blue{ color:var(--blue); }
+    .roma .rest{
+      color:var(--muted);
+      font-size:28px;
+      letter-spacing:0.08em;
+      padding-left:6px;
+      transform: translateY(-4px);
+      max-width: min(520px, 90vw);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
 
     .status{
-      text-align:center;
+      height:18px;
+      font-size:14px;
       color:var(--muted);
-      font-size:13px;
-      margin-top:8px;
-      line-height:1.35;
-      min-height: 20px;
+      user-select:none;
     }
-    .status strong{color:#111}
+    .status .k{
+      color:#111;
+      font-weight:700;
+    }
 
-    .tiny{
-      font-size:12px;
-      color:var(--muted);
+    /* keyboard */
+    .kbwrap{
+      width:min(980px, 100%);
+      border-top:1px solid var(--line);
+      padding-top:12px;
+    }
+    .keyboard{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .row{
+      width:100%;
+      display:flex;
+      gap:6px;
+      justify-content:center;
+    }
+    .key{
+      height:46px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:13px;
+      color:#111;
+      position:relative;
+      min-width:42px;
+      flex: 0 0 auto;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+    .key.small{ font-size:12px; }
+    .key.w1{ width:42px; }
+    .key.w15{ width:62px; }
+    .key.w2{ width:82px; }
+    .key.w25{ width:102px; }
+    .key.w3{ width:122px; }
+    .key.w35{ width:142px; }
+    .key.w6{ width:320px; }
+
+    /* finger zone tint */
+    .f-lp{ background:var(--lp); }
+    .f-lr{ background:var(--lr); }
+    .f-lm{ background:var(--lm); }
+    .f-li{ background:var(--li); }
+    .f-ri{ background:var(--ri); }
+    .f-rm{ background:var(--rm); }
+    .f-rr{ background:var(--rr); }
+    .f-rp{ background:var(--rp); }
+    .f-th{ background:var(--th); }
+
+    /* target highlight (does not change base color) */
+    .key.hl-red::after,
+    .key.hl-blue::after{
+      content:"";
+      position:absolute; inset:3px;
+      border-radius:8px;
+      border:3px solid transparent;
+      pointer-events:none;
+    }
+    .key.hl-red::after{ border-color:var(--red); }
+    .key.hl-blue::after{ border-color:var(--blue); }
+
+    /* pressed flash */
+    .key.pressed{
+      transform: translateY(1px);
+      filter: brightness(0.97);
+    }
+
+    /* shake on miss */
+    .shake{
+      animation: shake 180ms linear;
+    }
+    @keyframes shake{
+      0%{ transform: translateX(0); }
+      25%{ transform: translateX(-6px); }
+      50%{ transform: translateX(6px); }
+      75%{ transform: translateX(-4px); }
+      100%{ transform: translateX(0); }
+    }
+
+    @media (max-width: 520px){
+      .kana{ font-size:92px; }
+      .roma{ font-size:38px; }
+      .key{ height:42px; min-width:36px; border-radius:9px; }
+      .key.w6{ width:260px; }
     }
   </style>
 </head>
-
 <body>
+  <canvas id="fx"></canvas>
+
   <div class="wrap">
-    <div class="topbar">
-      <div class="controls">
-        <select id="courseSel" aria-label="コース">
-          <option value="basic">基本（あ〜わ）</option>
-          <option value="dakuten">濁点</option>
-          <option value="youon">拗音（きゃ等）</option>
-          <option value="sokuon">促音（っ）</option>
-        </select>
-
-        <select id="modeSel" aria-label="モード">
-          <option value="normal">通常モード（行を順番）</option>
-          <option value="row">行練習モード（同じ行をくり返し）</option>
-        </select>
-
-        <select id="rowSel" aria-label="行" style="display:none"></select>
-
-        <button id="resetBtn" class="primary" type="button">リセット</button>
-      </div>
-
-      <div class="hint" id="hint">Enterでスタート</div>
+    <div class="top">
+      <div class="pillbar" id="modes"></div>
     </div>
 
-    <div class="stage">
-      <div class="kana" id="kana">—</div>
+    <main class="center">
+      <h1 class="kana" id="kana">—</h1>
 
-      <div class="romaji" id="romaji"></div>
-
-      <div class="fingers" id="fingers"></div>
-
-      <div class="rowbar" id="rowbar"></div>
-
-      <div class="kbdWrap">
-        <div class="kbd" id="kbd">
-          <div class="zones" aria-hidden="true">
-            <div class="z1"></div><div class="z2"></div><div class="z3"></div><div class="z4"></div>
-            <div class="z5"></div><div class="z6"></div><div class="z7"></div><div class="z8"></div>
-          </div>
-
-          <div class="keys" id="keys">
-            <div class="row">
-              <div class="key wide" data-k="Tab">Tab</div>
-              <div class="key" data-k="q">Q</div><div class="key" data-k="w">W</div><div class="key" data-k="e">E</div><div class="key" data-k="r">R</div><div class="key" data-k="t">T</div>
-              <div class="key" data-k="y">Y</div><div class="key" data-k="u">U</div><div class="key" data-k="i">I</div><div class="key" data-k="o">O</div><div class="key" data-k="p">P</div>
-              <div class="key wide" data-k="Backspace">⌫</div>
-            </div>
-
-            <div class="row">
-              <div class="key wide" data-k="CapsLock">Caps</div>
-              <div class="key" data-k="a">A</div><div class="key" data-k="s">S</div><div class="key" data-k="d">D</div><div class="key" data-k="f">F</div><div class="key" data-k="g">G</div>
-              <div class="key" data-k="h">H</div><div class="key" data-k="j">J</div><div class="key" data-k="k">K</div><div class="key" data-k="l">L</div>
-              <div class="key wide" data-k="Enter">Enter</div>
-            </div>
-
-            <div class="row">
-              <div class="key wide" data-k="Shift">Shift</div>
-              <div class="key" data-k="z">Z</div><div class="key" data-k="x">X</div><div class="key" data-k="c">C</div><div class="key" data-k="v">V</div><div class="key" data-k="b">B</div>
-              <div class="key" data-k="n">N</div><div class="key" data-k="m">M</div>
-              <div class="key wide" data-k="ShiftRight">Shift</div>
-            </div>
-
-            <div class="row">
-              <div class="key space" data-k=" ">SPACE</div>
-            </div>
-          </div>
-        </div>
-        <div class="status" id="status"></div>
+      <div class="roma" id="roma">
+        <span class="c red" id="r1">—</span>
+        <span class="c blue" id="r2">—</span>
+        <span class="rest" id="rrest"></span>
       </div>
 
-      <div class="tiny" style="text-align:center;">
-        訓令式ベース + 許可: SI/SHI, TI/CHI, TU/TSU, HU/FU など
-      </div>
+      <div class="status" id="status"><span class="k">Space</span></div>
+    </main>
+
+    <div class="kbwrap">
+      <div class="keyboard" id="keyboard"></div>
     </div>
   </div>
 
-  <script>
-    // ===========
-    // Data
-    // ===========
+<script>
+(() => {
+  /* ---------------------------
+     Kana → Romaji (common variants)
+     --------------------------- */
+  const GOJUON = [
+    { row:"通し", key:"all", items:[
+      ["あ",["a"]], ["い",["i"]], ["う",["u"]], ["え",["e"]], ["お",["o"]],
+      ["か",["ka"]],["き",["ki"]],["く",["ku"]],["け",["ke"]],["こ",["ko"]],
+      ["さ",["sa"]],["し",["shi","si"]],["す",["su"]],["せ",["se"]],["そ",["so"]],
+      ["た",["ta"]],["ち",["chi","ti"]],["つ",["tsu","tu"]],["て",["te"]],["と",["to"]],
+      ["な",["na"]],["に",["ni"]],["ぬ",["nu"]],["ね",["ne"]],["の",["no"]],
+      ["は",["ha"]],["ひ",["hi"]],["ふ",["fu","hu"]],["へ",["he"]],["ほ",["ho"]],
+      ["ま",["ma"]],["み",["mi"]],["む",["mu"]],["め",["me"]],["も",["mo"]],
+      ["や",["ya"]],["ゆ",["yu"]],["よ",["yo"]],
+      ["ら",["ra"]],["り",["ri"]],["る",["ru"]],["れ",["re"]],["ろ",["ro"]],
+      ["わ",["wa"]],["を",["wo","o"]],["ん",["n","nn"]]
+    ]},
+    { row:"あ", key:"a", items:[["あ",["a"]],["い",["i"]],["う",["u"]],["え",["e"]],["お",["o"]]] },
+    { row:"か", key:"ka", items:[["か",["ka"]],["き",["ki"]],["く",["ku"]],["け",["ke"]],["こ",["ko"]]] },
+    { row:"さ", key:"sa", items:[["さ",["sa"]],["し",["shi","si"]],["す",["su"]],["せ",["se"]],["そ",["so"]]] },
+    { row:"た", key:"ta", items:[["た",["ta"]],["ち",["chi","ti"]],["つ",["tsu","tu"]],["て",["te"]],["と",["to"]]] },
+    { row:"な", key:"na", items:[["な",["na"]],["に",["ni"]],["ぬ",["nu"]],["ね",["ne"]],["の",["no"]]] },
+    { row:"は", key:"ha", items:[["は",["ha"]],["ひ",["hi"]],["ふ",["fu","hu"]],["へ",["he"]],["ほ",["ho"]]] },
+    { row:"ま", key:"ma", items:[["ま",["ma"]],["み",["mi"]],["む",["mu"]],["め",["me"]],["も",["mo"]]] },
+    { row:"や", key:"ya", items:[["や",["ya"]],["ゆ",["yu"]],["よ",["yo"]]] },
+    { row:"ら", key:"ra", items:[["ら",["ra"]],["り",["ri"]],["る",["ru"]],["れ",["re"]],["ろ",["ro"]]] },
+    { row:"わ", key:"wa", items:[["わ",["wa"]],["を",["wo","o"]],["ん",["n","nn"]]] },
+  ];
 
-    // Row definitions per course (for stars / progression)
-    const COURSE_ROWS = {
-      basic: [
-        {id:"a", label:"あ行"},
-        {id:"ka", label:"か行"},
-        {id:"sa", label:"さ行"},
-        {id:"ta", label:"た行"},
-        {id:"na", label:"な行"},
-        {id:"ha", label:"は行"},
-        {id:"ma", label:"ま行"},
-        {id:"ya", label:"や行"},
-        {id:"ra", label:"ら行"},
-        {id:"wa", label:"わ行"},
-      ],
-      dakuten: [
-        {id:"ga", label:"が行"},
-        {id:"za", label:"ざ行"},
-        {id:"da", label:"だ行"},
-        {id:"ba", label:"ば行"},
-        {id:"pa", label:"ぱ行"},
-      ],
-      youon: [
-        {id:"kya", label:"きゃ行"},
-        {id:"sya", label:"しゃ行"},
-        {id:"tya", label:"ちゃ行"},
-        {id:"nya", label:"にゃ行"},
-        {id:"hya", label:"ひゃ行"},
-        {id:"mya", label:"みゃ行"},
-        {id:"rya", label:"りゃ行"},
-        {id:"gya", label:"ぎゃ行"},
-        {id:"bya", label:"びゃ行"},
-        {id:"pya", label:"ぴゃ行"},
-      ],
-      sokuon: [
-        {id:"k", label:"っk（か行）"},
-        {id:"s", label:"っs（さ行）"},
-        {id:"t", label:"っt（た行）"},
-        {id:"p", label:"っp（ぱ行）"},
-      ]
-    };
+  /* ---------------------------
+     State
+     --------------------------- */
+  const elKana = document.getElementById("kana");
+  const elR1 = document.getElementById("r1");
+  const elR2 = document.getElementById("r2");
+  const elRrest = document.getElementById("rrest");
+  const elStatus = document.getElementById("status");
+  const elR = document.getElementById("roma");
 
-    // Helpers to make entries
-    function E(course, row, kana, accepts){
-      return {course, row, kana, accepts: accepts.map(s=>s.toLowerCase())};
-    }
+  let modeKey = "all";
+  let started = false;
+  let list = [];
+  let idx = 0;
 
-    // Basic (gojūon) + variants
-    const BASIC = [
-      // あ行
-      E("basic","a","あ",["a"]), E("basic","a","い",["i"]), E("basic","a","う",["u"]), E("basic","a","え",["e"]), E("basic","a","お",["o"]),
-      // か行
-      E("basic","ka","か",["ka"]), E("basic","ka","き",["ki"]), E("basic","ka","く",["ku"]), E("basic","ka","け",["ke"]), E("basic","ka","こ",["ko"]),
-      // さ行
-      E("basic","sa","さ",["sa"]), E("basic","sa","し",["si","shi"]), E("basic","sa","す",["su"]), E("basic","sa","せ",["se"]), E("basic","sa","そ",["so"]),
-      // た行
-      E("basic","ta","た",["ta"]), E("basic","ta","ち",["ti","chi"]), E("basic","ta","つ",["tu","tsu"]), E("basic","ta","て",["te"]), E("basic","ta","と",["to"]),
-      // な行
-      E("basic","na","な",["na"]), E("basic","na","に",["ni"]), E("basic","na","ぬ",["nu"]), E("basic","na","ね",["ne"]), E("basic","na","の",["no"]),
-      // は行
-      E("basic","ha","は",["ha"]), E("basic","ha","ひ",["hi"]), E("basic","ha","ふ",["hu","fu"]), E("basic","ha","へ",["he"]), E("basic","ha","ほ",["ho"]),
-      // ま行
-      E("basic","ma","ま",["ma"]), E("basic","ma","み",["mi"]), E("basic","ma","む",["mu"]), E("basic","ma","め",["me"]), E("basic","ma","も",["mo"]),
-      // や行
-      E("basic","ya","や",["ya"]), E("basic","ya","ゆ",["yu"]), E("basic","ya","よ",["yo"]),
-      // ら行
-      E("basic","ra","ら",["ra"]), E("basic","ra","り",["ri"]), E("basic","ra","る",["ru"]), E("basic","ra","れ",["re"]), E("basic","ra","ろ",["ro"]),
-      // わ行 + ん
-      E("basic","wa","わ",["wa"]), E("basic","wa","を",["wo","o"]), E("basic","wa","ん",["n","nn"]),
+  let target = "";        // current accepted target string (one of variants)
+  let variants = [];      // all variants for current kana
+  let typed = "";
+  let streak = 0;
+
+  /* ---------------------------
+     Audio (reliable: WebAudio)
+     --------------------------- */
+  let AC = null;
+  let audioReady = false;
+
+  function ensureAudio(){
+    if(!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if(AC.state !== "running") AC.resume();
+    audioReady = true;
+  }
+
+  function beep({t=0, f=440, dur=0.08, type="sine", gain=0.08}){
+    if(!AC) return;
+    const now = AC.currentTime;
+    const o = AC.createOscillator();
+    const g = AC.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f, now + t);
+    g.gain.setValueAtTime(0.0001, now + t);
+    g.gain.exponentialRampToValueAtTime(gain, now + t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + t + dur);
+
+    o.connect(g).connect(AC.destination);
+    o.start(now + t);
+    o.stop(now + t + dur + 0.02);
+  }
+
+  function fanfare(power=1){
+    if(!audioReady) return;
+    // light, short, not sharp
+    const base = 440;
+    const s = Math.min(1.8, 1 + power*0.12);
+    const notes = [
+      {t:0.00, f:base*1.00},
+      {t:0.06, f:base*1.26},
+      {t:0.12, f:base*1.50},
+      {t:0.18, f:base*2.00},
     ];
+    for(const n of notes){
+      beep({t:n.t, f:n.f*s, dur:0.10, type:"triangle", gain:0.06});
+    }
+    // tiny sparkle
+    if(power >= 4) beep({t:0.09, f:base*3.00*s, dur:0.06, type:"sine", gain:0.03});
+  }
 
-    // Dakuten / Handakuten
-    const DAKUTEN = [
-      // が行
-      E("dakuten","ga","が",["ga"]), E("dakuten","ga","ぎ",["gi"]), E("dakuten","ga","ぐ",["gu"]), E("dakuten","ga","げ",["ge"]), E("dakuten","ga","ご",["go"]),
-      // ざ行
-      E("dakuten","za","ざ",["za"]), E("dakuten","za","じ",["zi","ji"]), E("dakuten","za","ず",["zu"]), E("dakuten","za","ぜ",["ze"]), E("dakuten","za","ぞ",["zo"]),
-      // だ行（ぢ/づも許可）
-      E("dakuten","da","だ",["da"]), E("dakuten","da","ぢ",["di","ji"]), E("dakuten","da","づ",["du","zu"]), E("dakuten","da","で",["de"]), E("dakuten","da","ど",["do"]),
-      // ば行
-      E("dakuten","ba","ば",["ba"]), E("dakuten","ba","び",["bi"]), E("dakuten","ba","ぶ",["bu"]), E("dakuten","ba","べ",["be"]), E("dakuten","ba","ぼ",["bo"]),
-      // ぱ行
-      E("dakuten","pa","ぱ",["pa"]), E("dakuten","pa","ぴ",["pi"]), E("dakuten","pa","ぷ",["pu"]), E("dakuten","pa","ぺ",["pe"]), E("dakuten","pa","ぽ",["po"]),
-    ];
+  function missSound(){
+    if(!audioReady) return;
+    beep({t:0, f:180, dur:0.09, type:"square", gain:0.04});
+  }
 
-    // Youon (拗音)
-    const YOUON = [
-      // きゃ行
-      E("youon","kya","きゃ",["kya"]), E("youon","kya","きゅ",["kyu"]), E("youon","kya","きょ",["kyo"]),
-      // しゃ行（訓令: sya/ syu/ syo も許可）
-      E("youon","sya","しゃ",["sya","sha"]), E("youon","sya","しゅ",["syu","shu"]), E("youon","sya","しょ",["syo","sho"]),
-      // ちゃ行（訓令: tya/tyu/tyo + chi系も許可）
-      E("youon","tya","ちゃ",["tya","cha"]), E("youon","tya","ちゅ",["tyu","chu"]), E("youon","tya","ちょ",["tyo","cho"]),
-      // にゃ行
-      E("youon","nya","にゃ",["nya"]), E("youon","nya","にゅ",["nyu"]), E("youon","nya","にょ",["nyo"]),
-      // ひゃ行
-      E("youon","hya","ひゃ",["hya"]), E("youon","hya","ひゅ",["hyu"]), E("youon","hya","ひょ",["hyo"]),
-      // みゃ行
-      E("youon","mya","みゃ",["mya"]), E("youon","mya","みゅ",["myu"]), E("youon","mya","みょ",["myo"]),
-      // りゃ行
-      E("youon","rya","りゃ",["rya"]), E("youon","rya","りゅ",["ryu"]), E("youon","rya","りょ",["ryo"]),
-      // ぎゃ行
-      E("youon","gya","ぎゃ",["gya"]), E("youon","gya","ぎゅ",["gyu"]), E("youon","gya","ぎょ",["gyo"]),
-      // びゃ行
-      E("youon","bya","びゃ",["bya"]), E("youon","bya","びゅ",["byu"]), E("youon","bya","びょ",["byo"]),
-      // ぴゃ行
-      E("youon","pya","ぴゃ",["pya"]), E("youon","pya","ぴゅ",["pyu"]), E("youon","pya","ぴょ",["pyo"]),
-    ];
+  /* ---------------------------
+     Fireworks (canvas particles)
+     --------------------------- */
+  const canvas = document.getElementById("fx");
+  const ctx = canvas.getContext("2d");
+  const P = [];
+  function resize(){
+    canvas.width = Math.floor(window.innerWidth * devicePixelRatio);
+    canvas.height = Math.floor(window.innerHeight * devicePixelRatio);
+  }
+  window.addEventListener("resize", resize);
+  resize();
 
-    // Sokuon (促音) - include common + variants
-    const SOKUON = [
-      // っk
-      E("sokuon","k","っか",["kka"]), E("sokuon","k","っき",["kki"]), E("sokuon","k","っく",["kku"]), E("sokuon","k","っけ",["kke"]), E("sokuon","k","っこ",["kko"]),
-      // っs (し is special)
-      E("sokuon","s","っさ",["ssa"]), E("sokuon","s","っし",["ssi","sshi"]), E("sokuon","s","っす",["ssu"]), E("sokuon","s","っせ",["sse"]), E("sokuon","s","っそ",["sso"]),
-      // っt (ち/つ special)
-      E("sokuon","t","った",["tta"]),
-      E("sokuon","t","っち",["tti","cchi"]),
-      E("sokuon","t","っつ",["ttu","ttsu"]),
-      E("sokuon","t","って",["tte"]),
-      E("sokuon","t","っと",["tto"]),
-      // っp
-      E("sokuon","p","っぱ",["ppa"]), E("sokuon","p","っぴ",["ppi"]), E("sokuon","p","っぷ",["ppu"]), E("sokuon","p","っぺ",["ppe"]), E("sokuon","p","っぽ",["ppo"]),
-    ];
+  function burst(x, y, strength=1){
+    const count = Math.floor(26 + strength*10);
+    for(let i=0;i<count;i++){
+      const a = Math.random()*Math.PI*2;
+      const sp = (2.0 + Math.random()*3.0) * (0.9 + strength*0.12);
+      P.push({
+        x, y,
+        vx: Math.cos(a)*sp,
+        vy: Math.sin(a)*sp,
+        life: 1,
+        size: (2 + Math.random()*2) * (0.9 + strength*0.10),
+        // fixed bright-ish without setting a specific palette: use HSL hue
+        h: Math.floor(Math.random()*360)
+      });
+    }
+  }
 
-    const ALL = [...BASIC, ...DAKUTEN, ...YOUON, ...SOKUON];
+  function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // fade
+    for(let i=P.length-1;i>=0;i--){
+      const p = P[i];
+      p.vy += 0.05;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 0.02;
 
-    // ===========
-    // Finger mapping (zones + sign)
-    // ===========
-    const FINGER = {
-      L_PINKY: {id:"L_PINKY", name:"左小指"},
-      L_RING : {id:"L_RING",  name:"左薬指"},
-      L_MIDDLE:{id:"L_MIDDLE",name:"左中指"},
-      L_INDEX: {id:"L_INDEX", name:"左人差し指"},
-      R_INDEX: {id:"R_INDEX", name:"右人差し指"},
-      R_MIDDLE:{id:"R_MIDDLE",name:"右中指"},
-      R_RING : {id:"R_RING",  name:"右薬指"},
-      R_PINKY:{id:"R_PINKY", name:"右小指"},
-      THUMB  : {id:"THUMB",   name:"親指"},
-      NONE   : {id:"NONE",    name:"—"},
+      if(p.life <= 0){
+        P.splice(i,1);
+        continue;
+      }
+
+      const alpha = Math.max(0, p.life);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = `hsl(${p.h} 90% 55%)`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  function fireworkAtCenter(power=1){
+    const x = canvas.width*0.5;
+    const y = canvas.height*0.35;
+    burst(x, y, power);
+  }
+
+  /* ---------------------------
+     Mode buttons
+     --------------------------- */
+  const elModes = document.getElementById("modes");
+  const modeButtons = [];
+
+  function setMode(key){
+    modeKey = key;
+    for(const b of modeButtons){
+      b.setAttribute("aria-pressed", b.dataset.key === key ? "true" : "false");
+    }
+    resetRound();
+  }
+
+  function buildModes(){
+    // show: 通し + あ〜わ
+    const order = ["all","a","ka","sa","ta","na","ha","ma","ya","ra","wa"];
+    for(const k of order){
+      const m = GOJUON.find(x => x.key === k);
+      const b = document.createElement("button");
+      b.className = "pill";
+      b.type = "button";
+      b.textContent = (k === "all") ? "通し" : (m.row + "行");
+      b.dataset.key = k;
+      b.setAttribute("aria-pressed", k === modeKey ? "true" : "false");
+      b.addEventListener("click", () => setMode(k));
+      elModes.appendChild(b);
+      modeButtons.push(b);
+    }
+  }
+  buildModes();
+
+  /* ---------------------------
+     Questions
+     --------------------------- */
+  function getItemsForMode(key){
+    const m = GOJUON.find(x => x.key === key);
+    return m ? m.items.slice() : GOJUON[0].items.slice();
+  }
+
+  function chooseTargetFromVariants(vs){
+    // default: first variant (standard), accept any
+    return vs[0];
+  }
+
+  function nextQuestion(){
+    if(!list.length) list = getItemsForMode(modeKey);
+    idx = (idx + 1) % list.length;
+
+    // 通しは最後まで行ったら結果表示せず、最初に戻ってもいいが
+    // 要望は「50音連続で出題」なので、通しはループさせる。
+    loadQuestion(list[idx]);
+  }
+
+  function loadQuestion(pair){
+    const [k, vs] = pair;
+    elKana.textContent = k;
+    variants = vs.map(s => s.toLowerCase());
+    target = chooseTargetFromVariants(variants);
+    typed = "";
+    renderRoma();
+    updateHighlights();
+  }
+
+  function resetRound(){
+    started = false;
+    streak = 0;
+    list = getItemsForMode(modeKey);
+    idx = 0;
+    loadQuestion(list[idx]);
+    setStatusIdle();
+    updateHighlights();
+  }
+
+  function setStatusIdle(){
+    elStatus.innerHTML = `<span class="k">Space</span>`;
+  }
+
+  function setStatusPlaying(){
+    elStatus.textContent = "";
+  }
+
+  function setStatusCorrect(){
+    elStatus.textContent = "";
+  }
+
+  /* ---------------------------
+     Romaji UI: show next 2 chars in red/blue, rest gray
+     --------------------------- */
+  function renderRoma(){
+    const remaining = target.slice(typed.length);
+    const c1 = remaining[0] ? remaining[0].toUpperCase() : "—";
+    const c2 = remaining[1] ? remaining[1].toUpperCase() : "—";
+    elR1.textContent = c1;
+    elR2.textContent = c2;
+    elRrest.textContent = remaining.length > 2 ? remaining.slice(2).toUpperCase() : "";
+  }
+
+  function shake(){
+    elR.classList.remove("shake");
+    // reflow
+    void elR.offsetWidth;
+    elR.classList.add("shake");
+  }
+
+  /* ---------------------------
+     Keyboard (US layout)
+     --------------------------- */
+  const KEY_ROWS = [
+    [
+      k("`","Backquote","w1","f-lp"),
+      k("1","Digit1","w1","f-lp"),
+      k("2","Digit2","w1","f-lr"),
+      k("3","Digit3","w1","f-lm"),
+      k("4","Digit4","w1","f-li"),
+      k("5","Digit5","w1","f-li"),
+      k("6","Digit6","w1","f-ri"),
+      k("7","Digit7","w1","f-ri"),
+      k("8","Digit8","w1","f-rm"),
+      k("9","Digit9","w1","f-rr"),
+      k("0","Digit0","w1","f-rp"),
+      k("-","Minus","w1","f-rp"),
+      k("=","Equal","w1","f-rp"),
+      k("⌫","Backspace","w2 small","f-rp"),
+    ],
+    [
+      k("Tab","Tab","w15 small","f-lp"),
+      k("Q","KeyQ","w1","f-lp"),
+      k("W","KeyW","w1","f-lr"),
+      k("E","KeyE","w1","f-lm"),
+      k("R","KeyR","w1","f-li"),
+      k("T","KeyT","w1","f-li"),
+      k("Y","KeyY","w1","f-ri"),
+      k("U","KeyU","w1","f-ri"),
+      k("I","KeyI","w1","f-rm"),
+      k("O","KeyO","w1","f-rr"),
+      k("P","KeyP","w1","f-rp"),
+      k("[","BracketLeft","w1","f-rp"),
+      k("]","BracketRight","w1","f-rp"),
+      k("\\","Backslash","w15","f-rp"),
+    ],
+    [
+      k("Caps","CapsLock","w2 small","f-lp"),
+      k("A","KeyA","w1","f-lp"),
+      k("S","KeyS","w1","f-lr"),
+      k("D","KeyD","w1","f-lm"),
+      k("F","KeyF","w1","f-li"),
+      k("G","KeyG","w1","f-li"),
+      k("H","KeyH","w1","f-ri"),
+      k("J","KeyJ","w1","f-ri"),
+      k("K","KeyK","w1","f-rm"),
+      k("L","KeyL","w1","f-rr"),
+      k(";","Semicolon","w1","f-rp"),
+      k("'","Quote","w1","f-rp"),
+      k("Enter","Enter","w25 small","f-rp"),
+    ],
+    [
+      k("Shift","ShiftLeft","w25 small","f-lp"),
+      k("Z","KeyZ","w1","f-lp"),
+      k("X","KeyX","w1","f-lr"),
+      k("C","KeyC","w1","f-lm"),
+      k("V","KeyV","w1","f-li"),
+      k("B","KeyB","w1","f-li"),
+      k("N","KeyN","w1","f-ri"),
+      k("M","KeyM","w1","f-ri"),
+      k(",","Comma","w1","f-rm"),
+      k(".","Period","w1","f-rr"),
+      k("/","Slash","w1","f-rp"),
+      k("Shift","ShiftRight","w3 small","f-rp"),
+    ],
+    [
+      k("Ctrl","ControlLeft","w15 small","f-lp"),
+      k("⌘","MetaLeft","w15 small","f-lp"),
+      k("Alt","AltLeft","w15 small","f-li"),
+      k("Space","Space","w6","f-th"),
+      k("Alt","AltRight","w15 small","f-ri"),
+      k("⌘","MetaRight","w15 small","f-rp"),
+      k("Ctrl","ControlRight","w15 small","f-rp"),
+    ]
+  ];
+
+  const keyElsByCode = new Map();
+
+  function k(label, code, wClass, fingerClass){
+    return {label, code, wClass, fingerClass};
+  }
+
+  function buildKeyboard(){
+    const root = document.getElementById("keyboard");
+    root.innerHTML = "";
+    for(const row of KEY_ROWS){
+      const r = document.createElement("div");
+      r.className = "row";
+      for(const key of row){
+        const d = document.createElement("div");
+        d.className = `key ${key.wClass} ${key.fingerClass}`;
+        d.textContent = key.label;
+        d.dataset.code = key.code;
+        r.appendChild(d);
+        keyElsByCode.set(key.code, d);
+      }
+      root.appendChild(r);
+    }
+  }
+  buildKeyboard();
+
+  function clearHighlights(){
+    for(const el of keyElsByCode.values()){
+      el.classList.remove("hl-red","hl-blue");
+    }
+  }
+
+  function codeForChar(ch){
+    const c = ch.toLowerCase();
+    if(c >= "a" && c <= "z") return "Key" + c.toUpperCase();
+    if(c >= "0" && c <= "9") return "Digit" + c;
+    const map = {
+      "-":"Minus","=":"Equal","[":"BracketLeft","]":"BracketRight","\\":"Backslash",
+      ";":"Semicolon","'":"Quote",",":"Comma",".":"Period","/":"Slash","`":"Backquote"
     };
+    return map[c] || null;
+  }
 
-    // Basic touch-typing finger assignment for keys we show.
-    const KEY_TO_FINGER = {
-      // Left hand
-      "q":FINGER.L_PINKY, "a":FINGER.L_PINKY, "z":FINGER.L_PINKY,
-      "w":FINGER.L_RING,  "s":FINGER.L_RING,  "x":FINGER.L_RING,
-      "e":FINGER.L_MIDDLE,"d":FINGER.L_MIDDLE,"c":FINGER.L_MIDDLE,
-      "r":FINGER.L_INDEX, "f":FINGER.L_INDEX, "v":FINGER.L_INDEX,
-      "t":FINGER.L_INDEX, "g":FINGER.L_INDEX, "b":FINGER.L_INDEX,
+  function updateHighlights(){
+    clearHighlights();
+    if(!started) return;
+    const remaining = target.slice(typed.length);
+    const c1 = remaining[0];
+    const c2 = remaining[1];
 
-      // Right hand
-      "y":FINGER.R_INDEX, "h":FINGER.R_INDEX, "n":FINGER.R_INDEX,
-      "u":FINGER.R_INDEX, "j":FINGER.R_INDEX, "m":FINGER.R_INDEX,
-      "i":FINGER.R_MIDDLE,"k":FINGER.R_MIDDLE,
-      "o":FINGER.R_RING,  "l":FINGER.R_RING,
-      "p":FINGER.R_PINKY,
+    if(c1){
+      const code1 = codeForChar(c1);
+      const el1 = code1 ? keyElsByCode.get(code1) : null;
+      if(el1) el1.classList.add("hl-red");
+    }
+    if(c2){
+      const code2 = codeForChar(c2);
+      const el2 = code2 ? keyElsByCode.get(code2) : null;
+      if(el2) el2.classList.add("hl-blue");
+    }
+  }
 
-      " ":FINGER.THUMB
-    };
+  function pressFlash(code){
+    const el = keyElsByCode.get(code);
+    if(!el) return;
+    el.classList.add("pressed");
+    setTimeout(() => el.classList.remove("pressed"), 70);
+  }
 
-    function fingerZoneId(f){
-      // Map to 8 background zones (thumb shares index by default)
-      switch(f.id){
-        case "L_PINKY": return 1;
-        case "L_RING": return 2;
-        case "L_MIDDLE": return 3;
-        case "L_INDEX": return 4;
-        case "R_INDEX": return 5;
-        case "R_MIDDLE": return 6;
-        case "R_RING": return 7;
-        case "R_PINKY": return 8;
-        case "THUMB": return 5; // keep simple: space under right index zone
-        default: return 4;
+  /* ---------------------------
+     Input handling
+     --------------------------- */
+  function start(){
+    started = true;
+    setStatusPlaying();
+    typed = "";
+    renderRoma();
+    updateHighlights();
+  }
+
+  function normalizeKey(e){
+    // we only accept letters, digits, and listed punctuation used in romaji
+    if(e.key.length === 1){
+      return e.key.toLowerCase();
+    }
+    return null;
+  }
+
+  function anyVariantMatchesPrefix(prefix){
+    return variants.some(v => v.startsWith(prefix));
+  }
+
+  function isComplete(prefix){
+    return variants.includes(prefix);
+  }
+
+  function acceptChar(ch){
+    const next = typed + ch;
+
+    if(!anyVariantMatchesPrefix(next)){
+      missSound();
+      shake();
+      streak = 0;
+      return false;
+    }
+
+    typed = next;
+
+    // if one variant fully matches, choose it as current target for display
+    // (keeps highlights correct even if user typed alternative spelling)
+    const completed = variants.find(v => v === typed);
+    if(completed){
+      target = completed;
+    }else{
+      // keep target as shortest matching variant to make remaining display stable
+      const m = variants.filter(v => v.startsWith(typed)).sort((a,b)=>a.length-b.length)[0];
+      if(m) target = m;
+    }
+
+    renderRoma();
+    updateHighlights();
+
+    if(isComplete(typed)){
+      // success
+      streak += 1;
+      fanfare(streak);
+      fireworkAtCenter(streak);
+      setStatusCorrect();
+
+      // advance
+      setTimeout(() => {
+        typed = "";
+        // 通し/行: 次へ
+        nextQuestion();
+      }, 220);
+    }
+
+    return true;
+  }
+
+  document.addEventListener("keydown", (e) => {
+    // resume audio on first user action
+    if(!audioReady){
+      // only on user gesture; keydown qualifies
+      ensureAudio();
+    }
+
+    // Space starts
+    if(e.code === "Space"){
+      e.preventDefault();
+      pressFlash("Space");
+      if(!started){
+        start();
       }
+      return;
     }
 
-    // ===========
-    // State
-    // ===========
-    const els = {
-      courseSel: document.getElementById("courseSel"),
-      modeSel: document.getElementById("modeSel"),
-      rowSel: document.getElementById("rowSel"),
-      resetBtn: document.getElementById("resetBtn"),
-      hint: document.getElementById("hint"),
-      kana: document.getElementById("kana"),
-      romaji: document.getElementById("romaji"),
-      fingers: document.getElementById("fingers"),
-      rowbar: document.getElementById("rowbar"),
-      status: document.getElementById("status"),
-      keysRoot: document.getElementById("keys"),
-      kbd: document.getElementById("kbd"),
-    };
+    // allow mode buttons by mouse; keyboard ignores unless started
+    if(!started) return;
 
-    let running = false;
+    // visual flash for pressed keys on shown keyboard
+    if(keyElsByCode.has(e.code)) pressFlash(e.code);
 
-    let course = "basic";
-    let mode = "normal"; // normal | row
-    let rowId = COURSE_ROWS[course][0].id;
+    const ch = normalizeKey(e);
+    if(!ch) return;
 
-    let rowOrder = [];
-    let rowIndex = 0;
+    // block browser shortcuts interfering
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
 
-    let pool = [];          // entries for current row
-    let itemIndex = 0;      // index in pool
-    let accepted = [];      // accepted romaji strings for current kana
-    let progress = "";      // typed so far
-    let target = "";        // currently chosen target among accepted (dynamic)
-    let clearedRows = new Set();
-
-    // ===========
-    // Sound (simple WebAudio)
-    // ===========
-    let audioCtx = null;
-    function beep(freq=880, ms=110, type="sine", gain=0.06){
-      try{
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const t0 = audioCtx.currentTime;
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = type;
-        o.frequency.setValueAtTime(freq, t0);
-        g.gain.setValueAtTime(gain, t0);
-        g.gain.exponentialRampToValueAtTime(0.0001, t0 + ms/1000);
-        o.connect(g); g.connect(audioCtx.destination);
-        o.start(t0);
-        o.stop(t0 + ms/1000);
-      }catch(e){}
+    // accept
+    const ok = acceptChar(ch);
+    if(!ok){
+      // keep display as-is; do not clear typed
+      // (kids see remaining stays)
     }
-    function clearRowSound(){
-      // short happy triad-ish
-      beep(880,90,"sine",0.06);
-      setTimeout(()=>beep(1108,90,"sine",0.06), 90);
-      setTimeout(()=>beep(1320,120,"sine",0.06), 180);
+  }, {passive:false});
+
+  /* ---------------------------
+     Init
+     --------------------------- */
+  resetRound();
+
+  // small: clicking background focuses
+  document.body.addEventListener("pointerdown", () => {
+    if(!audioReady){
+      ensureAudio();
     }
+  });
 
-    // ===========
-    // Build UI
-    // ===========
-    function buildRowSelector(){
-      const rows = COURSE_ROWS[course];
-      els.rowSel.innerHTML = "";
-      for(const r of rows){
-        const opt = document.createElement("option");
-        opt.value = r.id;
-        opt.textContent = r.label;
-        els.rowSel.appendChild(opt);
-      }
-      els.rowSel.value = rowId;
-    }
-
-    function buildRowBar(){
-      els.rowbar.innerHTML = "";
-      const rows = COURSE_ROWS[course];
-      for(const r of rows){
-        const chip = document.createElement("div");
-        chip.className = "rowchip";
-        chip.dataset.row = r.id;
-
-        const star = document.createElement("div");
-        star.className = "star" + (clearedRows.has(r.id) ? " cleared" : "");
-        star.textContent = "★";
-
-        const label = document.createElement("div");
-        label.textContent = r.label;
-
-        chip.appendChild(star);
-        chip.appendChild(label);
-
-        chip.addEventListener("click", ()=>{
-          // allow quick jump (simple)
-          if(mode === "row"){
-            rowId = r.id;
-            els.rowSel.value = rowId;
-            startRow(rowId, true);
-          }
-        });
-
-        els.rowbar.appendChild(chip);
-      }
-      updateRowBarActive();
-    }
-
-    function updateRowBarActive(){
-      const chips = [...els.rowbar.querySelectorAll(".rowchip")];
-      for(const c of chips){
-        c.classList.toggle("active", c.dataset.row === rowId);
-        const star = c.querySelector(".star");
-        star.classList.toggle("cleared", clearedRows.has(c.dataset.row));
-      }
-    }
-
-    function setHint(text){
-      els.hint.textContent = text;
-    }
-
-    // ===========
-    // Game flow
-    // ===========
-    function setCourse(newCourse){
-      course = newCourse;
-      clearedRows = new Set();
-      rowOrder = COURSE_ROWS[course].map(r=>r.id);
-      rowIndex = 0;
-      rowId = rowOrder[0];
-      buildRowSelector();
-      buildRowBar();
-      hardResetView();
-    }
-
-    function setMode(newMode){
-      mode = newMode;
-      const showRow = (mode === "row");
-      els.rowSel.style.display = showRow ? "" : "none";
-
-      if(mode === "normal"){
-        rowOrder = COURSE_ROWS[course].map(r=>r.id);
-        rowIndex = 0;
-        rowId = rowOrder[0];
-      }else{
-        rowId = els.rowSel.value || COURSE_ROWS[course][0].id;
-      }
-      buildRowBar();
-      hardResetView();
-    }
-
-    function startGame(){
-      running = true;
-      setHint("いまは入力中（Enterはスタート専用）");
-      if(mode === "normal"){
-        rowIndex = 0;
-        rowId = rowOrder[rowIndex];
-        startRow(rowId, true);
-      }else{
-        rowId = els.rowSel.value || rowId;
-        startRow(rowId, true);
-      }
-    }
-
-    function startRow(rid, resetClear=false){
-      if(resetClear){
-        // keep clearedRows as is; only reset per-row progress
-      }
-      rowId = rid;
-      updateRowBarActive();
-
-      pool = ALL.filter(e => e.course === course && e.row === rowId);
-      itemIndex = 0;
-      nextItem(true);
-
-      els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong> をれんしゅう`;
-    }
-
-    function getRowLabel(course, rid){
-      const r = COURSE_ROWS[course].find(x=>x.id===rid);
-      return r ? r.label : rid;
-    }
-
-    function nextItem(forceNew=false){
-      if(pool.length === 0){
-        els.kana.textContent = "—";
-        els.romaji.innerHTML = "";
-        els.fingers.innerHTML = "";
-        els.status.textContent = "この行の問題がありません";
-        return;
-      }
-
-      if(!forceNew){
-        itemIndex++;
-      }
-      if(itemIndex >= pool.length){
-        // Row cleared
-        clearedRows.add(rowId);
-        buildRowBar();
-        updateRowBarActive();
-        clearRowSound();
-
-        if(mode === "normal"){
-          rowIndex++;
-          if(rowIndex >= rowOrder.length){
-            running = false;
-            setHint("Enterでスタート");
-            els.status.innerHTML = `<strong>コース クリア！</strong> もういちど Enter`;
-            // keep current display
-            return;
-          }
-          startRow(rowOrder[rowIndex], true);
-          return;
-        }else{
-          // row practice: loop same row
-          itemIndex = 0;
-        }
-      }
-
-      const cur = pool[itemIndex];
-      els.kana.textContent = cur.kana;
-
-      accepted = cur.accepts.slice();
-      progress = "";
-      target = ""; // decide dynamically as user types
-
-      renderRomaji();
-      renderFingerSigns();
-      renderKeyboardHighlight();
-    }
-
-    // Decide which accepted romaji we are aiming for (based on typed prefix)
-    function pickTargetForPrefix(prefix){
-      if(prefix.length === 0) return ""; // none yet
-      const candidates = accepted.filter(t => t.startsWith(prefix));
-      if(candidates.length === 0) return "";
-      // choose shortest (easiest)
-      candidates.sort((a,b)=>a.length-b.length);
-      return candidates[0];
-    }
-
-    function currentExpectedChar(){
-      // if no target chosen yet, any first char from any accepted
-      if(target){
-        return target[progress.length] || "";
-      }
-      // gather possible next char for current progress among all accepted
-      const candidates = accepted.filter(t => t.startsWith(progress));
-      if(candidates.length === 0) return "";
-      const chars = new Set();
-      for(const c of candidates){
-        const ch = c[progress.length];
-        if(ch) chars.add(ch);
-      }
-      // If multiple, we highlight none on keyboard (still show finger if possible)
-      if(chars.size === 1) return [...chars][0];
-      return "";
-    }
-
-    function nextExpectedChar(){
-      const ch = currentExpectedChar();
-      if(!ch) return "";
-      // next char after that, only if deterministic
-      const p2 = progress + ch;
-      const candidates = accepted.filter(t => t.startsWith(p2));
-      if(candidates.length === 0) return "";
-      if(target){
-        return target[p2.length] || "";
-      }
-      const chars = new Set();
-      for(const c of candidates){
-        const c2 = c[p2.length];
-        if(c2) chars.add(c2);
-      }
-      if(chars.size === 1) return [...chars][0];
-      return "";
-    }
-
-    // ===========
-    // Rendering
-    // ===========
-    function renderRomaji(){
-      els.romaji.innerHTML = "";
-
-      // Choose a display template: show the shortest accepted as "guide"
-      const guide = accepted.slice().sort((a,b)=>a.length-b.length)[0] || "";
-      const letters = guide.toUpperCase().split("");
-
-      for(let i=0;i<letters.length;i++){
-        const div = document.createElement("div");
-        div.className = "letter";
-        div.textContent = letters[i];
-
-        if(i < progress.length){
-          div.classList.add("done");
-        }else if(i === progress.length){
-          div.classList.add("cur");
-        }else if(i === progress.length + 1){
-          div.classList.add("next");
-        }
-
-        els.romaji.appendChild(div);
-      }
-
-      // If multiple romanizations, show small hint in status line (light)
-      const uniq = [...new Set(accepted)].sort((a,b)=>a.length-b.length);
-      if(uniq.length > 1){
-        const shown = uniq.slice(0,4).map(s=>s.toUpperCase()).join(" / ");
-        els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong>　（OK: ${shown}${uniq.length>4 ? " …" : ""}）`;
-      }else{
-        els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong>`;
-      }
-    }
-
-    function renderFingerSigns(){
-      els.fingers.innerHTML = "";
-
-      const curChar = currentExpectedChar();
-      const nextChar = nextExpectedChar();
-
-      const curFinger = charToFinger(curChar);
-      const nextFinger = charToFinger(nextChar);
-
-      els.fingers.appendChild(fingerCard("赤", "いま押す", curChar, curFinger, "red"));
-      els.fingers.appendChild(fingerCard("青", "つぎ", nextChar, nextFinger, "blue"));
-    }
-
-    function fingerCard(colorLabel, subtitle, ch, finger, dotClass){
-      const card = document.createElement("div");
-      card.className = "fingerCard";
-
-      const dot = document.createElement("div");
-      dot.className = "dot " + dotClass;
-
-      const col = document.createElement("div");
-      col.className = "fingerCol";
-
-      const t1 = document.createElement("div");
-      t1.className = "fingerText";
-      const keyStr = (ch ? ch.toUpperCase() : "—");
-      const fingerStr = (finger ? finger.name : "—");
-      t1.textContent = `${keyStr} → ${fingerStr}`;
-
-      const t2 = document.createElement("div");
-      t2.className = "fingerSub";
-      t2.textContent = `${colorLabel}：${subtitle}`;
-
-      col.appendChild(t1);
-      col.appendChild(t2);
-
-      card.appendChild(dot);
-      card.appendChild(col);
-      return card;
-    }
-
-    function charToFinger(ch){
-      if(!ch) return FINGER.NONE;
-      if(ch === " ") return FINGER.THUMB;
-      const f = KEY_TO_FINGER[ch.toLowerCase()];
-      return f || FINGER.NONE;
-    }
-
-    function clearKeyboardHighlights(){
-      const keys = els.keysRoot.querySelectorAll(".key");
-      keys.forEach(k=>k.classList.remove("cur","next"));
-    }
-
-    function renderKeyboardHighlight(){
-      clearKeyboardHighlights();
-
-      const curChar = currentExpectedChar();
-      const nextChar = nextExpectedChar();
-
-      if(curChar){
-        const el = els.keysRoot.querySelector(`.key[data-k="${cssEscapeKey(curChar)}"]`);
-        if(el) el.classList.add("cur");
-      }
-      if(nextChar){
-        const el2 = els.keysRoot.querySelector(`.key[data-k="${cssEscapeKey(nextChar)}"]`);
-        if(el2) el2.classList.add("next");
-      }
-
-      // Also emphasize zone subtly by adding outline on keyboard (optional, keep simple)
-      // (No extra elements; current key highlight is main)
-    }
-
-    function cssEscapeKey(k){
-      // data-k is simple ("a".."z" or " ")
-      if(k === " ") return " ";
-      return k.toLowerCase();
-    }
-
-    function hardResetView(){
-      running = false;
-      setHint("Enterでスタート");
-      els.kana.textContent = "—";
-      els.romaji.innerHTML = "";
-      els.fingers.innerHTML = "";
-      els.status.textContent = "";
-      clearKeyboardHighlights();
-      updateRowBarActive();
-    }
-
-    function resetAll(){
-      clearedRows = new Set();
-      buildRowBar();
-      hardResetView();
-    }
-
-    // ===========
-    // Input handling
-    // ===========
-    function normalizeKey(e){
-      // Only letters + space
-      if(e.key === " "){ return " "; }
-      const k = e.key.toLowerCase();
-      if(k.length === 1 && k >= "a" && k <= "z") return k;
-      return null;
-    }
-
-    function handleType(k){
-      // Determine if k can be next, across accepted options
-      const nextPrefix = progress + k;
-      const candidates = accepted.filter(t => t.startsWith(nextPrefix));
-      if(candidates.length === 0){
-        // wrong (quiet; keep UI simple)
-        beep(220,70,"sine",0.03);
-        return;
-      }
-
-      progress = nextPrefix;
-
-      // lock-in target if possible
-      const picked = pickTargetForPrefix(progress);
-      if(picked) target = picked;
-
-      renderRomaji();
-      renderFingerSigns();
-      renderKeyboardHighlight();
-
-      // if complete any accepted string => correct
-      const isDone = accepted.some(t => t === progress);
-      if(isDone){
-        beep(660,70,"sine",0.045);
-        // move on
-        nextItem(false);
-      }
-    }
-
-    // ===========
-    // Events
-    // ===========
-    els.courseSel.addEventListener("change", ()=>{
-      setCourse(els.courseSel.value);
-    });
-
-    els.modeSel.addEventListener("change", ()=>{
-      setMode(els.modeSel.value);
-    });
-
-    els.rowSel.addEventListener("change", ()=>{
-      rowId = els.rowSel.value;
-      if(running && mode === "row"){
-        startRow(rowId, true);
-      }else{
-        buildRowBar();
-        updateRowBarActive();
-      }
-    });
-
-    els.resetBtn.addEventListener("click", ()=>{
-      resetAll();
-    });
-
-    window.addEventListener("keydown", (e)=>{
-      // Enter starts (only when not running)
-      if(e.key === "Enter"){
-        e.preventDefault();
-        if(!running){
-          startGame();
-        }
-        return;
-      }
-
-      if(!running) return;
-
-      // Prevent page scroll by space
-      if(e.key === " "){
-        e.preventDefault();
-      }
-
-      const k = normalizeKey(e);
-      if(!k) return;
-
-      handleType(k);
-    }, {passive:false});
-
-    // ===========
-    // Init
-    // ===========
-    (function init(){
-      rowOrder = COURSE_ROWS[course].map(r=>r.id);
-      rowId = rowOrder[0];
-      buildRowSelector();
-      buildRowBar();
-      hardResetView();
-    })();
-  </script>
+})();
+</script>
 </body>
 </html>
