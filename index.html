@@ -3,758 +3,764 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>かなタイピング</title>
+  <title>ローマ字タイピング</title>
   <style>
     :root{
-      --bg:#fff;
+      --bg:#ffffff;
       --fg:#111;
+      --muted:#777;
       --red:#ff3b30;
       --blue:#007aff;
 
-      /* finger base tints (very light) */
-      --f-lp:#ffe9e9;  /* left pinky */
-      --f-lr:#fff2e0;  /* left ring */
-      --f-lm:#fff9d6;  /* left middle */
-      --f-li:#e9fff0;  /* left index */
-      --f-ri:#e9f3ff;  /* right index */
-      --f-rm:#efe9ff;  /* right middle */
-      --f-rr:#ffe9fb;  /* right ring */
-      --f-rp:#f2f2f2;  /* right pinky / specials */
-      --f-th:#f7f7f7;  /* thumb */
-    }
+      /* finger tints (very light) */
+      --pinky: rgba(255, 59, 48, .10);
+      --ring:  rgba(255, 149, 0, .11);
+      --middle:rgba(52, 199, 89, .11);
+      --index: rgba(0, 122, 255, .10);
+      --thumb: rgba(175, 82, 222, .10);
 
+      --keyBorder: rgba(0,0,0,.10);
+      --keyShadow: 0 1px 0 rgba(0,0,0,.06);
+      --radius: 12px;
+    }
     html,body{height:100%;}
     body{
       margin:0;
       background:var(--bg);
       color:var(--fg);
-      font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       overflow:hidden;
     }
-
-    /* full-screen canvas (behind text, above background) */
-    #fx {
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:1;
-    }
-
     .wrap{
-      position:relative;
       height:100%;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:space-between;
-      padding:22px 18px 22px;
+      padding:18px 14px 18px;
       box-sizing:border-box;
-      z-index:2; /* above canvas */
+      gap:10px;
     }
 
-    /* ultra-min mode toggle (no explanation text) */
+    /* top mode toggle (no text except kana) */
+    .top{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:38px;
+      user-select:none;
+    }
     .modes{
-      position:absolute;
-      top:14px;
-      left:14px;
       display:flex;
       gap:8px;
-      z-index:3;
+      padding:4px;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:999px;
     }
     .mode{
       width:44px;
-      height:34px;
-      border-radius:999px;
-      border:1px solid #e7e7e7;
-      background:#fff;
+      height:28px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:800;
-      font-size:18px;
-      color:#222;
-      user-select:none;
+      border-radius:999px;
+      font-weight:700;
+      font-size:15px;
+      color:rgba(0,0,0,.55);
       cursor:pointer;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-      opacity:0.85;
     }
     .mode.active{
-      border-color:#cfcfcf;
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
-      opacity:1;
+      color:#111;
+      background:rgba(0,0,0,.06);
     }
 
-    .top{
+    /* center prompt */
+    .center{
       flex:1;
+      width:100%;
       display:flex;
       flex-direction:column;
       align-items:center;
       justify-content:center;
       gap:12px;
-      width:100%;
-      max-width:920px;
+      position:relative;
+      user-select:none;
     }
-
-    #kana{
-      font-size:min(22vw, 140px);
-      line-height:1;
+    .kana{
+      font-size:min(22vw, 160px);
       font-weight:800;
+      line-height:1;
       letter-spacing:0.02em;
-      user-select:none;
-      min-height:1em;
     }
-
-    #romaji{
-      font-size:min(10vw, 64px);
-      line-height:1;
-      font-weight:800;
-      letter-spacing:0.06em;
-      user-select:none;
-      min-height:1em;
+    .roman{
       display:flex;
-      align-items:baseline;
-      gap:12px;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      height:54px;
     }
+    .rbox{
+      width:64px;
+      height:54px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow:var(--keyShadow);
+      font-size:32px;
+      font-weight:900;
+      line-height:1;
+    }
+    .r1{ color:var(--red); }
+    .r2{ color:var(--blue); }
+    .rbox.dim{ color:rgba(0,0,0,.15); }
 
-    .r-red{color:var(--red);}
-    .r-blue{color:var(--blue);}
-
-    /* subtle “pop” on correct */
-    .pop { animation: pop 120ms ease-out; }
-    @keyframes pop {
-      0%{ transform:scale(1); }
-      40%{ transform:scale(1.08); }
-      100%{ transform:scale(1); }
+    .pulseOk{
+      animation: okPop .18s ease-out;
+    }
+    @keyframes okPop{
+      from{ transform:scale(0.98); filter:brightness(1); }
+      to{ transform:scale(1.05); filter:brightness(1.05); }
+    }
+    .shake{
+      animation: shake .20s ease-in-out;
+    }
+    @keyframes shake{
+      0%{ transform:translateX(0); }
+      25%{ transform:translateX(-6px); }
+      50%{ transform:translateX(6px); }
+      75%{ transform:translateX(-4px); }
+      100%{ transform:translateX(0); }
     }
 
     /* keyboard */
-    .kbd{
+    .kbArea{
       width:min(980px, 100%);
+      padding-bottom:6px;
+      position:relative;
+    }
+    .keyboard{
+      width:100%;
       display:flex;
       flex-direction:column;
       gap:8px;
       user-select:none;
+      touch-action:manipulation;
     }
-
     .row{
       display:flex;
       gap:8px;
       justify-content:center;
     }
-
     .key{
       height:52px;
-      border-radius:12px;
-      border:1px solid #e7e7e7;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
-      background:#fafafa;
+      min-width:52px;
+      padding:0 10px;
+      box-sizing:border-box;
+      border-radius:var(--radius);
+      border:1px solid var(--keyBorder);
+      box-shadow:var(--keyShadow);
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:700;
-      color:#222;
+      font-weight:800;
+      font-size:14px;
+      background:#fff;
       position:relative;
-      transform:translateZ(0);
-      will-change:transform, box-shadow;
+      transition: transform .05s ease, filter .08s ease;
     }
+    .key.small{ font-size:13px; font-weight:800; }
+    .key.wide{ min-width:86px; justify-content:flex-start; padding-left:12px; }
+    .key.xwide{ min-width:120px; justify-content:flex-start; padding-left:12px; }
+    .key.space{ min-width:320px; }
+    .key.kbDown{ transform:translateY(1px); filter:brightness(0.98); }
 
-    .key small{
-      font-size:12px;
-      opacity:0.95;
-      letter-spacing:0.02em;
-    }
-
-    /* widths based on US layout proportions */
-    .w-1{ width:52px; }         /* standard */
-    .w-125{ width:66px; }       /* 1.25u */
-    .w-15{ width:78px; }        /* 1.5u */
-    .w-175{ width:92px; }       /* 1.75u */
-    .w-2{ width:108px; }        /* 2u */
-    .w-225{ width:122px; }      /* 2.25u */
-    .w-275{ width:150px; }      /* 2.75u */
-    .w-625{ width:340px; }      /* space */
-
-    /* finger tints */
-    .f-lp{ background:var(--f-lp); }
-    .f-lr{ background:var(--f-lr); }
-    .f-lm{ background:var(--f-lm); }
-    .f-li{ background:var(--f-li); }
-    .f-ri{ background:var(--f-ri); }
-    .f-rm{ background:var(--f-rm); }
-    .f-rr{ background:var(--f-rr); }
-    .f-rp{ background:var(--f-rp); }
-    .f-th{ background:var(--f-th); }
-
-    /* key press visual */
-    .pressed{
-      transform: translateY(2px) scale(0.98);
-      box-shadow: 0 0 0 rgba(0,0,0,0);
-    }
+    /* finger colors */
+    .f-pinky{ background:var(--pinky); }
+    .f-ring{ background:var(--ring); }
+    .f-middle{ background:var(--middle); }
+    .f-index{ background:var(--index); }
+    .f-thumb{ background:var(--thumb); }
 
     /* target highlights */
-    .target-strong-red::after,
-    .target-weak-red::after,
-    .target-strong-blue::after,
-    .target-weak-blue::after{
-      content:"";
+    .hl{
       position:absolute;
-      inset:4px;
-      border-radius:10px;
+      inset:-2px;
+      border-radius:calc(var(--radius) + 2px);
+      pointer-events:none;
+      opacity:0;
+      transform:scale(0.98);
+      transition:opacity .08s ease, transform .08s ease;
+      border:2px solid transparent;
+    }
+    .key.target1 .hl{
+      opacity:1;
+      transform:scale(1);
+      border-color:rgba(255,59,48,.95);
+      box-shadow:0 0 0 3px rgba(255,59,48,.15);
+    }
+    .key.target2 .hl{
+      opacity:1;
+      transform:scale(1);
+      border-color:rgba(0,122,255,.95);
+      box-shadow:0 0 0 3px rgba(0,122,255,.14);
+    }
+
+    /* fireworks canvas */
+    canvas#fx{
+      position:absolute;
+      inset:0;
       pointer-events:none;
     }
 
-    .target-strong-red::after{
-      border:3px solid rgba(255,59,48,0.95);
-      box-shadow: 0 0 18px rgba(255,59,48,0.35);
-    }
-    .target-weak-red::after{
-      border:2px solid rgba(255,59,48,0.55);
-      box-shadow: 0 0 10px rgba(255,59,48,0.18);
-    }
-    .target-strong-blue::after{
-      border:3px solid rgba(0,122,255,0.95);
-      box-shadow: 0 0 18px rgba(0,122,255,0.30);
-    }
-    .target-weak-blue::after{
-      border:2px solid rgba(0,122,255,0.55);
-      box-shadow: 0 0 10px rgba(0,122,255,0.15);
-    }
-
-    /* idle space pulse (no text) */
-    .pulse{ animation: pulse 900ms ease-in-out infinite; }
-    @keyframes pulse{
-      0%,100%{ box-shadow: 0 0 0 rgba(0,0,0,0); }
-      50%{ box-shadow: 0 0 18px rgba(0,0,0,0.10); }
-    }
-
-    /* miss shake (key only) */
-    .shake{ animation: shake 120ms linear; }
-    @keyframes shake{
-      0%{ transform: translateX(0); }
-      25%{ transform: translateX(-2px); }
-      50%{ transform: translateX(2px); }
-      75%{ transform: translateX(-2px); }
-      100%{ transform: translateX(0); }
-    }
-
-    @media (max-width:560px){
-      .modes{ top:10px; left:10px; }
-      .mode{ width:40px; height:32px; font-size:17px; }
-      .key{ height:44px; border-radius:10px; }
-      .w-1{ width:44px; }
-      .w-125{ width:56px; }
-      .w-15{ width:66px; }
-      .w-175{ width:78px; }
-      .w-2{ width:92px; }
-      .w-225{ width:106px; }
-      .w-275{ width:128px; }
-      .w-625{ width:280px; }
-      .row{ gap:6px; }
-      .kbd{ gap:6px; }
+    /* keep things visually minimal on small screens */
+    @media (max-width:520px){
+      .key{ height:46px; min-width:44px; border-radius:11px; }
+      .key.wide{ min-width:74px; }
+      .key.xwide{ min-width:104px; }
+      .key.space{ min-width:240px; }
+      .rbox{ width:56px; height:48px; font-size:28px; }
     }
   </style>
 </head>
 <body>
-  <canvas id="fx"></canvas>
-
   <div class="wrap">
-    <!-- mode toggle: only kana labels -->
-    <div class="modes" id="modes">
-      <div class="mode active" data-mode="a">あ</div>
-      <div class="mode" data-mode="ka">か</div>
-    </div>
-
     <div class="top">
-      <div id="kana"></div>
-      <div id="romaji"></div>
+      <div class="modes" aria-label="mode">
+        <div class="mode active" data-mode="a">あ</div>
+        <div class="mode" data-mode="ka">か</div>
+      </div>
     </div>
 
-    <div class="kbd" id="kbd"></div>
+    <div class="center" id="center">
+      <canvas id="fx"></canvas>
+      <div class="kana" id="kana">あ</div>
+      <div class="roman" id="roman">
+        <div class="rbox r1" id="r1">A</div>
+        <div class="rbox r2 dim" id="r2">—</div>
+      </div>
+    </div>
+
+    <div class="kbArea">
+      <div class="keyboard" id="keyboard"></div>
+    </div>
   </div>
 
 <script>
 (() => {
-  /* -----------------------------
-     問題プール（あ行/か行）
-  ----------------------------- */
-  const POOLS = {
-    a:  [
-      {k:'あ', r:'A'}, {k:'い', r:'I'}, {k:'う', r:'U'}, {k:'え', r:'E'}, {k:'お', r:'O'},
+  /* ---------------------------
+     Data
+  --------------------------- */
+
+  const sets = {
+    a: [
+      { kana:"あ", roma:"a" }, { kana:"い", roma:"i" }, { kana:"う", roma:"u" }, { kana:"え", roma:"e" }, { kana:"お", roma:"o" }
     ],
     ka: [
-      {k:'か', r:'KA'}, {k:'き', r:'KI'}, {k:'く', r:'KU'}, {k:'け', r:'KE'}, {k:'こ', r:'KO'},
-    ],
+      { kana:"か", roma:"ka" }, { kana:"き", roma:"ki" }, { kana:"く", roma:"ku" }, { kana:"け", roma:"ke" }, { kana:"こ", roma:"ko" }
+    ]
   };
 
-  /* -----------------------------
-     US配列キーボード（見た目）
-  ----------------------------- */
-  const KBD_LAYOUT = [
+  // US keyboard layout (accurate positions/keys)
+  const layout = [
     [
-      ['`','w-1','f-lp'], ['1','w-1','f-lp'], ['2','w-1','f-lr'], ['3','w-1','f-lm'], ['4','w-1','f-li'],
-      ['5','w-1','f-li'], ['6','w-1','f-ri'], ['7','w-1','f-ri'], ['8','w-1','f-rm'], ['9','w-1','f-rr'],
-      ['0','w-1','f-rp'], ['-','w-1','f-rp'], ['=','w-1','f-rp'], ['⌫','w-2','f-rp','Backspace']
+      { code:"Backquote", label:"`" },
+      { code:"Digit1", label:"1" },
+      { code:"Digit2", label:"2" },
+      { code:"Digit3", label:"3" },
+      { code:"Digit4", label:"4" },
+      { code:"Digit5", label:"5" },
+      { code:"Digit6", label:"6" },
+      { code:"Digit7", label:"7" },
+      { code:"Digit8", label:"8" },
+      { code:"Digit9", label:"9" },
+      { code:"Digit0", label:"0" },
+      { code:"Minus", label:"-" },
+      { code:"Equal", label:"=" },
+      { code:"Backspace", label:"Backspace", wide:true, cls:"small" },
     ],
     [
-      ['Tab','w-15','f-lp','Tab'], ['Q','w-1','f-lp'], ['W','w-1','f-lr'], ['E','w-1','f-lm'], ['R','w-1','f-li'],
-      ['T','w-1','f-li'], ['Y','w-1','f-ri'], ['U','w-1','f-ri'], ['I','w-1','f-rm'], ['O','w-1','f-rr'],
-      ['P','w-1','f-rp'], ['[','w-1','f-rp'], [']','w-1','f-rp'], ['\\','w-15','f-rp','Backslash']
+      { code:"Tab", label:"Tab", wide:true, cls:"small" },
+      { code:"KeyQ", label:"Q" },
+      { code:"KeyW", label:"W" },
+      { code:"KeyE", label:"E" },
+      { code:"KeyR", label:"R" },
+      { code:"KeyT", label:"T" },
+      { code:"KeyY", label:"Y" },
+      { code:"KeyU", label:"U" },
+      { code:"KeyI", label:"I" },
+      { code:"KeyO", label:"O" },
+      { code:"KeyP", label:"P" },
+      { code:"BracketLeft", label:"[" },
+      { code:"BracketRight", label:"]" },
+      { code:"Backslash", label:"\\", wide:false },
     ],
     [
-      ['Caps','w-175','f-lp','CapsLock'], ['A','w-1','f-lp'], ['S','w-1','f-lr'], ['D','w-1','f-lm'], ['F','w-1','f-li'],
-      ['G','w-1','f-li'], ['H','w-1','f-ri'], ['J','w-1','f-ri'], ['K','w-1','f-rm'], ['L','w-1','f-rr'],
-      [';','w-1','f-rp'], ["'","w-1","f-rp"], ['Enter','w-225','f-rp','Enter']
+      { code:"CapsLock", label:"Caps", xwide:true, cls:"small" },
+      { code:"KeyA", label:"A" },
+      { code:"KeyS", label:"S" },
+      { code:"KeyD", label:"D" },
+      { code:"KeyF", label:"F" },
+      { code:"KeyG", label:"G" },
+      { code:"KeyH", label:"H" },
+      { code:"KeyJ", label:"J" },
+      { code:"KeyK", label:"K" },
+      { code:"KeyL", label:"L" },
+      { code:"Semicolon", label:";" },
+      { code:"Quote", label:"'" },
+      { code:"Enter", label:"Enter", xwide:true, cls:"small" },
     ],
     [
-      ['Shift','w-225','f-lp','ShiftLeft'], ['Z','w-1','f-lp'], ['X','w-1','f-lr'], ['C','w-1','f-lm'], ['V','w-1','f-li'],
-      ['B','w-1','f-li'], ['N','w-1','f-ri'], ['M','w-1','f-ri'], [',','w-1','f-rm'], ['.','w-1','f-rr'],
-      ['/','w-1','f-rp'], ['Shift','w-275','f-rp','ShiftRight']
+      { code:"ShiftLeft", label:"Shift", xwide:true, cls:"small" },
+      { code:"KeyZ", label:"Z" },
+      { code:"KeyX", label:"X" },
+      { code:"KeyC", label:"C" },
+      { code:"KeyV", label:"V" },
+      { code:"KeyB", label:"B" },
+      { code:"KeyN", label:"N" },
+      { code:"KeyM", label:"M" },
+      { code:"Comma", label:"," },
+      { code:"Period", label:"." },
+      { code:"Slash", label:"/" },
+      { code:"ShiftRight", label:"Shift", xwide:true, cls:"small" },
     ],
     [
-      ['Ctrl','w-125','f-rp','ControlLeft'], ['Win','w-125','f-rp','MetaLeft'], ['Alt','w-125','f-rp','AltLeft'],
-      ['Space','w-625','f-th','Space'],
-      ['Alt','w-125','f-rp','AltRight'], ['Win','w-125','f-rp','MetaRight'], ['Menu','w-125','f-rp','ContextMenu'], ['Ctrl','w-125','f-rp','ControlRight']
-    ]
+      { code:"ControlLeft", label:"Ctrl", wide:true, cls:"small" },
+      { code:"MetaLeft", label:"Win", wide:true, cls:"small" },
+      { code:"AltLeft", label:"Alt", wide:true, cls:"small" },
+      { code:"Space", label:"", space:true },
+      { code:"AltRight", label:"Alt", wide:true, cls:"small" },
+      { code:"MetaRight", label:"Win", wide:true, cls:"small" },
+      { code:"ContextMenu", label:"Menu", wide:true, cls:"small" },
+      { code:"ControlRight", label:"Ctrl", wide:true, cls:"small" },
+    ],
   ];
 
-  const kbdEl = document.getElementById('kbd');
-  const keyEls = new Map(); // keyLabel -> element
+  // Finger assignment by key code (includes right pinky keys explicitly)
+  const fingerByCode = new Map();
+
+  const add = (codes, fingerClass) => codes.forEach(c => fingerByCode.set(c, fingerClass));
+
+  // Left hand
+  add(["Backquote","Digit1","KeyQ","KeyA","KeyZ","Tab","CapsLock","ShiftLeft","ControlLeft"], "f-pinky");
+  add(["Digit2","KeyW","KeyS","KeyX"], "f-ring");
+  add(["Digit3","KeyE","KeyD","KeyC"], "f-middle");
+  add(["Digit4","Digit5","KeyR","KeyT","KeyF","KeyG","KeyV","KeyB"], "f-index");
+
+  // Right hand
+  add(["Digit6","Digit7","KeyY","KeyU","KeyH","KeyJ","KeyN","KeyM"], "f-index");
+  add(["Digit8","KeyI","KeyK","Comma"], "f-middle");
+  add(["Digit9","KeyO","KeyL","Period"], "f-ring");
+
+  // Right pinky (FIX: include all requested right-pinky keys)
+  add([
+    "Digit0","Minus","Equal",
+    "KeyP","BracketLeft","BracketRight","Backslash",
+    "Semicolon","Quote","Slash",
+    "Enter","Backspace","ShiftRight",
+    "ControlRight"
+  ], "f-pinky");
+
+  // Thumbs
+  add(["Space","AltLeft","AltRight","MetaLeft","MetaRight","ContextMenu"], "f-thumb");
+
+  // char -> key code (for highlighting)
+  const charToCode = new Map([
+    ["a","KeyA"],["b","KeyB"],["c","KeyC"],["d","KeyD"],["e","KeyE"],["f","KeyF"],["g","KeyG"],["h","KeyH"],
+    ["i","KeyI"],["j","KeyJ"],["k","KeyK"],["l","KeyL"],["m","KeyM"],["n","KeyN"],["o","KeyO"],["p","KeyP"],
+    ["q","KeyQ"],["r","KeyR"],["s","KeyS"],["t","KeyT"],["u","KeyU"],["v","KeyV"],["w","KeyW"],["x","KeyX"],
+    ["y","KeyY"],["z","KeyZ"],
+    ["`","Backquote"],["1","Digit1"],["2","Digit2"],["3","Digit3"],["4","Digit4"],["5","Digit5"],
+    ["6","Digit6"],["7","Digit7"],["8","Digit8"],["9","Digit9"],["0","Digit0"],
+    ["-","Minus"],["=","Equal"],["[","BracketLeft"],["]","BracketRight"],["\\","Backslash"],
+    [";","Semicolon"],["'","Quote"],[",","Comma"],[".","Period"],["/","Slash"],[" ","Space"]
+  ]);
+
+  /* ---------------------------
+     DOM
+  --------------------------- */
+
+  const elKeyboard = document.getElementById("keyboard");
+  const elKana = document.getElementById("kana");
+  const elR1 = document.getElementById("r1");
+  const elR2 = document.getElementById("r2");
+  const elCenter = document.getElementById("center");
+  const elFx = document.getElementById("fx");
+
+  const keyElsByCode = new Map();
 
   function buildKeyboard(){
-    kbdEl.innerHTML = '';
-    for (const row of KBD_LAYOUT){
-      const rowEl = document.createElement('div');
-      rowEl.className = 'row';
-      for (const item of row){
-        const [label, w, finger, code] = item;
-        const key = document.createElement('div');
-        key.className = `key ${w} ${finger}`;
-        key.dataset.label = label;
-        if (code) key.dataset.code = code;
-        const s = document.createElement('small');
-        s.textContent = label;
-        key.appendChild(s);
-        rowEl.appendChild(key);
+    elKeyboard.innerHTML = "";
+    layout.forEach(row => {
+      const r = document.createElement("div");
+      r.className = "row";
+      row.forEach(k => {
+        const d = document.createElement("div");
+        d.className = "key";
+        if (k.cls) d.classList.add(k.cls);
+        if (k.wide) d.classList.add("wide");
+        if (k.xwide) d.classList.add("xwide");
+        if (k.space) d.classList.add("space");
 
-        keyEls.set(label.toUpperCase(), key);
-        if (label === 'Space') keyEls.set(' ', key);
-      }
-      kbdEl.appendChild(rowEl);
-    }
+        const finger = fingerByCode.get(k.code);
+        if (finger) d.classList.add(finger);
+
+        d.dataset.code = k.code;
+
+        const label = document.createElement("div");
+        label.textContent = k.label;
+        d.appendChild(label);
+
+        const hl = document.createElement("div");
+        hl.className = "hl";
+        d.appendChild(hl);
+
+        keyElsByCode.set(k.code, d);
+        r.appendChild(d);
+      });
+      elKeyboard.appendChild(r);
+    });
   }
+
   buildKeyboard();
 
-  /* -----------------------------
-     状態
-  ----------------------------- */
-  const kanaEl = document.getElementById('kana');
-  const romajiEl = document.getElementById('romaji');
+  /* ---------------------------
+     Audio (WebAudio)
+  --------------------------- */
 
-  let mode = 'a';            // 'a' or 'ka'
-  let started = false;
-
-  let pool = POOLS[mode];
-  let idx = 0;               // question index within pool
-  let pos = 0;               // position within romaji
-
-  let combo = 0;
-  let lastCorrectAt = 0;
-
-  // あいうえお演出（あ行練習の時だけ効く）
-  const VOWEL_RUN = ['あ','い','う','え','お'];
-  let vowelStreak = 0;
-  let lastVowelAt = 0;
-
-  function setMode(next){
-    if (started) return; // プレイ中は切替不可（テキスト説明ゼロ維持のため）
-    mode = next;
-    pool = POOLS[mode];
-    idx = 0; pos = 0;
-    vowelStreak = 0; lastVowelAt = 0;
-    renderModeButtons();
-    setIdleUI(); // idleのまま見た目更新
-  }
-
-  function renderModeButtons(){
-    document.querySelectorAll('.mode').forEach(b=>{
-      b.classList.toggle('active', b.dataset.mode === mode);
-    });
-  }
-
-  document.getElementById('modes').addEventListener('click', (e)=>{
-    const b = e.target.closest('.mode');
-    if (!b) return;
-    setMode(b.dataset.mode);
-  });
-
-  /* -----------------------------
-     WebAudio（効果音）
-  ----------------------------- */
   let audioCtx = null;
+
   function ensureAudio(){
-    if (audioCtx) return;
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    audioCtx = new AC();
+    if (!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
   }
 
-  function beep({freq=880, dur=0.06, type='sine', gain=0.08, bend=0, noise=false}){
+  // light, pleasant correct sound (short blip + shimmer)
+  function playOk(){
     if (!audioCtx) return;
+
     const t0 = audioCtx.currentTime;
-    const t1 = t0 + dur;
 
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t1);
+    // main tone
+    const o1 = audioCtx.createOscillator();
+    const g1 = audioCtx.createGain();
+    o1.type = "triangle";
+    o1.frequency.setValueAtTime(880, t0);
+    o1.frequency.exponentialRampToValueAtTime(1320, t0 + 0.06);
 
-    let srcNode;
+    g1.gain.setValueAtTime(0.0001, t0);
+    g1.gain.exponentialRampToValueAtTime(0.22, t0 + 0.01);
+    g1.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.10);
 
-    if (noise){
-      const bufferSize = Math.max(1, Math.floor(audioCtx.sampleRate * dur));
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * 0.6;
-      const n = audioCtx.createBufferSource();
-      n.buffer = buffer;
+    o1.connect(g1).connect(audioCtx.destination);
+    o1.start(t0);
+    o1.stop(t0 + 0.12);
 
-      const f = audioCtx.createBiquadFilter();
-      f.type = 'lowpass';
-      f.frequency.setValueAtTime(900, t0);
+    // tiny sparkle
+    const o2 = audioCtx.createOscillator();
+    const g2 = audioCtx.createGain();
+    o2.type = "sine";
+    o2.frequency.setValueAtTime(1760, t0);
+    g2.gain.setValueAtTime(0.0001, t0);
+    g2.gain.exponentialRampToValueAtTime(0.10, t0 + 0.008);
+    g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06);
 
-      n.connect(f).connect(g);
-      srcNode = n;
-    } else {
-      const o = audioCtx.createOscillator();
-      o.type = type;
-      o.frequency.setValueAtTime(freq, t0);
-      if (bend !== 0){
-        o.frequency.exponentialRampToValueAtTime(freq * (bend > 0 ? 1.25 : 0.75), t0 + dur);
-      }
-      o.connect(g);
-      srcNode = o;
+    o2.connect(g2).connect(audioCtx.destination);
+    o2.start(t0);
+    o2.stop(t0 + 0.07);
+  }
+
+  // miss sound: soft “thud” (filtered noise)
+  function playMiss(){
+    if (!audioCtx) return;
+
+    const t0 = audioCtx.currentTime;
+
+    const bufferSize = Math.floor(audioCtx.sampleRate * 0.12);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i=0; i<bufferSize; i++){
+      const x = i / bufferSize;
+      // decaying noise
+      data[i] = (Math.random()*2-1) * Math.pow(1 - x, 2.6);
     }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
 
-    g.connect(audioCtx.destination);
-    srcNode.start(t0);
-    srcNode.stop(t1 + 0.02);
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(520, t0);
+    filter.Q.setValueAtTime(0.9, t0);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.28, t0 + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.12);
+
+    noise.connect(filter).connect(gain).connect(audioCtx.destination);
+    noise.start(t0);
+    noise.stop(t0 + 0.13);
   }
 
-  function sfxCorrect(power=1){
-    const base = 740 + Math.min(8, power) * 35;
-    beep({freq:base, dur:0.05, type:'triangle', gain:0.07});
+  /* ---------------------------
+     Fireworks (Canvas)
+  --------------------------- */
+
+  const fx = {
+    w: 0, h: 0,
+    ctx: null,
+    particles: [],
+    last: 0
+  };
+
+  function resizeFx(){
+    const rect = elCenter.getBoundingClientRect();
+    elFx.width = Math.floor(rect.width * devicePixelRatio);
+    elFx.height = Math.floor(rect.height * devicePixelRatio);
+    elFx.style.width = rect.width + "px";
+    elFx.style.height = rect.height + "px";
+    fx.w = elFx.width;
+    fx.h = elFx.height;
+    fx.ctx = elFx.getContext("2d");
   }
+  window.addEventListener("resize", resizeFx, {passive:true});
+  resizeFx();
 
-  function sfxMiss(){
-    beep({freq:180, dur:0.07, type:'sine', gain:0.08, bend:-1});
-    beep({dur:0.05, gain:0.035, noise:true});
-  }
+  function spawnFirework(strength=1){
+    // strength grows with streak
+    const ctx = fx.ctx;
+    if (!ctx) return;
 
-  /* -----------------------------
-     Canvas Fireworks
-  ----------------------------- */
-  const canvas = document.getElementById('fx');
-  const ctx = canvas.getContext('2d');
+    const cx = (Math.random()*0.72 + 0.14) * fx.w;
+    const cy = (Math.random()*0.45 + 0.18) * fx.h;
 
-  let W=0,H=0, DPR=1;
-  function resize(){
-    DPR = Math.min(2, window.devicePixelRatio || 1);
-    W = canvas.width  = Math.floor(window.innerWidth * DPR);
-    H = canvas.height = Math.floor(window.innerHeight * DPR);
-    canvas.style.width  = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
-  }
-  window.addEventListener('resize', resize, {passive:true});
-  resize();
+    const count = Math.floor(18 + 10 * Math.min(3.0, strength));
+    const speed = (1.8 + 1.2 * Math.min(3.0, strength)) * devicePixelRatio;
+    const life = 520 + 220 * Math.min(3.0, strength);
 
-  const particles = [];
-  function spawnFirework({x, y, power=1, bursts=1}){
-    const p = Math.max(1, Math.min(10, power));
-    const count = Math.floor(16 + p * 10);
-    const speed = (1.2 + p * 0.28) * DPR;
-    const life  = 28 + p * 7;
-
-    for (let b=0;b<bursts;b++){
-      const bx = x + (Math.random()*2-1) * 18 * DPR;
-      const by = y + (Math.random()*2-1) * 12 * DPR;
-
-      for (let i=0;i<count;i++){
-        const a = (Math.PI*2) * (i / count) + (Math.random()*0.15);
-        const v = speed * (0.45 + Math.random()*0.85);
-        particles.push({
-          x: bx, y: by,
-          vx: Math.cos(a)*v,
-          vy: Math.sin(a)*v,
-          life: life * (0.75 + Math.random()*0.55),
-          maxLife: life,
-          c: (Math.random() < 0.5) ? 'rgba(255,59,48,' : 'rgba(0,122,255,'
-        });
-      }
+    for (let i=0; i<count; i++){
+      const a = (Math.PI*2) * (i / count) + (Math.random()*0.10);
+      const v = speed * (0.55 + Math.random()*0.75);
+      fx.particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(a)*v,
+        vy: Math.sin(a)*v,
+        r: (1.2 + Math.random()*1.4) * devicePixelRatio,
+        life,
+        born: performance.now(),
+        // no fixed palette; derive from direction for subtle variety
+        hue: (i*360/count + Math.random()*18) % 360
+      });
     }
   }
 
-  function fxTick(){
-    ctx.fillStyle = 'rgba(255,255,255,0.20)';
-    ctx.fillRect(0,0,W,H);
+  function stepFx(ts){
+    if (!fx.ctx) return requestAnimationFrame(stepFx);
+    const ctx = fx.ctx;
+    const dt = Math.min(34, ts - (fx.last || ts));
+    fx.last = ts;
 
-    const g = 0.055 * DPR;
-    for (let i = particles.length-1; i>=0; i--){
-      const p = particles[i];
-      p.vy += g;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vx *= 0.985;
-      p.vy *= 0.985;
-      p.life -= 1;
+    ctx.clearRect(0,0,fx.w,fx.h);
 
-      const t = Math.max(0, p.life / p.maxLife);
-      const alpha = 0.65 * t;
-      ctx.fillStyle = p.c + alpha.toFixed(3) + ')';
+    const now = ts;
+    fx.particles = fx.particles.filter(p => {
+      const age = now - p.born;
+      if (age > p.life) return false;
+
+      const t = age / p.life;
+      p.vy += 0.0035 * dt * devicePixelRatio; // gravity
+      p.x += p.vx * (dt/16);
+      p.y += p.vy * (dt/16);
+
+      const alpha = Math.pow(1 - t, 1.6);
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 2.0 * DPR, 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${p.hue}, 95%, 55%, ${alpha})`;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
       ctx.fill();
 
-      if (p.life <= 0 || p.y > H + 40*DPR) particles.splice(i,1);
-    }
+      // tiny trail
+      ctx.strokeStyle = `hsla(${p.hue}, 95%, 55%, ${alpha*0.35})`;
+      ctx.lineWidth = 2 * devicePixelRatio;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x - p.vx*0.10, p.y - p.vy*0.10);
+      ctx.stroke();
 
-    requestAnimationFrame(fxTick);
-  }
-  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
-  requestAnimationFrame(fxTick);
-
-  function centerFirework(power, bursts=1){
-    spawnFirework({x:W*0.5, y:H*0.40, power, bursts});
-  }
-
-  function barrageFinal(){
-    const steps = 6;
-    for (let i=0;i<steps;i++){
-      setTimeout(() => centerFirework(4 + i, 1), i * 70);
-      setTimeout(() => sfxCorrect(3 + i), i * 70);
-    }
-    setTimeout(() => {
-      centerFirework(10, 3);
-      beep({freq:140, dur:0.11, type:'sine', gain:0.11});
-      beep({freq:260, dur:0.07, type:'triangle', gain:0.06});
-    }, steps * 70 + 60);
-  }
-
-  /* -----------------------------
-     UI helpers
-  ----------------------------- */
-  function clearHighlights(){
-    for (const el of keyEls.values()){
-      el.classList.remove(
-        'target-strong-red','target-weak-red','target-strong-blue','target-weak-blue',
-        'pulse','shake'
-      );
-    }
-  }
-
-  function setIdleUI(){
-    kanaEl.textContent = '';
-    romajiEl.textContent = '';
-    clearHighlights();
-    const spaceKey = keyEls.get(' ');
-    if (spaceKey) spaceKey.classList.add('pulse');
-  }
-
-  function setQuestionUI(){
-    const q = pool[idx];
-    const r = q.r.toUpperCase();
-    kanaEl.textContent = q.k;
-
-    romajiEl.innerHTML = '';
-    const first = document.createElement('span');
-    first.className = 'r-red';
-    first.textContent = r[0] || '';
-    romajiEl.appendChild(first);
-
-    const rest = r.slice(1);
-    if (rest.length){
-      const second = document.createElement('span');
-      second.className = 'r-blue';
-      second.textContent = rest;
-      romajiEl.appendChild(second);
-    }
-
-    clearHighlights();
-
-    const need = r.split('');
-    need.forEach((ch, i) => {
-      const k = keyEls.get(ch);
-      if (!k) return;
-      if (i === 0) k.classList.add('target-weak-red');
-      else k.classList.add('target-weak-blue');
+      return true;
     });
 
-    const current = need[pos] || '';
-    const kcur = keyEls.get(current);
-    if (kcur){
-      if (pos === 0) kcur.classList.remove('target-weak-red');
-      else kcur.classList.remove('target-weak-blue');
-
-      if (pos === 0) kcur.classList.add('target-strong-red');
-      else kcur.classList.add('target-strong-blue');
-    }
+    requestAnimationFrame(stepFx);
   }
+  requestAnimationFrame(stepFx);
 
-  function pop(el){
-    el.classList.remove('pop');
-    void el.offsetWidth;
-    el.classList.add('pop');
-  }
+  /* ---------------------------
+     Game State
+  --------------------------- */
 
-  function pressVisual(keyEl){
-    if (!keyEl) return;
-    keyEl.classList.add('pressed');
-    setTimeout(() => keyEl.classList.remove('pressed'), 70);
-  }
+  let mode = "a";
+  let started = false;
 
-  function shakeKey(keyEl){
-    if (!keyEl) return;
-    keyEl.classList.remove('shake');
-    void keyEl.offsetWidth;
-    keyEl.classList.add('shake');
-    setTimeout(() => keyEl.classList.remove('shake'), 140);
-  }
+  let current = null;     // {kana, roma}
+  let idx = 0;            // current expected char index in roma
+  let streak = 0;
 
-  /* -----------------------------
-     Start / Progress
-  ----------------------------- */
-  function startGame(){
-    started = true;
+  function pickNext(){
+    const arr = sets[mode];
+    current = arr[Math.floor(Math.random() * arr.length)];
     idx = 0;
-    pos = 0;
-    combo = 0;
-    lastCorrectAt = 0;
-    vowelStreak = 0;
-    lastVowelAt = 0;
-    setQuestionUI();
+    renderPrompt();
+    updateTargets();
   }
 
-  function advanceQuestion(){
-    idx = (idx + 1) % pool.length;
-    pos = 0;
-    setQuestionUI();
-  }
+  function renderPrompt(){
+    elKana.textContent = current.kana;
 
-  function handleCorrectKeystroke(){
-    const now = performance.now();
-    const dt = lastCorrectAt ? (now - lastCorrectAt) : 9999;
-    lastCorrectAt = now;
+    const r = current.roma.toUpperCase();
+    const c1 = r[0] || "";
+    const c2 = r[1] || "";
 
-    if (dt < 350) combo += 2;
-    else combo += 1;
-
-    const power = Math.max(1, Math.min(10, Math.floor(combo / 2)));
-
-    sfxCorrect(power);
-    pop(romajiEl);
-
-    if (pos > 0) centerFirework(Math.max(1, Math.min(6, power)), 1);
-
-    pos++;
-
-    const r = pool[idx].r.toUpperCase();
-    if (pos >= r.length){
-      const qKana = pool[idx].k;
-
-      // あ行の時だけ「あいうえお」演出
-      if (mode === 'a'){
-        const expected = VOWEL_RUN[vowelStreak] || null;
-        const dtV = lastVowelAt ? (now - lastVowelAt) : 9999;
-
-        if (qKana === expected && dtV < 2000) vowelStreak++;
-        else if (qKana === VOWEL_RUN[0]) vowelStreak = 1;
-        else vowelStreak = 0;
-
-        lastVowelAt = now;
-      } else {
-        vowelStreak = 0;
-      }
-
-      centerFirework(Math.max(2, Math.min(9, power + 2)), 2);
-
-      if (mode === 'a' && vowelStreak >= 5){
-        vowelStreak = 0;
-        barrageFinal();
-      }
-
-      advanceQuestion();
-      return;
-    }
-
-    setQuestionUI();
-  }
-
-  function handleMissKeystroke(keyEl){
-    combo = 0;
-    vowelStreak = 0;
-    sfxMiss();
-    shakeKey(keyEl);
-    if (navigator.vibrate) navigator.vibrate(20);
-    setQuestionUI();
-  }
-
-  /* -----------------------------
-     Key handling (no input box)
-  ----------------------------- */
-  function normalizeKey(ev){
-    if (ev.key && ev.key.length === 1){
-      const ch = ev.key;
-      if (/[a-z]/i.test(ch)) return ch.toUpperCase();
-      if (ch === ' ') return ' ';
-      // mode shortcuts (idle only): 1 => あ, 2 => か
-      if (!started && (ch === '1' || ch === '2')) return ch;
-    }
-    if (ev.code === 'Space') return ' ';
-    return null;
-  }
-
-  function onKeyDown(ev){
-    const k = normalizeKey(ev);
-    if (!k) return;
-
-    if (k === ' ') ev.preventDefault();
-
-    // idle shortcuts for mode (no text)
-    if (!started && (k === '1' || k === '2')){
-      setMode(k === '1' ? 'a' : 'ka');
-      return;
-    }
-
-    const keyEl = (k === ' ') ? keyEls.get(' ') : keyEls.get(k);
-    pressVisual(keyEl);
-
-    if (!started){
-      if (k === ' '){
-        ensureAudio();
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        beep({freq:520, dur:0.05, type:'triangle', gain:0.06});
-        clearHighlights();
-        startGame();
-      }
-      return;
-    }
-
-    const r = pool[idx].r.toUpperCase();
-    const expected = r[pos] || '';
-
-    if (k === expected){
-      handleCorrectKeystroke();
+    elR1.textContent = c1 || "—";
+    if (c2){
+      elR2.classList.remove("dim");
+      elR2.textContent = c2;
     } else {
-      handleMissKeystroke(keyEl);
+      elR2.classList.add("dim");
+      elR2.textContent = "—";
     }
   }
 
-  window.addEventListener('keydown', onKeyDown, {passive:false});
+  function clearTargets(){
+    for (const el of keyElsByCode.values()){
+      el.classList.remove("target1","target2");
+    }
+  }
 
-  /* -----------------------------
-     Initial UI
-  ----------------------------- */
-  renderModeButtons();
-  setIdleUI();
+  function updateTargets(){
+    clearTargets();
+
+    const roma = current.roma.toLowerCase();
+    const c1 = roma[0];
+    const c2 = roma[1];
+
+    const code1 = charToCode.get(c1);
+    if (code1 && keyElsByCode.has(code1)) keyElsByCode.get(code1).classList.add("target1");
+
+    if (c2){
+      const code2 = charToCode.get(c2);
+      if (code2 && keyElsByCode.has(code2)) keyElsByCode.get(code2).classList.add("target2");
+    }
+  }
+
+  function pressKeyVisual(code){
+    const el = keyElsByCode.get(code);
+    if (!el) return;
+    el.classList.add("kbDown");
+    setTimeout(() => el.classList.remove("kbDown"), 60);
+  }
+
+  function okVisual(){
+    elKana.classList.remove("pulseOk");
+    void elKana.offsetWidth;
+    elKana.classList.add("pulseOk");
+  }
+
+  function missVisual(){
+    elCenter.classList.remove("shake");
+    void elCenter.offsetWidth;
+    elCenter.classList.add("shake");
+  }
+
+  function startIfNeeded(){
+    if (started) return;
+    started = true;
+    pickNext();
+  }
+
+  /* ---------------------------
+     Input Handling
+  --------------------------- */
+
+  document.addEventListener("pointerdown", () => {
+    // allow iOS/Safari to unlock audio on first gesture
+    ensureAudio();
+  }, {passive:true});
+
+  document.addEventListener("keydown", (e) => {
+    // prevent page scroll on Space
+    if (e.code === "Space") e.preventDefault();
+
+    ensureAudio();
+
+    pressKeyVisual(e.code);
+
+    // Space starts
+    if (!started){
+      if (e.code === "Space"){
+        startIfNeeded();
+      }
+      return;
+    }
+
+    // ignore modifier-only
+    if (e.key.length !== 1) return;
+
+    const expected = current.roma.toLowerCase()[idx];
+    if (!expected) return;
+
+    const got = e.key.toLowerCase();
+    if (got === expected){
+      // correct char
+      playOk();
+
+      idx++;
+      okVisual();
+
+      // if finished kana (full romaji)
+      if (idx >= current.roma.length){
+        streak++;
+        spawnFirework(Math.min(4, 1 + streak * 0.18)); // bigger with streak
+        pickNext();
+      } else {
+        // second letter now "active" (no UI text; keep highlights as red/blue)
+      }
+    } else {
+      // wrong
+      streak = 0;
+      playMiss();
+      missVisual();
+    }
+  }, {passive:false});
+
+  /* ---------------------------
+     Mode Toggle (no extra text)
+  --------------------------- */
+
+  document.querySelectorAll(".mode").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const m = btn.dataset.mode;
+      if (m === mode) return;
+      mode = m;
+
+      document.querySelectorAll(".mode").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+
+      // reset run
+      started = false;
+      streak = 0;
+      current = sets[mode][0];
+      idx = 0;
+      renderPrompt();
+      clearTargets();
+    }, {passive:true});
+  });
+
+  // initial prompt (idle)
+  current = sets[mode][0];
+  renderPrompt();
+  clearTargets();
 
 })();
 </script>
