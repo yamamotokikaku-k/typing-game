@@ -8,11 +8,9 @@
     :root{
       --bg:#ffffff;
       --fg:#111;
-      --muted:#777;
       --red:#ff3b30;
       --blue:#007aff;
 
-      /* finger tints (very light) */
       --pinky: rgba(255, 59, 48, .10);
       --ring:  rgba(255, 149, 0, .11);
       --middle:rgba(52, 199, 89, .11);
@@ -28,7 +26,7 @@
       margin:0;
       background:var(--bg);
       color:var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", Segoe UI, Roboto, Helvetica, Arial;
       overflow:hidden;
     }
     .wrap{
@@ -41,8 +39,6 @@
       box-sizing:border-box;
       gap:10px;
     }
-
-    /* top mode toggle (no text except kana) */
     .top{
       width:100%;
       display:flex;
@@ -75,7 +71,6 @@
       background:rgba(0,0,0,.06);
     }
 
-    /* center prompt */
     .center{
       flex:1;
       width:100%;
@@ -117,16 +112,12 @@
     .r2{ color:var(--blue); }
     .rbox.dim{ color:rgba(0,0,0,.15); }
 
-    .pulseOk{
-      animation: okPop .18s ease-out;
-    }
+    .pulseOk{ animation: okPop .18s ease-out; }
     @keyframes okPop{
       from{ transform:scale(0.98); filter:brightness(1); }
       to{ transform:scale(1.05); filter:brightness(1.05); }
     }
-    .shake{
-      animation: shake .20s ease-in-out;
-    }
+    .shake{ animation: shake .20s ease-in-out; }
     @keyframes shake{
       0%{ transform:translateX(0); }
       25%{ transform:translateX(-6px); }
@@ -135,7 +126,6 @@
       100%{ transform:translateX(0); }
     }
 
-    /* keyboard */
     .kbArea{
       width:min(980px, 100%);
       padding-bottom:6px;
@@ -149,11 +139,7 @@
       user-select:none;
       touch-action:manipulation;
     }
-    .row{
-      display:flex;
-      gap:8px;
-      justify-content:center;
-    }
+    .row{ display:flex; gap:8px; justify-content:center; }
     .key{
       height:52px;
       min-width:52px;
@@ -177,14 +163,12 @@
     .key.space{ min-width:320px; }
     .key.kbDown{ transform:translateY(1px); filter:brightness(0.98); }
 
-    /* finger colors */
     .f-pinky{ background:var(--pinky); }
     .f-ring{ background:var(--ring); }
     .f-middle{ background:var(--middle); }
     .f-index{ background:var(--index); }
     .f-thumb{ background:var(--thumb); }
 
-    /* target highlights */
     .hl{
       position:absolute;
       inset:-2px;
@@ -196,26 +180,18 @@
       border:2px solid transparent;
     }
     .key.target1 .hl{
-      opacity:1;
-      transform:scale(1);
+      opacity:1; transform:scale(1);
       border-color:rgba(255,59,48,.95);
       box-shadow:0 0 0 3px rgba(255,59,48,.15);
     }
     .key.target2 .hl{
-      opacity:1;
-      transform:scale(1);
+      opacity:1; transform:scale(1);
       border-color:rgba(0,122,255,.95);
       box-shadow:0 0 0 3px rgba(0,122,255,.14);
     }
 
-    /* fireworks canvas */
-    canvas#fx{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-    }
+    canvas#fx{ position:absolute; inset:0; pointer-events:none; }
 
-    /* keep things visually minimal on small screens */
     @media (max-width:520px){
       .key{ height:46px; min-width:44px; border-radius:11px; }
       .key.wide{ min-width:74px; }
@@ -229,8 +205,7 @@
   <div class="wrap">
     <div class="top">
       <div class="modes" aria-label="mode">
-        <div class="mode active" data-mode="a">あ</div>
-        <div class="mode" data-mode="ka">か</div>
+        <div class="mode active" data-mode="goju">50</div>
       </div>
     </div>
 
@@ -251,19 +226,28 @@
 <script>
 (() => {
   /* ---------------------------
-     Data
+     50音（連続出題）
+     - 「あ→い→う→…→ん」順番固定で回す（連続）
   --------------------------- */
 
-  const sets = {
-    a: [
-      { kana:"あ", roma:"a" }, { kana:"い", roma:"i" }, { kana:"う", roma:"u" }, { kana:"え", roma:"e" }, { kana:"お", roma:"o" }
-    ],
-    ka: [
-      { kana:"か", roma:"ka" }, { kana:"き", roma:"ki" }, { kana:"く", roma:"ku" }, { kana:"け", roma:"ke" }, { kana:"こ", roma:"ko" }
-    ]
-  };
+  const gojuon = [
+    {kana:"あ", roma:"a"}, {kana:"い", roma:"i"}, {kana:"う", roma:"u"}, {kana:"え", roma:"e"}, {kana:"お", roma:"o"},
+    {kana:"か", roma:"ka"}, {kana:"き", roma:"ki"}, {kana:"く", roma:"ku"}, {kana:"け", roma:"ke"}, {kana:"こ", roma:"ko"},
+    {kana:"さ", roma:"sa"}, {kana:"し", roma:"shi"}, {kana:"す", roma:"su"}, {kana:"せ", roma:"se"}, {kana:"そ", roma:"so"},
+    {kana:"た", roma:"ta"}, {kana:"ち", roma:"chi"}, {kana:"つ", roma:"tsu"}, {kana:"て", roma:"te"}, {kana:"と", roma:"to"},
+    {kana:"な", roma:"na"}, {kana:"に", roma:"ni"}, {kana:"ぬ", roma:"nu"}, {kana:"ね", roma:"ne"}, {kana:"の", roma:"no"},
+    {kana:"は", roma:"ha"}, {kana:"ひ", roma:"hi"}, {kana:"ふ", roma:"fu"}, {kana:"へ", roma:"he"}, {kana:"ほ", roma:"ho"},
+    {kana:"ま", roma:"ma"}, {kana:"み", roma:"mi"}, {kana:"む", roma:"mu"}, {kana:"め", roma:"me"}, {kana:"も", roma:"mo"},
+    {kana:"や", roma:"ya"}, {kana:"ゆ", roma:"yu"}, {kana:"よ", roma:"yo"},
+    {kana:"ら", roma:"ra"}, {kana:"り", roma:"ri"}, {kana:"る", roma:"ru"}, {kana:"れ", roma:"re"}, {kana:"ろ", roma:"ro"},
+    {kana:"わ", roma:"wa"}, {kana:"を", roma:"wo"},
+    {kana:"ん", roma:"n"}
+  ];
 
-  // US keyboard layout (accurate positions/keys)
+  /* ---------------------------
+     US keyboard layout
+  --------------------------- */
+
   const layout = [
     [
       { code:"Backquote", label:"`" },
@@ -295,7 +279,7 @@
       { code:"KeyP", label:"P" },
       { code:"BracketLeft", label:"[" },
       { code:"BracketRight", label:"]" },
-      { code:"Backslash", label:"\\", wide:false },
+      { code:"Backslash", label:"\\" },
     ],
     [
       { code:"CapsLock", label:"Caps", xwide:true, cls:"small" },
@@ -338,23 +322,21 @@
     ],
   ];
 
-  // Finger assignment by key code (includes right pinky keys explicitly)
   const fingerByCode = new Map();
-
   const add = (codes, fingerClass) => codes.forEach(c => fingerByCode.set(c, fingerClass));
 
-  // Left hand
+  // Left
   add(["Backquote","Digit1","KeyQ","KeyA","KeyZ","Tab","CapsLock","ShiftLeft","ControlLeft"], "f-pinky");
   add(["Digit2","KeyW","KeyS","KeyX"], "f-ring");
   add(["Digit3","KeyE","KeyD","KeyC"], "f-middle");
   add(["Digit4","Digit5","KeyR","KeyT","KeyF","KeyG","KeyV","KeyB"], "f-index");
 
-  // Right hand
+  // Right
   add(["Digit6","Digit7","KeyY","KeyU","KeyH","KeyJ","KeyN","KeyM"], "f-index");
   add(["Digit8","KeyI","KeyK","Comma"], "f-middle");
   add(["Digit9","KeyO","KeyL","Period"], "f-ring");
 
-  // Right pinky (FIX: include all requested right-pinky keys)
+  // Right pinky (全部含める)
   add([
     "Digit0","Minus","Equal",
     "KeyP","BracketLeft","BracketRight","Backslash",
@@ -366,7 +348,6 @@
   // Thumbs
   add(["Space","AltLeft","AltRight","MetaLeft","MetaRight","ContextMenu"], "f-thumb");
 
-  // char -> key code (for highlighting)
   const charToCode = new Map([
     ["a","KeyA"],["b","KeyB"],["c","KeyC"],["d","KeyD"],["e","KeyE"],["f","KeyF"],["g","KeyG"],["h","KeyH"],
     ["i","KeyI"],["j","KeyJ"],["k","KeyK"],["l","KeyL"],["m","KeyM"],["n","KeyN"],["o","KeyO"],["p","KeyP"],
@@ -423,44 +404,56 @@
       elKeyboard.appendChild(r);
     });
   }
-
   buildKeyboard();
 
   /* ---------------------------
      Audio (WebAudio)
+     - iOS/Safariは「ユーザー操作の直後に鳴らす」必要がある
+     - なので、Spaceでスタートした瞬間に ctx を作って beep を一発鳴らす
   --------------------------- */
 
   let audioCtx = null;
 
-  function ensureAudio(){
+  function unlockAudioIfNeeded(){
     if (!audioCtx){
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-    if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
+    if (audioCtx.state === "suspended"){
+      audioCtx.resume().catch(()=>{});
+    }
   }
 
-  // light, pleasant correct sound (short blip + shimmer)
+  function beep(freq, dur, type="sine", gain=0.2){
+    if (!audioCtx) return;
+    const t0 = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(t0);
+    o.stop(t0 + dur + 0.02);
+  }
+
   function playOk(){
     if (!audioCtx) return;
-
     const t0 = audioCtx.currentTime;
 
-    // main tone
     const o1 = audioCtx.createOscillator();
     const g1 = audioCtx.createGain();
     o1.type = "triangle";
     o1.frequency.setValueAtTime(880, t0);
     o1.frequency.exponentialRampToValueAtTime(1320, t0 + 0.06);
-
     g1.gain.setValueAtTime(0.0001, t0);
     g1.gain.exponentialRampToValueAtTime(0.22, t0 + 0.01);
     g1.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.10);
-
     o1.connect(g1).connect(audioCtx.destination);
     o1.start(t0);
     o1.stop(t0 + 0.12);
 
-    // tiny sparkle
     const o2 = audioCtx.createOscillator();
     const g2 = audioCtx.createGain();
     o2.type = "sine";
@@ -468,24 +461,20 @@
     g2.gain.setValueAtTime(0.0001, t0);
     g2.gain.exponentialRampToValueAtTime(0.10, t0 + 0.008);
     g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06);
-
     o2.connect(g2).connect(audioCtx.destination);
     o2.start(t0);
     o2.stop(t0 + 0.07);
   }
 
-  // miss sound: soft “thud” (filtered noise)
   function playMiss(){
     if (!audioCtx) return;
 
     const t0 = audioCtx.currentTime;
-
     const bufferSize = Math.floor(audioCtx.sampleRate * 0.12);
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i=0; i<bufferSize; i++){
       const x = i / bufferSize;
-      // decaying noise
       data[i] = (Math.random()*2-1) * Math.pow(1 - x, 2.6);
     }
     const noise = audioCtx.createBufferSource();
@@ -506,16 +495,80 @@
     noise.stop(t0 + 0.13);
   }
 
+  // 花火音（破裂 + パチパチ）
+  function playFirework(strength=1){
+    if (!audioCtx) return;
+
+    const t0 = audioCtx.currentTime;
+    const s = Math.min(4, Math.max(1, strength));
+
+    // 1) ドン（低めの破裂）
+    // decaying noise -> lowpass -> gain
+    const boomLen = 0.18 + 0.05 * (s-1);
+    const boomN = Math.floor(audioCtx.sampleRate * boomLen);
+    const boomBuf = audioCtx.createBuffer(1, boomN, audioCtx.sampleRate);
+    const boom = boomBuf.getChannelData(0);
+    for (let i=0;i<boomN;i++){
+      const x = i/boomN;
+      // 低域寄りにしたいので少しスムース
+      boom[i] = (Math.random()*2-1) * Math.pow(1-x, 2.2);
+    }
+    const boomSrc = audioCtx.createBufferSource();
+    boomSrc.buffer = boomBuf;
+
+    const boomLP = audioCtx.createBiquadFilter();
+    boomLP.type = "lowpass";
+    boomLP.frequency.setValueAtTime(240 + 70*s, t0);
+    boomLP.Q.setValueAtTime(0.7, t0);
+
+    const boomGain = audioCtx.createGain();
+    boomGain.gain.setValueAtTime(0.0001, t0);
+    boomGain.gain.exponentialRampToValueAtTime(0.45 + 0.08*s, t0 + 0.01);
+    boomGain.gain.exponentialRampToValueAtTime(0.0001, t0 + boomLen);
+
+    boomSrc.connect(boomLP).connect(boomGain).connect(audioCtx.destination);
+    boomSrc.start(t0);
+    boomSrc.stop(t0 + boomLen + 0.02);
+
+    // 2) パチパチ（高めの短いクリックを複数）
+    const crackCount = 7 + Math.floor(5*s);
+    for (let i=0;i<crackCount;i++){
+      const dt = 0.03 + Math.random()*(0.22 + 0.05*s);
+      const t = t0 + dt;
+
+      // tiny noise burst
+      const len = 0.018 + Math.random()*0.02;
+      const n = Math.floor(audioCtx.sampleRate * len);
+      const buf = audioCtx.createBuffer(1, n, audioCtx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let j=0;j<n;j++){
+        const x = j/n;
+        d[j] = (Math.random()*2-1) * Math.pow(1-x, 3.2);
+      }
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.setValueAtTime(1600 + Math.random()*1200, t);
+      hp.Q.setValueAtTime(0.8, t);
+
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.10 + 0.03*s, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+
+      src.connect(hp).connect(g).connect(audioCtx.destination);
+      src.start(t);
+      src.stop(t + len + 0.01);
+    }
+  }
+
   /* ---------------------------
      Fireworks (Canvas)
   --------------------------- */
 
-  const fx = {
-    w: 0, h: 0,
-    ctx: null,
-    particles: [],
-    last: 0
-  };
+  const fx = { w:0, h:0, ctx:null, particles:[], last:0 };
 
   function resizeFx(){
     const rect = elCenter.getBoundingClientRect();
@@ -531,19 +584,17 @@
   resizeFx();
 
   function spawnFirework(strength=1){
-    // strength grows with streak
-    const ctx = fx.ctx;
-    if (!ctx) return;
-
+    if (!fx.ctx) return;
     const cx = (Math.random()*0.72 + 0.14) * fx.w;
     const cy = (Math.random()*0.45 + 0.18) * fx.h;
 
-    const count = Math.floor(18 + 10 * Math.min(3.0, strength));
-    const speed = (1.8 + 1.2 * Math.min(3.0, strength)) * devicePixelRatio;
-    const life = 520 + 220 * Math.min(3.0, strength);
+    const s = Math.min(4, Math.max(1, strength));
+    const count = Math.floor(18 + 12 * s);
+    const speed = (1.8 + 1.3 * s) * devicePixelRatio;
+    const life = 520 + 200 * s;
 
     for (let i=0; i<count; i++){
-      const a = (Math.PI*2) * (i / count) + (Math.random()*0.10);
+      const a = (Math.PI*2) * (i / count) + (Math.random()*0.12);
       const v = speed * (0.55 + Math.random()*0.75);
       fx.particles.push({
         x: cx, y: cy,
@@ -552,7 +603,6 @@
         r: (1.2 + Math.random()*1.4) * devicePixelRatio,
         life,
         born: performance.now(),
-        // no fixed palette; derive from direction for subtle variety
         hue: (i*360/count + Math.random()*18) % 360
       });
     }
@@ -572,7 +622,7 @@
       if (age > p.life) return false;
 
       const t = age / p.life;
-      p.vy += 0.0035 * dt * devicePixelRatio; // gravity
+      p.vy += 0.0035 * dt * devicePixelRatio;
       p.x += p.vx * (dt/16);
       p.y += p.vy * (dt/16);
 
@@ -582,7 +632,6 @@
       ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
       ctx.fill();
 
-      // tiny trail
       ctx.strokeStyle = `hsla(${p.hue}, 95%, 55%, ${alpha*0.35})`;
       ctx.lineWidth = 2 * devicePixelRatio;
       ctx.beginPath();
@@ -598,26 +647,17 @@
   requestAnimationFrame(stepFx);
 
   /* ---------------------------
-     Game State
+     Game
   --------------------------- */
 
-  let mode = "a";
   let started = false;
-
-  let current = null;     // {kana, roma}
-  let idx = 0;            // current expected char index in roma
-  let streak = 0;
-
-  function pickNext(){
-    const arr = sets[mode];
-    current = arr[Math.floor(Math.random() * arr.length)];
-    idx = 0;
-    renderPrompt();
-    updateTargets();
-  }
+  let iGoju = 0;
+  let current = gojuon[0];
+  let idx = 0;     // expected char index in roma
+  let streak = 0;  // continuous correct kana count
 
   function renderPrompt(){
-    elKana.textContent = current.kana;
+    document.getElementById("kana").textContent = current.kana;
 
     const r = current.roma.toUpperCase();
     const c1 = r[0] || "";
@@ -641,7 +681,6 @@
 
   function updateTargets(){
     clearTargets();
-
     const roma = current.roma.toLowerCase();
     const c1 = roma[0];
     const c2 = roma[1];
@@ -653,6 +692,14 @@
       const code2 = charToCode.get(c2);
       if (code2 && keyElsByCode.has(code2)) keyElsByCode.get(code2).classList.add("target2");
     }
+  }
+
+  function pickNextSequential(){
+    current = gojuon[iGoju];
+    idx = 0;
+    renderPrompt();
+    updateTargets();
+    iGoju = (iGoju + 1) % gojuon.length; // 連続でループ
   }
 
   function pressKeyVisual(code){
@@ -674,93 +721,67 @@
     elCenter.classList.add("shake");
   }
 
-  function startIfNeeded(){
+  function start(){
     if (started) return;
     started = true;
-    pickNext();
+
+    // ★ここが重要：Space押下＝ユーザー操作直後にAudioContextを解放して、即座に音を鳴らす
+    unlockAudioIfNeeded();
+    beep(660, 0.06, "sine", 0.08); // start音（小さく）
+
+    // 最初は「あ」から
+    iGoju = 0;
+    streak = 0;
+    pickNextSequential();
   }
 
-  /* ---------------------------
-     Input Handling
-  --------------------------- */
+  // initial idle
+  renderPrompt();
+  clearTargets();
 
   document.addEventListener("pointerdown", () => {
-    // allow iOS/Safari to unlock audio on first gesture
-    ensureAudio();
+    // mobile対策：ポインタでもアンロック
+    unlockAudioIfNeeded();
   }, {passive:true});
 
   document.addEventListener("keydown", (e) => {
-    // prevent page scroll on Space
     if (e.code === "Space") e.preventDefault();
-
-    ensureAudio();
 
     pressKeyVisual(e.code);
 
-    // Space starts
+    // start by Space
     if (!started){
-      if (e.code === "Space"){
-        startIfNeeded();
-      }
+      if (e.code === "Space") start();
       return;
     }
 
-    // ignore modifier-only
+    // ignore non-character keys for typing judgement
     if (e.key.length !== 1) return;
+
+    unlockAudioIfNeeded();
 
     const expected = current.roma.toLowerCase()[idx];
     if (!expected) return;
 
     const got = e.key.toLowerCase();
     if (got === expected){
-      // correct char
       playOk();
-
       idx++;
       okVisual();
 
-      // if finished kana (full romaji)
       if (idx >= current.roma.length){
         streak++;
-        spawnFirework(Math.min(4, 1 + streak * 0.18)); // bigger with streak
-        pickNext();
-      } else {
-        // second letter now "active" (no UI text; keep highlights as red/blue)
+        const strength = Math.min(4, 1 + streak * 0.18);
+        spawnFirework(strength);
+        playFirework(strength); // ★花火音（ここで鳴る）
+        pickNextSequential();
       }
     } else {
-      // wrong
       streak = 0;
       playMiss();
       missVisual();
     }
   }, {passive:false});
-
-  /* ---------------------------
-     Mode Toggle (no extra text)
-  --------------------------- */
-
-  document.querySelectorAll(".mode").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const m = btn.dataset.mode;
-      if (m === mode) return;
-      mode = m;
-
-      document.querySelectorAll(".mode").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
-
-      // reset run
-      started = false;
-      streak = 0;
-      current = sets[mode][0];
-      idx = 0;
-      renderPrompt();
-      clearTargets();
-    }, {passive:true});
-  });
-
-  // initial prompt (idle)
-  current = sets[mode][0];
-  renderPrompt();
-  clearTargets();
 
 })();
 </script>
