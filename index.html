@@ -3,415 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>五十音 ローマ字タイピング（超入門）</title>
+  <title>五十音ローマ字タイピング（行ごと）</title>
   <style>
     :root{
       --fg:#111; --muted:#666; --line:#e9e9e9; --bg:#fff;
-      --red:#b00020; --blue:#1357d6; --ok:#0a7a2f;
+      --red:#b00020; --blue:#1357d6; --ok:#0a7a2f; --gold:#f2b705;
     }
     html,body{height:100%; margin:0; background:var(--bg); color:var(--fg);
       font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", sans-serif;}
-    .wrap{max-width:980px; margin:0 auto; padding:22px;}
-    .top{display:flex; gap:18px; flex-wrap:wrap; align-items:stretch;}
-    .card{border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.03); background:#fff;}
-    .left{flex:1 1 360px; min-width:320px;}
-    .right{flex:1 1 520px; min-width:320px;}
-    h1{font-size:18px; margin:0 0 10px; font-weight:800;}
-    .sub{margin:0 0 14px; color:var(--muted); font-size:13px; line-height:1.6;}
-    .bigKana{
-      display:flex; align-items:center; justify-content:center;
-      height:200px; border:1px dashed var(--line); border-radius:18px;
-      font-size:120px; font-weight:900; user-select:none;
+    .wrap{max-width:980px; margin:0 auto; padding:18px;}
+
+    /* Header / Prompt */
+    .top{
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      padding:10px 0 12px; border-bottom:1px solid var(--line);
     }
-    .romajiLine{display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap;}
-    .chip{border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-size:13px; color:var(--muted);}
-    .chip strong{color:var(--fg);}
-    .seq{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size:18px; letter-spacing:.06em; color:var(--fg);}
-    .seq .r{color:var(--red); font-weight:900;}
-    .seq .b{color:var(--blue); font-weight:900;}
-    .seq .done{color:var(--ok); font-weight:900;}
-    .status{margin-top:10px; min-height:22px; font-size:14px;}
-    .ok{color:var(--ok); font-weight:800;}
-    .ng{color:var(--red); font-weight:800;}
-    .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+    .title{font-weight:900; font-size:16px;}
+    .mini{color:var(--muted); font-size:12px; line-height:1.4;}
+    .controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
     button{
       appearance:none; border:1px solid var(--line); background:#fff; color:var(--fg);
-      padding:10px 14px; border-radius:12px; font-size:14px; cursor:pointer;
+      padding:8px 10px; border-radius:10px; font-size:13px; cursor:pointer;
     }
     button:active{transform:translateY(1px);}
+    select{
+      border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:#fff; font-size:13px;
+    }
+    .star{
+      font-size:18px; font-weight:900;
+      color:#bbb;
+    }
+    .star.done{ color: var(--gold); }
 
-    /* Keyboard */
-    .kbdWrap{display:flex; flex-direction:column; gap:10px;}
-    .row{display:flex; gap:8px; flex-wrap:nowrap;}
-    .key{
-      flex:0 0 auto;
-      width:44px; height:44px;
-      border:1px solid var(--line);
-      border-bottom-width:2px;
-      border-radius:12px;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900;
+    .prompt{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:18px 0 10px;
+      gap:10px;
+    }
+    .kana{
+      font-size:120px; font-weight:900; line-height:1; user-select:none;
+    }
+    .seq{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:18px; letter-spacing:.08em;
       user-select:none;
-      background:#fafafa;
-      position:relative;
     }
-    .key.small{width:40px;}
-    .key.wide{width:70px;}
-    .key.xwide{width:92px;}
-    .key .label{font-size:15px;}
-    .key.hintDot{
-      position:absolute; bottom:6px; right:8px;
-      width:7px; height:7px; border-radius:50%;
-      background:#d1d1d1;
-      display:none;
-    }
-    .key.red{background:rgba(176,0,32,.12); border-color:rgba(176,0,32,.35);}
-    .key.blue{background:rgba(19,87,214,.12); border-color:rgba(19,87,214,.35);}
-    .key.red .hintDot{display:block; background:var(--red);}
-    .key.blue .hintDot{display:block; background:var(--blue);}
-
-    .note{margin-top:10px; color:var(--muted); font-size:12px; line-height:1.6;}
-    .kbdLegend{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px;}
-    .legendItem{display:flex; gap:6px; align-items:center; color:var(--muted); font-size:12px;}
-    .swatch{width:12px; height:12px; border-radius:4px; border:1px solid var(--line); background:#fafafa;}
-    .swatch.red{background:rgba(176,0,32,.12); border-color:rgba(176,0,32,.35);}
-    .swatch.blue{background:rgba(19,87,214,.12); border-color:rgba(19,87,214,.35);}
-
-    /* Progress */
-    .bar{height:10px; background:#f4f4f4; border-radius:999px; overflow:hidden; border:1px solid var(--line); margin-top:14px;}
-    .bar > div{height:100%; width:0%;}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="top">
-      <div class="card left">
-        <h1>五十音 ローマ字タイピング（超入門）</h1>
-        <p class="sub">
-          画面に出た<strong>ひらがな</strong>を、ローマ字で打つ練習。<br>
-          キーボードが光るので、アルファベットが分からなくても進められます。<br>
-          はじめる：Enter / Space　やめる：Esc
-        </p>
-
-        <div id="bigKana" class="bigKana">▶</div>
-
-        <div class="bar"><div id="barFill"></div></div>
-
-        <div class="romajiLine">
-          <div class="chip">もんだい：<strong id="q">-</strong>/<span id="qTotal">20</span></div>
-          <div class="chip">せいかい：<strong id="ok">0</strong></div>
-          <div class="chip">ミス：<strong id="ng">0</strong></div>
-          <div class="chip">ローマ字：<span class="seq" id="seq">-</span></div>
-        </div>
-
-        <div class="status" id="status"></div>
-
-        <div class="btnrow">
-          <button id="startBtn" type="button">スタート</button>
-          <button id="resetBtn" type="button">リセット</button>
-          <button id="orderBtn" type="button">出題：ランダム</button>
-          <button id="soundBtn" type="button">おと：ON</button>
-        </div>
-
-        <div class="note">
-          方式：<strong>訓令式（2文字優先）</strong>で出題します。例：し=SI、ち=TI、つ=TU、ふ=HU。<br>
-          ※ 小さい「ゃゅょ」、促音「っ」、拗音（きゃ等）、長音（ー）はこの試作では未対応。
-        </div>
-      </div>
-
-      <div class="card right">
-        <h1>キーボード</h1>
-        <div class="kbdLegend">
-          <div class="legendItem"><span class="swatch red"></span>最初に打つキー</div>
-          <div class="legendItem"><span class="swatch blue"></span>次に打つキー</div>
-        </div>
-
-        <div class="kbdWrap" style="margin-top:12px;">
-          <div class="row">
-            <div class="key small" data-key="Q"><span class="label">Q</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="W"><span class="label">W</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="E"><span class="label">E</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="R"><span class="label">R</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="T"><span class="label">T</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="Y"><span class="label">Y</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="U"><span class="label">U</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="I"><span class="label">I</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="O"><span class="label">O</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="P"><span class="label">P</span><span class="hintDot"></span></div>
-          </div>
-          <div class="row">
-            <div class="key small" data-key="A"><span class="label">A</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="S"><span class="label">S</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="D"><span class="label">D</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="F"><span class="label">F</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="G"><span class="label">G</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="H"><span class="label">H</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="J"><span class="label">J</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="K"><span class="label">K</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="L"><span class="label">L</span><span class="hintDot"></span></div>
-          </div>
-          <div class="row">
-            <div class="key small" data-key="Z"><span class="label">Z</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="X"><span class="label">X</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="C"><span class="label">C</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="V"><span class="label">V</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="B"><span class="label">B</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="N"><span class="label">N</span><span class="hintDot"></span></div>
-            <div class="key small" data-key="M"><span class="label">M</span><span class="hintDot"></span></div>
-            <div class="key xwide" data-key=" "><span class="label">SPACE</span><span class="hintDot"></span></div>
-          </div>
-        </div>
-
-        <div class="note">
-          入力欄なし。どこをクリックしてもキー入力を拾います。<br>
-          ※ ブラウザのショートカットと衝突するキーは避けています（この試作では英字とSpace/Enter/Esc中心）。
-        </div>
-      </div>
-    </div>
-  </div>
-
-<script>
-(() => {
-  // ===== ひらがな→ローマ字（訓令式 2文字優先 / この試作は拗音・促音なし） =====
-  // し=SI, ち=TI, つ=TU, ふ=HU を採用して「だいたい2文字」で進められるようにする
-  const ITEMS = [
-    ["あ","A"], ["い","I"], ["う","U"], ["え","E"], ["お","O"],
-    ["か","KA"], ["き","KI"], ["く","KU"], ["け","KE"], ["こ","KO"],
-    ["さ","SA"], ["し","SI"], ["す","SU"], ["せ","SE"], ["そ","SO"],
-    ["た","TA"], ["ち","TI"], ["つ","TU"], ["て","TE"], ["と","TO"],
-    ["な","NA"], ["に","NI"], ["ぬ","NU"], ["ね","NE"], ["の","NO"],
-    ["は","HA"], ["ひ","HI"], ["ふ","HU"], ["へ","HE"], ["ほ","HO"],
-    ["ま","MA"], ["み","MI"], ["む","MU"], ["め","ME"], ["も","MO"],
-    ["や","YA"], ["ゆ","YU"], ["よ","YO"],
-    ["ら","RA"], ["り","RI"], ["る","RU"], ["れ","RE"], ["ろ","RO"],
-    ["わ","WA"], ["を","WO"], ["ん","N"]
-  ];
-
-  // ===== 設定 =====
-  const TOTAL_DEFAULT = 20;
-
-  // ===== 状態 =====
-  let running = false;
-  let randomMode = true;
-  let total = TOTAL_DEFAULT;
-  let qIndex = 0;
-  let ok = 0;
-  let ng = 0;
-  let currentKana = "▶";
-  let currentSeq = "";
-  let step = 0; // 0..len
-  let soundOn = true;
-  let orderCursor = 0;
-  let startedAt = null;
-
-  // ===== DOM =====
-  const $bigKana = document.getElementById("bigKana");
-  const $q = document.getElementById("q");
-  const $qTotal = document.getElementById("qTotal");
-  const $ok = document.getElementById("ok");
-  const $ng = document.getElementById("ng");
-  const $seq = document.getElementById("seq");
-  const $status = document.getElementById("status");
-  const $barFill = document.getElementById("barFill");
-  const $startBtn = document.getElementById("startBtn");
-  const $resetBtn = document.getElementById("resetBtn");
-  const $orderBtn = document.getElementById("orderBtn");
-  const $soundBtn = document.getElementById("soundBtn");
-
-  $qTotal.textContent = String(total);
-
-  const keyEls = new Map();
-  document.querySelectorAll(".key").forEach(el => {
-    keyEls.set(el.getAttribute("data-key"), el);
-  });
-
-  // ===== サウンド（軽量） =====
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let actx = null;
-  function beep(freq, ms){
-    if (!soundOn) return;
-    try{
-      if (!actx) actx = new AudioCtx();
-      const o = actx.createOscillator();
-      const g = actx.createGain();
-      o.type = "square";
-      o.frequency.value = freq;
-      g.gain.value = 0.03;
-      o.connect(g); g.connect(actx.destination);
-      o.start();
-      setTimeout(() => o.stop(), ms);
-    }catch(e){}
-  }
-
-  // ===== util =====
-  function randInt(n){ return Math.floor(Math.random()*n); }
-  function setStatus(text, cls){
-    $status.className = "status " + (cls || "");
-    $status.textContent = text || "";
-  }
-  function setProgress(){
-    const pct = total ? Math.round((qIndex / total) * 100) : 0;
-    $barFill.style.width = pct + "%";
-  }
-  function clearKeyHighlights(){
-    keyEls.forEach(el => { el.classList.remove("red","blue"); });
-  }
-  function highlightForStep(seq, stepIdx){
-    clearKeyHighlights();
-    if (!seq) return;
-    const first = seq[stepIdx] || "";
-    const second = seq[stepIdx + 1] || "";
-
-    if (first){
-      const el1 = keyEls.get(first);
-      if (el1) el1.classList.add("red");
-    }
-    if (second){
-      const el2 = keyEls.get(second);
-      if (el2) el2.classList.add("blue");
-    }
-  }
-  function renderSeq(seq, stepIdx){
-    if (!seq) { $seq.textContent = "-"; return; }
-    // stepIdx文字は完了、次が赤、次々が青（それ以降は通常）
-    const chars = seq.split("");
-    const out = chars.map((ch,i) => {
-      if (i < stepIdx) return `<span class="done">${ch}</span>`;
-      if (i === stepIdx) return `<span class="r">${ch}</span>`;
-      if (i === stepIdx + 1) return `<span class="b">${ch}</span>`;
-      return ch;
-    }).join("");
-    $seq.innerHTML = out;
-  }
-  function draw(){
-    $bigKana.textContent = currentKana;
-    $q.textContent = running ? String(qIndex) : "-";
-    $ok.textContent = String(ok);
-    $ng.textContent = String(ng);
-    renderSeq(currentSeq, step);
-    setProgress();
-    highlightForStep(currentSeq, step);
-  }
-
-  function pickNext(){
-    if (randomMode){
-      return ITEMS[randInt(ITEMS.length)];
-    } else {
-      const item = ITEMS[orderCursor % ITEMS.length];
-      orderCursor += 1;
-      return item;
-    }
-  }
-
-  function nextQuestion(){
-    qIndex += 1;
-    if (qIndex > total){
-      finish();
-      return;
-    }
-    const [kana, roma] = pickNext();
-    currentKana = kana;
-    currentSeq = roma.toUpperCase();
-    step = 0;
-    setStatus("", "");
-    draw();
-  }
-
-  function finish(){
-    running = false;
-    clearKeyHighlights();
-    const sec = startedAt ? Math.max(0.001, (performance.now() - startedAt) / 1000) : 0;
-    const acc = (ok + ng) ? Math.round((ok / (ok + ng)) * 100) : 0;
-    $bigKana.textContent = "★";
-    renderSeq("", 0);
-    setStatus(`けっか：せいかい ${ok}/${total}　ミス ${ng}　せいかく ${acc}%　じかん ${sec.toFixed(1)}びょう`, "");
-    beep(880, 90); setTimeout(()=>beep(988, 90),120); setTimeout(()=>beep(1175, 120),240);
-  }
-
-  function start(){
-    if (running) return;
-    running = true;
-    qIndex = 0; ok = 0; ng = 0;
-    step = 0;
-    startedAt = performance.now();
-    setStatus("", "");
-    nextQuestion();
-  }
-
-  function reset(){
-    running = false;
-    qIndex = 0; ok = 0; ng = 0;
-    currentKana = "▶";
-    currentSeq = "";
-    step = 0;
-    startedAt = null;
-    clearKeyHighlights();
-    setStatus("Enter / Space でスタート", "");
-    $qTotal.textContent = String(total);
-    draw();
-  }
-
-  // ===== 入力 =====
-  function onKeyDown(e){
-    const k = e.key;
-
-    // Spaceのスクロール抑止
-    if (k === " ") e.preventDefault();
-
-    if (!running){
-      if (k === "Enter" || k === " ") start();
-      return;
-    }
-    if (k === "Escape"){
-      reset();
-      return;
-    }
-
-    // 英字のみ判定
-    if (k.length !== 1) return;
-    const pressed = k.toUpperCase();
-    if (!/^[A-Z]$/.test(pressed)) return;
-
-    const need = currentSeq[step] || "";
-    if (!need) return;
-
-    if (pressed === need){
-      step += 1;
-      beep(660, 55);
-      if (step >= currentSeq.length){
-        ok += 1;
-        setStatus("OK", "ok");
-        nextQuestion();
-      }else{
-        setStatus("", "");
-        draw(); // 赤/青の更新
-      }
-    }else{
-      ng += 1;
-      beep(220, 70);
-      setStatus("ちがう", "ng");
-      draw();
-    }
-  }
-
-  // ===== buttons =====
-  $startBtn.addEventListener("click", start);
-  $resetBtn.addEventListener("click", reset);
-  $orderBtn.addEventListener("click", () => {
-    randomMode = !randomMode;
-    $orderBtn.textContent = "出題：" + (randomMode ? "ランダム" : "じゅんばん");
-    // 途中切替でも破綻しない
-  });
-  $soundBtn.addEventListener("click", () => {
-    soundOn = !soundOn;
-    $soundBtn.textContent = "おと：" + (soundOn ? "ON" : "OFF");
-    if (soundOn) beep(440, 60);
-  });
-
-  window.addEventListener("keydown", onKeyDown, { passive:false });
-  reset();
-})();
-</script>
-</body>
-</html>
+    .seq .done{color:var(--ok); font-weight:900;}
+    .seq .r{color:var(--red); font-weight:900;}
+    .seq .b{color:var(--blue); font-weight:900;}
