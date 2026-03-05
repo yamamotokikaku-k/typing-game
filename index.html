@@ -1,789 +1,1071 @@
-　<!doctype html>
+<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ローマ字タイピング</title>
+  <title>ローマ字タイピング（こども）</title>
   <style>
     :root{
       --bg:#ffffff;
       --fg:#111;
+      --muted:#666;
+      --line:#e8e8e8;
+
       --red:#ff3b30;
       --blue:#007aff;
+      --ok:#2ecc71;
 
-      --pinky: rgba(255, 59, 48, .10);
-      --ring:  rgba(255, 149, 0, .11);
-      --middle:rgba(52, 199, 89, .11);
-      --index: rgba(0, 122, 255, .10);
-      --thumb: rgba(175, 82, 222, .10);
-
-      --keyBorder: rgba(0,0,0,.10);
-      --keyShadow: 0 1px 0 rgba(0,0,0,.06);
-      --radius: 12px;
+      --zone1:#ffe6e6; /* L pinky */
+      --zone2:#fff2d9; /* L ring */
+      --zone3:#fffbd9; /* L middle */
+      --zone4:#e8f7ff; /* L index */
+      --zone5:#e8fff1; /* R index */
+      --zone6:#eef1ff; /* R middle */
+      --zone7:#f3e8ff; /* R ring */
+      --zone8:#ffe8f6; /* R pinky */
     }
-    html,body{height:100%;}
+
+    *{box-sizing:border-box}
     body{
       margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
       background:var(--bg);
       color:var(--fg);
-      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", Segoe UI, Roboto, Helvetica, Arial;
-      overflow:hidden;
     }
+
     .wrap{
-      height:100%;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 14px 18px;
+    }
+
+    /* Top controls (small) */
+    .topbar{
       display:flex;
-      flex-direction:column;
+      gap:10px;
+      flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
-      padding:18px 14px 18px;
-      box-sizing:border-box;
-      gap:10px;
+      margin-bottom:10px;
+      padding-bottom:10px;
+      border-bottom:1px solid var(--line);
     }
-    .top{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:38px;
-      user-select:none;
-    }
-    .modes{
+    .controls{
       display:flex;
       gap:8px;
-      padding:4px;
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:999px;
+      flex-wrap:wrap;
+      align-items:center;
     }
-    .mode{
-      width:44px;
-      height:28px;
+    select, button{
+      font:inherit;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:8px 10px;
+      border-radius:10px;
+    }
+    button{
+      cursor:pointer;
+      user-select:none;
+    }
+    button.primary{
+      border-color:#d8d8d8;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    /* Main display */
+    .stage{
+      display:grid;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .kana{
+      text-align:center;
+      font-size:72px;
+      line-height:1.05;
+      font-weight:800;
+      letter-spacing: 0.02em;
+      margin: 6px 0 0;
+    }
+    @media (max-width:520px){
+      .kana{font-size:56px}
+    }
+
+    .romaji{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin: 2px 0 0;
+      min-height: 64px;
+    }
+    .letter{
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      border: 2px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius:999px;
-      font-weight:700;
-      font-size:15px;
-      color:rgba(0,0,0,.55);
-      cursor:pointer;
+      font-size:28px;
+      font-weight:800;
+      letter-spacing:0.02em;
+      background:#fff;
     }
-    .mode.active{
-      color:#111;
-      background:rgba(0,0,0,.06);
+    .letter.cur{
+      border-color: color-mix(in srgb, var(--red) 55%, #fff);
+      background: color-mix(in srgb, var(--red) 12%, #fff);
+      color: var(--red);
+    }
+    .letter.next{
+      border-color: color-mix(in srgb, var(--blue) 55%, #fff);
+      background: color-mix(in srgb, var(--blue) 10%, #fff);
+      color: var(--blue);
+    }
+    .letter.done{
+      border-color: color-mix(in srgb, var(--ok) 55%, #fff);
+      background: color-mix(in srgb, var(--ok) 10%, #fff);
+      color: var(--ok);
     }
 
-    .center{
-      flex:1;
-      width:100%;
+    /* Finger signs */
+    .fingers{
       display:flex;
-      flex-direction:column;
-      align-items:center;
       justify-content:center;
       gap:12px;
-      position:relative;
+      flex-wrap:wrap;
+      margin-top:2px;
+      min-height: 44px;
+    }
+    .fingerCard{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:8px 10px;
+      min-width: 210px;
+      background:#fff;
+    }
+    .dot{
+      width:14px;height:14px;border-radius:999px;
+      flex:0 0 auto;
+    }
+    .dot.red{background:var(--red)}
+    .dot.blue{background:var(--blue)}
+    .fingerText{
+      font-size:14px;
+      font-weight:700;
+    }
+    .fingerSub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      font-weight:600;
+    }
+    .fingerCol{
+      display:flex;
+      flex-direction:column;
+      line-height:1.15;
+    }
+
+    /* Row stars */
+    .rowbar{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:6px;
+      padding-top:10px;
+      border-top:1px solid var(--line);
+    }
+    .rowchip{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      background:#fff;
+      font-size:12px;
+      color:#222;
       user-select:none;
     }
-    .kana{
-      font-size:min(22vw, 160px);
+    .star{
+      font-size:14px;
+      color:#bbb;
+      line-height:1;
+    }
+    .star.cleared{color:#ffcc00}
+    .rowchip.active{
+      border-color:#cfcfcf;
+      box-shadow: 0 0 0 2px #f3f3f3 inset;
       font-weight:800;
-      line-height:1;
-      letter-spacing:0.02em;
-    }
-    .roman{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:center;
-      height:54px;
-    }
-    .rbox{
-      width:64px;
-      height:54px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.10);
-      box-shadow:var(--keyShadow);
-      font-size:32px;
-      font-weight:900;
-      line-height:1;
-    }
-    .r1{ color:var(--red); }
-    .r2{ color:var(--blue); }
-    .rbox.dim{ color:rgba(0,0,0,.15); }
-
-    .pulseOk{ animation: okPop .18s ease-out; }
-    @keyframes okPop{
-      from{ transform:scale(0.98); filter:brightness(1); }
-      to{ transform:scale(1.05); filter:brightness(1.05); }
-    }
-    .shake{ animation: shake .20s ease-in-out; }
-    @keyframes shake{
-      0%{ transform:translateX(0); }
-      25%{ transform:translateX(-6px); }
-      50%{ transform:translateX(6px); }
-      75%{ transform:translateX(-4px); }
-      100%{ transform:translateX(0); }
     }
 
-    .kbArea{
-      width:min(980px, 100%);
-      padding-bottom:6px;
+    /* Keyboard */
+    .kbdWrap{
+      margin-top: 8px;
+    }
+
+    .kbd{
       position:relative;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 14px 12px;
+      background:#fff;
+      overflow:hidden;
     }
-    .keyboard{
-      width:100%;
+
+    /* Background finger zones (columns) */
+    .zones{
+      position:absolute;
+      inset:0;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr 1.35fr 1.35fr 1fr 1fr 1fr;
+      opacity:0.55;
+      pointer-events:none;
+    }
+    .z1{background:var(--zone1)}
+    .z2{background:var(--zone2)}
+    .z3{background:var(--zone3)}
+    .z4{background:var(--zone4)}
+    .z5{background:var(--zone5)}
+    .z6{background:var(--zone6)}
+    .z7{background:var(--zone7)}
+    .z8{background:var(--zone8)}
+
+    .keys{
+      position:relative;
       display:flex;
       flex-direction:column;
       gap:8px;
-      user-select:none;
-      touch-action:manipulation;
     }
-    .row{ display:flex; gap:8px; justify-content:center; }
+    .row{
+      display:flex;
+      justify-content:center;
+      gap:6px;
+      flex-wrap:nowrap;
+    }
     .key{
-      height:52px;
-      min-width:52px;
-      padding:0 10px;
-      box-sizing:border-box;
-      border-radius:var(--radius);
-      border:1px solid var(--keyBorder);
-      box-shadow:var(--keyShadow);
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      border: 2px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:center;
       font-weight:800;
-      font-size:14px;
+      letter-spacing:0.02em;
       background:#fff;
-      position:relative;
-      transition: transform .05s ease, filter .08s ease;
+      user-select:none;
+      font-size:14px;
     }
-    .key.small{ font-size:13px; font-weight:800; }
-    .key.wide{ min-width:86px; justify-content:flex-start; padding-left:12px; }
-    .key.xwide{ min-width:120px; justify-content:flex-start; padding-left:12px; }
-    .key.space{ min-width:320px; }
-    .key.kbDown{ transform:translateY(1px); filter:brightness(0.98); }
-
-    .f-pinky{ background:var(--pinky); }
-    .f-ring{ background:var(--ring); }
-    .f-middle{ background:var(--middle); }
-    .f-index{ background:var(--index); }
-    .f-thumb{ background:var(--thumb); }
-
-    .hl{
-      position:absolute;
-      inset:-2px;
-      border-radius:calc(var(--radius) + 2px);
-      pointer-events:none;
-      opacity:0;
-      transform:scale(0.98);
-      transition:opacity .08s ease, transform .08s ease;
-      border:2px solid transparent;
-    }
-    .key.target1 .hl{
-      opacity:1; transform:scale(1);
-      border-color:rgba(255,59,48,.95);
-      box-shadow:0 0 0 3px rgba(255,59,48,.15);
-    }
-    .key.target2 .hl{
-      opacity:1; transform:scale(1);
-      border-color:rgba(0,122,255,.95);
-      box-shadow:0 0 0 3px rgba(0,122,255,.14);
-    }
-
-    canvas#fx{ position:absolute; inset:0; pointer-events:none; }
-
+    .key.wide{width: 74px}
+    .key.space{width: 320px}
     @media (max-width:520px){
-      .key{ height:46px; min-width:44px; border-radius:11px; }
-      .key.wide{ min-width:74px; }
-      .key.xwide{ min-width:104px; }
-      .key.space{ min-width:240px; }
-      .rbox{ width:56px; height:48px; font-size:28px; }
+      .key{width: 38px; height: 42px; border-radius:10px}
+      .key.wide{width: 62px}
+      .key.space{width: 240px}
+    }
+
+    .key.cur{
+      border-color: color-mix(in srgb, var(--red) 70%, #fff);
+      background: color-mix(in srgb, var(--red) 12%, #fff);
+      color: var(--red);
+    }
+    .key.next{
+      border-color: color-mix(in srgb, var(--blue) 70%, #fff);
+      background: color-mix(in srgb, var(--blue) 10%, #fff);
+      color: var(--blue);
+    }
+
+    .status{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:8px;
+      line-height:1.35;
+      min-height: 20px;
+    }
+    .status strong{color:#111}
+
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="top">
-      <div class="modes" aria-label="mode">
-        <div class="mode active" data-mode="goju">50</div>
+    <div class="topbar">
+      <div class="controls">
+        <select id="courseSel" aria-label="コース">
+          <option value="basic">基本（あ〜わ）</option>
+          <option value="dakuten">濁点</option>
+          <option value="youon">拗音（きゃ等）</option>
+          <option value="sokuon">促音（っ）</option>
+        </select>
+
+        <select id="modeSel" aria-label="モード">
+          <option value="normal">通常モード（行を順番）</option>
+          <option value="row">行練習モード（同じ行をくり返し）</option>
+        </select>
+
+        <select id="rowSel" aria-label="行" style="display:none"></select>
+
+        <button id="resetBtn" class="primary" type="button">リセット</button>
       </div>
+
+      <div class="hint" id="hint">Enterでスタート</div>
     </div>
 
-    <div class="center" id="center">
-      <canvas id="fx"></canvas>
-      <div class="kana" id="kana">あ</div>
-      <div class="roman" id="roman">
-        <div class="rbox r1" id="r1">A</div>
-        <div class="rbox r2 dim" id="r2">—</div>
-      </div>
-    </div>
+    <div class="stage">
+      <div class="kana" id="kana">—</div>
 
-    <div class="kbArea">
-      <div class="keyboard" id="keyboard"></div>
+      <div class="romaji" id="romaji"></div>
+
+      <div class="fingers" id="fingers"></div>
+
+      <div class="rowbar" id="rowbar"></div>
+
+      <div class="kbdWrap">
+        <div class="kbd" id="kbd">
+          <div class="zones" aria-hidden="true">
+            <div class="z1"></div><div class="z2"></div><div class="z3"></div><div class="z4"></div>
+            <div class="z5"></div><div class="z6"></div><div class="z7"></div><div class="z8"></div>
+          </div>
+
+          <div class="keys" id="keys">
+            <div class="row">
+              <div class="key wide" data-k="Tab">Tab</div>
+              <div class="key" data-k="q">Q</div><div class="key" data-k="w">W</div><div class="key" data-k="e">E</div><div class="key" data-k="r">R</div><div class="key" data-k="t">T</div>
+              <div class="key" data-k="y">Y</div><div class="key" data-k="u">U</div><div class="key" data-k="i">I</div><div class="key" data-k="o">O</div><div class="key" data-k="p">P</div>
+              <div class="key wide" data-k="Backspace">⌫</div>
+            </div>
+
+            <div class="row">
+              <div class="key wide" data-k="CapsLock">Caps</div>
+              <div class="key" data-k="a">A</div><div class="key" data-k="s">S</div><div class="key" data-k="d">D</div><div class="key" data-k="f">F</div><div class="key" data-k="g">G</div>
+              <div class="key" data-k="h">H</div><div class="key" data-k="j">J</div><div class="key" data-k="k">K</div><div class="key" data-k="l">L</div>
+              <div class="key wide" data-k="Enter">Enter</div>
+            </div>
+
+            <div class="row">
+              <div class="key wide" data-k="Shift">Shift</div>
+              <div class="key" data-k="z">Z</div><div class="key" data-k="x">X</div><div class="key" data-k="c">C</div><div class="key" data-k="v">V</div><div class="key" data-k="b">B</div>
+              <div class="key" data-k="n">N</div><div class="key" data-k="m">M</div>
+              <div class="key wide" data-k="ShiftRight">Shift</div>
+            </div>
+
+            <div class="row">
+              <div class="key space" data-k=" ">SPACE</div>
+            </div>
+          </div>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+
+      <div class="tiny" style="text-align:center;">
+        訓令式ベース + 許可: SI/SHI, TI/CHI, TU/TSU, HU/FU など
+      </div>
     </div>
   </div>
 
-<script>
-(() => {
-  /* ---------------------------
-     50音（連続出題）
-     - 「あ→い→う→…→ん」順番固定で回す（連続）
-  --------------------------- */
+  <script>
+    // ===========
+    // Data
+    // ===========
 
-  const gojuon = [
-    {kana:"あ", roma:"a"}, {kana:"い", roma:"i"}, {kana:"う", roma:"u"}, {kana:"え", roma:"e"}, {kana:"お", roma:"o"},
-    {kana:"か", roma:"ka"}, {kana:"き", roma:"ki"}, {kana:"く", roma:"ku"}, {kana:"け", roma:"ke"}, {kana:"こ", roma:"ko"},
-    {kana:"さ", roma:"sa"}, {kana:"し", roma:"shi"}, {kana:"す", roma:"su"}, {kana:"せ", roma:"se"}, {kana:"そ", roma:"so"},
-    {kana:"た", roma:"ta"}, {kana:"ち", roma:"chi"}, {kana:"つ", roma:"tsu"}, {kana:"て", roma:"te"}, {kana:"と", roma:"to"},
-    {kana:"な", roma:"na"}, {kana:"に", roma:"ni"}, {kana:"ぬ", roma:"nu"}, {kana:"ね", roma:"ne"}, {kana:"の", roma:"no"},
-    {kana:"は", roma:"ha"}, {kana:"ひ", roma:"hi"}, {kana:"ふ", roma:"fu"}, {kana:"へ", roma:"he"}, {kana:"ほ", roma:"ho"},
-    {kana:"ま", roma:"ma"}, {kana:"み", roma:"mi"}, {kana:"む", roma:"mu"}, {kana:"め", roma:"me"}, {kana:"も", roma:"mo"},
-    {kana:"や", roma:"ya"}, {kana:"ゆ", roma:"yu"}, {kana:"よ", roma:"yo"},
-    {kana:"ら", roma:"ra"}, {kana:"り", roma:"ri"}, {kana:"る", roma:"ru"}, {kana:"れ", roma:"re"}, {kana:"ろ", roma:"ro"},
-    {kana:"わ", roma:"wa"}, {kana:"を", roma:"wo"},
-    {kana:"ん", roma:"n"}
-  ];
+    // Row definitions per course (for stars / progression)
+    const COURSE_ROWS = {
+      basic: [
+        {id:"a", label:"あ行"},
+        {id:"ka", label:"か行"},
+        {id:"sa", label:"さ行"},
+        {id:"ta", label:"た行"},
+        {id:"na", label:"な行"},
+        {id:"ha", label:"は行"},
+        {id:"ma", label:"ま行"},
+        {id:"ya", label:"や行"},
+        {id:"ra", label:"ら行"},
+        {id:"wa", label:"わ行"},
+      ],
+      dakuten: [
+        {id:"ga", label:"が行"},
+        {id:"za", label:"ざ行"},
+        {id:"da", label:"だ行"},
+        {id:"ba", label:"ば行"},
+        {id:"pa", label:"ぱ行"},
+      ],
+      youon: [
+        {id:"kya", label:"きゃ行"},
+        {id:"sya", label:"しゃ行"},
+        {id:"tya", label:"ちゃ行"},
+        {id:"nya", label:"にゃ行"},
+        {id:"hya", label:"ひゃ行"},
+        {id:"mya", label:"みゃ行"},
+        {id:"rya", label:"りゃ行"},
+        {id:"gya", label:"ぎゃ行"},
+        {id:"bya", label:"びゃ行"},
+        {id:"pya", label:"ぴゃ行"},
+      ],
+      sokuon: [
+        {id:"k", label:"っk（か行）"},
+        {id:"s", label:"っs（さ行）"},
+        {id:"t", label:"っt（た行）"},
+        {id:"p", label:"っp（ぱ行）"},
+      ]
+    };
 
-  /* ---------------------------
-     US keyboard layout
-  --------------------------- */
+    // Helpers to make entries
+    function E(course, row, kana, accepts){
+      return {course, row, kana, accepts: accepts.map(s=>s.toLowerCase())};
+    }
 
-  const layout = [
-    [
-      { code:"Backquote", label:"`" },
-      { code:"Digit1", label:"1" },
-      { code:"Digit2", label:"2" },
-      { code:"Digit3", label:"3" },
-      { code:"Digit4", label:"4" },
-      { code:"Digit5", label:"5" },
-      { code:"Digit6", label:"6" },
-      { code:"Digit7", label:"7" },
-      { code:"Digit8", label:"8" },
-      { code:"Digit9", label:"9" },
-      { code:"Digit0", label:"0" },
-      { code:"Minus", label:"-" },
-      { code:"Equal", label:"=" },
-      { code:"Backspace", label:"Backspace", wide:true, cls:"small" },
-    ],
-    [
-      { code:"Tab", label:"Tab", wide:true, cls:"small" },
-      { code:"KeyQ", label:"Q" },
-      { code:"KeyW", label:"W" },
-      { code:"KeyE", label:"E" },
-      { code:"KeyR", label:"R" },
-      { code:"KeyT", label:"T" },
-      { code:"KeyY", label:"Y" },
-      { code:"KeyU", label:"U" },
-      { code:"KeyI", label:"I" },
-      { code:"KeyO", label:"O" },
-      { code:"KeyP", label:"P" },
-      { code:"BracketLeft", label:"[" },
-      { code:"BracketRight", label:"]" },
-      { code:"Backslash", label:"\\" },
-    ],
-    [
-      { code:"CapsLock", label:"Caps", xwide:true, cls:"small" },
-      { code:"KeyA", label:"A" },
-      { code:"KeyS", label:"S" },
-      { code:"KeyD", label:"D" },
-      { code:"KeyF", label:"F" },
-      { code:"KeyG", label:"G" },
-      { code:"KeyH", label:"H" },
-      { code:"KeyJ", label:"J" },
-      { code:"KeyK", label:"K" },
-      { code:"KeyL", label:"L" },
-      { code:"Semicolon", label:";" },
-      { code:"Quote", label:"'" },
-      { code:"Enter", label:"Enter", xwide:true, cls:"small" },
-    ],
-    [
-      { code:"ShiftLeft", label:"Shift", xwide:true, cls:"small" },
-      { code:"KeyZ", label:"Z" },
-      { code:"KeyX", label:"X" },
-      { code:"KeyC", label:"C" },
-      { code:"KeyV", label:"V" },
-      { code:"KeyB", label:"B" },
-      { code:"KeyN", label:"N" },
-      { code:"KeyM", label:"M" },
-      { code:"Comma", label:"," },
-      { code:"Period", label:"." },
-      { code:"Slash", label:"/" },
-      { code:"ShiftRight", label:"Shift", xwide:true, cls:"small" },
-    ],
-    [
-      { code:"ControlLeft", label:"Ctrl", wide:true, cls:"small" },
-      { code:"MetaLeft", label:"Win", wide:true, cls:"small" },
-      { code:"AltLeft", label:"Alt", wide:true, cls:"small" },
-      { code:"Space", label:"", space:true },
-      { code:"AltRight", label:"Alt", wide:true, cls:"small" },
-      { code:"MetaRight", label:"Win", wide:true, cls:"small" },
-      { code:"ContextMenu", label:"Menu", wide:true, cls:"small" },
-      { code:"ControlRight", label:"Ctrl", wide:true, cls:"small" },
-    ],
-  ];
+    // Basic (gojūon) + variants
+    const BASIC = [
+      // あ行
+      E("basic","a","あ",["a"]), E("basic","a","い",["i"]), E("basic","a","う",["u"]), E("basic","a","え",["e"]), E("basic","a","お",["o"]),
+      // か行
+      E("basic","ka","か",["ka"]), E("basic","ka","き",["ki"]), E("basic","ka","く",["ku"]), E("basic","ka","け",["ke"]), E("basic","ka","こ",["ko"]),
+      // さ行
+      E("basic","sa","さ",["sa"]), E("basic","sa","し",["si","shi"]), E("basic","sa","す",["su"]), E("basic","sa","せ",["se"]), E("basic","sa","そ",["so"]),
+      // た行
+      E("basic","ta","た",["ta"]), E("basic","ta","ち",["ti","chi"]), E("basic","ta","つ",["tu","tsu"]), E("basic","ta","て",["te"]), E("basic","ta","と",["to"]),
+      // な行
+      E("basic","na","な",["na"]), E("basic","na","に",["ni"]), E("basic","na","ぬ",["nu"]), E("basic","na","ね",["ne"]), E("basic","na","の",["no"]),
+      // は行
+      E("basic","ha","は",["ha"]), E("basic","ha","ひ",["hi"]), E("basic","ha","ふ",["hu","fu"]), E("basic","ha","へ",["he"]), E("basic","ha","ほ",["ho"]),
+      // ま行
+      E("basic","ma","ま",["ma"]), E("basic","ma","み",["mi"]), E("basic","ma","む",["mu"]), E("basic","ma","め",["me"]), E("basic","ma","も",["mo"]),
+      // や行
+      E("basic","ya","や",["ya"]), E("basic","ya","ゆ",["yu"]), E("basic","ya","よ",["yo"]),
+      // ら行
+      E("basic","ra","ら",["ra"]), E("basic","ra","り",["ri"]), E("basic","ra","る",["ru"]), E("basic","ra","れ",["re"]), E("basic","ra","ろ",["ro"]),
+      // わ行 + ん
+      E("basic","wa","わ",["wa"]), E("basic","wa","を",["wo","o"]), E("basic","wa","ん",["n","nn"]),
+    ];
 
-  const fingerByCode = new Map();
-  const add = (codes, fingerClass) => codes.forEach(c => fingerByCode.set(c, fingerClass));
+    // Dakuten / Handakuten
+    const DAKUTEN = [
+      // が行
+      E("dakuten","ga","が",["ga"]), E("dakuten","ga","ぎ",["gi"]), E("dakuten","ga","ぐ",["gu"]), E("dakuten","ga","げ",["ge"]), E("dakuten","ga","ご",["go"]),
+      // ざ行
+      E("dakuten","za","ざ",["za"]), E("dakuten","za","じ",["zi","ji"]), E("dakuten","za","ず",["zu"]), E("dakuten","za","ぜ",["ze"]), E("dakuten","za","ぞ",["zo"]),
+      // だ行（ぢ/づも許可）
+      E("dakuten","da","だ",["da"]), E("dakuten","da","ぢ",["di","ji"]), E("dakuten","da","づ",["du","zu"]), E("dakuten","da","で",["de"]), E("dakuten","da","ど",["do"]),
+      // ば行
+      E("dakuten","ba","ば",["ba"]), E("dakuten","ba","び",["bi"]), E("dakuten","ba","ぶ",["bu"]), E("dakuten","ba","べ",["be"]), E("dakuten","ba","ぼ",["bo"]),
+      // ぱ行
+      E("dakuten","pa","ぱ",["pa"]), E("dakuten","pa","ぴ",["pi"]), E("dakuten","pa","ぷ",["pu"]), E("dakuten","pa","ぺ",["pe"]), E("dakuten","pa","ぽ",["po"]),
+    ];
 
-  // Left
-  add(["Backquote","Digit1","KeyQ","KeyA","KeyZ","Tab","CapsLock","ShiftLeft","ControlLeft"], "f-pinky");
-  add(["Digit2","KeyW","KeyS","KeyX"], "f-ring");
-  add(["Digit3","KeyE","KeyD","KeyC"], "f-middle");
-  add(["Digit4","Digit5","KeyR","KeyT","KeyF","KeyG","KeyV","KeyB"], "f-index");
+    // Youon (拗音)
+    const YOUON = [
+      // きゃ行
+      E("youon","kya","きゃ",["kya"]), E("youon","kya","きゅ",["kyu"]), E("youon","kya","きょ",["kyo"]),
+      // しゃ行（訓令: sya/ syu/ syo も許可）
+      E("youon","sya","しゃ",["sya","sha"]), E("youon","sya","しゅ",["syu","shu"]), E("youon","sya","しょ",["syo","sho"]),
+      // ちゃ行（訓令: tya/tyu/tyo + chi系も許可）
+      E("youon","tya","ちゃ",["tya","cha"]), E("youon","tya","ちゅ",["tyu","chu"]), E("youon","tya","ちょ",["tyo","cho"]),
+      // にゃ行
+      E("youon","nya","にゃ",["nya"]), E("youon","nya","にゅ",["nyu"]), E("youon","nya","にょ",["nyo"]),
+      // ひゃ行
+      E("youon","hya","ひゃ",["hya"]), E("youon","hya","ひゅ",["hyu"]), E("youon","hya","ひょ",["hyo"]),
+      // みゃ行
+      E("youon","mya","みゃ",["mya"]), E("youon","mya","みゅ",["myu"]), E("youon","mya","みょ",["myo"]),
+      // りゃ行
+      E("youon","rya","りゃ",["rya"]), E("youon","rya","りゅ",["ryu"]), E("youon","rya","りょ",["ryo"]),
+      // ぎゃ行
+      E("youon","gya","ぎゃ",["gya"]), E("youon","gya","ぎゅ",["gyu"]), E("youon","gya","ぎょ",["gyo"]),
+      // びゃ行
+      E("youon","bya","びゃ",["bya"]), E("youon","bya","びゅ",["byu"]), E("youon","bya","びょ",["byo"]),
+      // ぴゃ行
+      E("youon","pya","ぴゃ",["pya"]), E("youon","pya","ぴゅ",["pyu"]), E("youon","pya","ぴょ",["pyo"]),
+    ];
 
-  // Right
-  add(["Digit6","Digit7","KeyY","KeyU","KeyH","KeyJ","KeyN","KeyM"], "f-index");
-  add(["Digit8","KeyI","KeyK","Comma"], "f-middle");
-  add(["Digit9","KeyO","KeyL","Period"], "f-ring");
+    // Sokuon (促音) - include common + variants
+    const SOKUON = [
+      // っk
+      E("sokuon","k","っか",["kka"]), E("sokuon","k","っき",["kki"]), E("sokuon","k","っく",["kku"]), E("sokuon","k","っけ",["kke"]), E("sokuon","k","っこ",["kko"]),
+      // っs (し is special)
+      E("sokuon","s","っさ",["ssa"]), E("sokuon","s","っし",["ssi","sshi"]), E("sokuon","s","っす",["ssu"]), E("sokuon","s","っせ",["sse"]), E("sokuon","s","っそ",["sso"]),
+      // っt (ち/つ special)
+      E("sokuon","t","った",["tta"]),
+      E("sokuon","t","っち",["tti","cchi"]),
+      E("sokuon","t","っつ",["ttu","ttsu"]),
+      E("sokuon","t","って",["tte"]),
+      E("sokuon","t","っと",["tto"]),
+      // っp
+      E("sokuon","p","っぱ",["ppa"]), E("sokuon","p","っぴ",["ppi"]), E("sokuon","p","っぷ",["ppu"]), E("sokuon","p","っぺ",["ppe"]), E("sokuon","p","っぽ",["ppo"]),
+    ];
 
-  // Right pinky (全部含める)
-  add([
-    "Digit0","Minus","Equal",
-    "KeyP","BracketLeft","BracketRight","Backslash",
-    "Semicolon","Quote","Slash",
-    "Enter","Backspace","ShiftRight",
-    "ControlRight"
-  ], "f-pinky");
+    const ALL = [...BASIC, ...DAKUTEN, ...YOUON, ...SOKUON];
 
-  // Thumbs
-  add(["Space","AltLeft","AltRight","MetaLeft","MetaRight","ContextMenu"], "f-thumb");
+    // ===========
+    // Finger mapping (zones + sign)
+    // ===========
+    const FINGER = {
+      L_PINKY: {id:"L_PINKY", name:"左小指"},
+      L_RING : {id:"L_RING",  name:"左薬指"},
+      L_MIDDLE:{id:"L_MIDDLE",name:"左中指"},
+      L_INDEX: {id:"L_INDEX", name:"左人差し指"},
+      R_INDEX: {id:"R_INDEX", name:"右人差し指"},
+      R_MIDDLE:{id:"R_MIDDLE",name:"右中指"},
+      R_RING : {id:"R_RING",  name:"右薬指"},
+      R_PINKY:{id:"R_PINKY", name:"右小指"},
+      THUMB  : {id:"THUMB",   name:"親指"},
+      NONE   : {id:"NONE",    name:"—"},
+    };
 
-  const charToCode = new Map([
-    ["a","KeyA"],["b","KeyB"],["c","KeyC"],["d","KeyD"],["e","KeyE"],["f","KeyF"],["g","KeyG"],["h","KeyH"],
-    ["i","KeyI"],["j","KeyJ"],["k","KeyK"],["l","KeyL"],["m","KeyM"],["n","KeyN"],["o","KeyO"],["p","KeyP"],
-    ["q","KeyQ"],["r","KeyR"],["s","KeyS"],["t","KeyT"],["u","KeyU"],["v","KeyV"],["w","KeyW"],["x","KeyX"],
-    ["y","KeyY"],["z","KeyZ"],
-    ["`","Backquote"],["1","Digit1"],["2","Digit2"],["3","Digit3"],["4","Digit4"],["5","Digit5"],
-    ["6","Digit6"],["7","Digit7"],["8","Digit8"],["9","Digit9"],["0","Digit0"],
-    ["-","Minus"],["=","Equal"],["[","BracketLeft"],["]","BracketRight"],["\\","Backslash"],
-    [";","Semicolon"],["'","Quote"],[",","Comma"],[".","Period"],["/","Slash"],[" ","Space"]
-  ]);
+    // Basic touch-typing finger assignment for keys we show.
+    const KEY_TO_FINGER = {
+      // Left hand
+      "q":FINGER.L_PINKY, "a":FINGER.L_PINKY, "z":FINGER.L_PINKY,
+      "w":FINGER.L_RING,  "s":FINGER.L_RING,  "x":FINGER.L_RING,
+      "e":FINGER.L_MIDDLE,"d":FINGER.L_MIDDLE,"c":FINGER.L_MIDDLE,
+      "r":FINGER.L_INDEX, "f":FINGER.L_INDEX, "v":FINGER.L_INDEX,
+      "t":FINGER.L_INDEX, "g":FINGER.L_INDEX, "b":FINGER.L_INDEX,
 
-  /* ---------------------------
-     DOM
-  --------------------------- */
+      // Right hand
+      "y":FINGER.R_INDEX, "h":FINGER.R_INDEX, "n":FINGER.R_INDEX,
+      "u":FINGER.R_INDEX, "j":FINGER.R_INDEX, "m":FINGER.R_INDEX,
+      "i":FINGER.R_MIDDLE,"k":FINGER.R_MIDDLE,
+      "o":FINGER.R_RING,  "l":FINGER.R_RING,
+      "p":FINGER.R_PINKY,
 
-  const elKeyboard = document.getElementById("keyboard");
-  const elKana = document.getElementById("kana");
-  const elR1 = document.getElementById("r1");
-  const elR2 = document.getElementById("r2");
-  const elCenter = document.getElementById("center");
-  const elFx = document.getElementById("fx");
+      " ":FINGER.THUMB
+    };
 
-  const keyElsByCode = new Map();
+    function fingerZoneId(f){
+      // Map to 8 background zones (thumb shares index by default)
+      switch(f.id){
+        case "L_PINKY": return 1;
+        case "L_RING": return 2;
+        case "L_MIDDLE": return 3;
+        case "L_INDEX": return 4;
+        case "R_INDEX": return 5;
+        case "R_MIDDLE": return 6;
+        case "R_RING": return 7;
+        case "R_PINKY": return 8;
+        case "THUMB": return 5; // keep simple: space under right index zone
+        default: return 4;
+      }
+    }
 
-  function buildKeyboard(){
-    elKeyboard.innerHTML = "";
-    layout.forEach(row => {
-      const r = document.createElement("div");
-      r.className = "row";
-      row.forEach(k => {
-        const d = document.createElement("div");
-        d.className = "key";
-        if (k.cls) d.classList.add(k.cls);
-        if (k.wide) d.classList.add("wide");
-        if (k.xwide) d.classList.add("xwide");
-        if (k.space) d.classList.add("space");
+    // ===========
+    // State
+    // ===========
+    const els = {
+      courseSel: document.getElementById("courseSel"),
+      modeSel: document.getElementById("modeSel"),
+      rowSel: document.getElementById("rowSel"),
+      resetBtn: document.getElementById("resetBtn"),
+      hint: document.getElementById("hint"),
+      kana: document.getElementById("kana"),
+      romaji: document.getElementById("romaji"),
+      fingers: document.getElementById("fingers"),
+      rowbar: document.getElementById("rowbar"),
+      status: document.getElementById("status"),
+      keysRoot: document.getElementById("keys"),
+      kbd: document.getElementById("kbd"),
+    };
 
-        const finger = fingerByCode.get(k.code);
-        if (finger) d.classList.add(finger);
+    let running = false;
 
-        d.dataset.code = k.code;
+    let course = "basic";
+    let mode = "normal"; // normal | row
+    let rowId = COURSE_ROWS[course][0].id;
+
+    let rowOrder = [];
+    let rowIndex = 0;
+
+    let pool = [];          // entries for current row
+    let itemIndex = 0;      // index in pool
+    let accepted = [];      // accepted romaji strings for current kana
+    let progress = "";      // typed so far
+    let target = "";        // currently chosen target among accepted (dynamic)
+    let clearedRows = new Set();
+
+    // ===========
+    // Sound (simple WebAudio)
+    // ===========
+    let audioCtx = null;
+    function beep(freq=880, ms=110, type="sine", gain=0.06){
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const t0 = audioCtx.currentTime;
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, t0);
+        g.gain.setValueAtTime(gain, t0);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + ms/1000);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t0);
+        o.stop(t0 + ms/1000);
+      }catch(e){}
+    }
+    function clearRowSound(){
+      // short happy triad-ish
+      beep(880,90,"sine",0.06);
+      setTimeout(()=>beep(1108,90,"sine",0.06), 90);
+      setTimeout(()=>beep(1320,120,"sine",0.06), 180);
+    }
+
+    // ===========
+    // Build UI
+    // ===========
+    function buildRowSelector(){
+      const rows = COURSE_ROWS[course];
+      els.rowSel.innerHTML = "";
+      for(const r of rows){
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        opt.textContent = r.label;
+        els.rowSel.appendChild(opt);
+      }
+      els.rowSel.value = rowId;
+    }
+
+    function buildRowBar(){
+      els.rowbar.innerHTML = "";
+      const rows = COURSE_ROWS[course];
+      for(const r of rows){
+        const chip = document.createElement("div");
+        chip.className = "rowchip";
+        chip.dataset.row = r.id;
+
+        const star = document.createElement("div");
+        star.className = "star" + (clearedRows.has(r.id) ? " cleared" : "");
+        star.textContent = "★";
 
         const label = document.createElement("div");
-        label.textContent = k.label;
-        d.appendChild(label);
+        label.textContent = r.label;
 
-        const hl = document.createElement("div");
-        hl.className = "hl";
-        d.appendChild(hl);
+        chip.appendChild(star);
+        chip.appendChild(label);
 
-        keyElsByCode.set(k.code, d);
-        r.appendChild(d);
-      });
-      elKeyboard.appendChild(r);
-    });
-  }
-  buildKeyboard();
+        chip.addEventListener("click", ()=>{
+          // allow quick jump (simple)
+          if(mode === "row"){
+            rowId = r.id;
+            els.rowSel.value = rowId;
+            startRow(rowId, true);
+          }
+        });
 
-  /* ---------------------------
-     Audio (WebAudio)
-     - iOS/Safariは「ユーザー操作の直後に鳴らす」必要がある
-     - なので、Spaceでスタートした瞬間に ctx を作って beep を一発鳴らす
-  --------------------------- */
-
-  let audioCtx = null;
-
-  function unlockAudioIfNeeded(){
-    if (!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === "suspended"){
-      audioCtx.resume().catch(()=>{});
-    }
-  }
-
-  function beep(freq, dur, type="sine", gain=0.2){
-    if (!audioCtx) return;
-    const t0 = audioCtx.currentTime;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t0);
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    o.connect(g).connect(audioCtx.destination);
-    o.start(t0);
-    o.stop(t0 + dur + 0.02);
-  }
-
-  function playOk(){
-    if (!audioCtx) return;
-    const t0 = audioCtx.currentTime;
-
-    const o1 = audioCtx.createOscillator();
-    const g1 = audioCtx.createGain();
-    o1.type = "triangle";
-    o1.frequency.setValueAtTime(880, t0);
-    o1.frequency.exponentialRampToValueAtTime(1320, t0 + 0.06);
-    g1.gain.setValueAtTime(0.0001, t0);
-    g1.gain.exponentialRampToValueAtTime(0.22, t0 + 0.01);
-    g1.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.10);
-    o1.connect(g1).connect(audioCtx.destination);
-    o1.start(t0);
-    o1.stop(t0 + 0.12);
-
-    const o2 = audioCtx.createOscillator();
-    const g2 = audioCtx.createGain();
-    o2.type = "sine";
-    o2.frequency.setValueAtTime(1760, t0);
-    g2.gain.setValueAtTime(0.0001, t0);
-    g2.gain.exponentialRampToValueAtTime(0.10, t0 + 0.008);
-    g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.06);
-    o2.connect(g2).connect(audioCtx.destination);
-    o2.start(t0);
-    o2.stop(t0 + 0.07);
-  }
-
-  function playMiss(){
-    if (!audioCtx) return;
-
-    const t0 = audioCtx.currentTime;
-    const bufferSize = Math.floor(audioCtx.sampleRate * 0.12);
-    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i=0; i<bufferSize; i++){
-      const x = i / bufferSize;
-      data[i] = (Math.random()*2-1) * Math.pow(1 - x, 2.6);
-    }
-    const noise = audioCtx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(520, t0);
-    filter.Q.setValueAtTime(0.9, t0);
-
-    const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.exponentialRampToValueAtTime(0.28, t0 + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.12);
-
-    noise.connect(filter).connect(gain).connect(audioCtx.destination);
-    noise.start(t0);
-    noise.stop(t0 + 0.13);
-  }
-
-  // 花火音（破裂 + パチパチ）
-  function playFirework(strength=1){
-    if (!audioCtx) return;
-
-    const t0 = audioCtx.currentTime;
-    const s = Math.min(4, Math.max(1, strength));
-
-    // 1) ドン（低めの破裂）
-    // decaying noise -> lowpass -> gain
-    const boomLen = 0.18 + 0.05 * (s-1);
-    const boomN = Math.floor(audioCtx.sampleRate * boomLen);
-    const boomBuf = audioCtx.createBuffer(1, boomN, audioCtx.sampleRate);
-    const boom = boomBuf.getChannelData(0);
-    for (let i=0;i<boomN;i++){
-      const x = i/boomN;
-      // 低域寄りにしたいので少しスムース
-      boom[i] = (Math.random()*2-1) * Math.pow(1-x, 2.2);
-    }
-    const boomSrc = audioCtx.createBufferSource();
-    boomSrc.buffer = boomBuf;
-
-    const boomLP = audioCtx.createBiquadFilter();
-    boomLP.type = "lowpass";
-    boomLP.frequency.setValueAtTime(240 + 70*s, t0);
-    boomLP.Q.setValueAtTime(0.7, t0);
-
-    const boomGain = audioCtx.createGain();
-    boomGain.gain.setValueAtTime(0.0001, t0);
-    boomGain.gain.exponentialRampToValueAtTime(0.45 + 0.08*s, t0 + 0.01);
-    boomGain.gain.exponentialRampToValueAtTime(0.0001, t0 + boomLen);
-
-    boomSrc.connect(boomLP).connect(boomGain).connect(audioCtx.destination);
-    boomSrc.start(t0);
-    boomSrc.stop(t0 + boomLen + 0.02);
-
-    // 2) パチパチ（高めの短いクリックを複数）
-    const crackCount = 7 + Math.floor(5*s);
-    for (let i=0;i<crackCount;i++){
-      const dt = 0.03 + Math.random()*(0.22 + 0.05*s);
-      const t = t0 + dt;
-
-      // tiny noise burst
-      const len = 0.018 + Math.random()*0.02;
-      const n = Math.floor(audioCtx.sampleRate * len);
-      const buf = audioCtx.createBuffer(1, n, audioCtx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let j=0;j<n;j++){
-        const x = j/n;
-        d[j] = (Math.random()*2-1) * Math.pow(1-x, 3.2);
+        els.rowbar.appendChild(chip);
       }
-      const src = audioCtx.createBufferSource();
-      src.buffer = buf;
-
-      const hp = audioCtx.createBiquadFilter();
-      hp.type = "highpass";
-      hp.frequency.setValueAtTime(1600 + Math.random()*1200, t);
-      hp.Q.setValueAtTime(0.8, t);
-
-      const g = audioCtx.createGain();
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.10 + 0.03*s, t + 0.005);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-
-      src.connect(hp).connect(g).connect(audioCtx.destination);
-      src.start(t);
-      src.stop(t + len + 0.01);
+      updateRowBarActive();
     }
-  }
 
-  /* ---------------------------
-     Fireworks (Canvas)
-  --------------------------- */
-
-  const fx = { w:0, h:0, ctx:null, particles:[], last:0 };
-
-  function resizeFx(){
-    const rect = elCenter.getBoundingClientRect();
-    elFx.width = Math.floor(rect.width * devicePixelRatio);
-    elFx.height = Math.floor(rect.height * devicePixelRatio);
-    elFx.style.width = rect.width + "px";
-    elFx.style.height = rect.height + "px";
-    fx.w = elFx.width;
-    fx.h = elFx.height;
-    fx.ctx = elFx.getContext("2d");
-  }
-  window.addEventListener("resize", resizeFx, {passive:true});
-  resizeFx();
-
-  function spawnFirework(strength=1){
-    if (!fx.ctx) return;
-    const cx = (Math.random()*0.72 + 0.14) * fx.w;
-    const cy = (Math.random()*0.45 + 0.18) * fx.h;
-
-    const s = Math.min(4, Math.max(1, strength));
-    const count = Math.floor(18 + 12 * s);
-    const speed = (1.8 + 1.3 * s) * devicePixelRatio;
-    const life = 520 + 200 * s;
-
-    for (let i=0; i<count; i++){
-      const a = (Math.PI*2) * (i / count) + (Math.random()*0.12);
-      const v = speed * (0.55 + Math.random()*0.75);
-      fx.particles.push({
-        x: cx, y: cy,
-        vx: Math.cos(a)*v,
-        vy: Math.sin(a)*v,
-        r: (1.2 + Math.random()*1.4) * devicePixelRatio,
-        life,
-        born: performance.now(),
-        hue: (i*360/count + Math.random()*18) % 360
-      });
+    function updateRowBarActive(){
+      const chips = [...els.rowbar.querySelectorAll(".rowchip")];
+      for(const c of chips){
+        c.classList.toggle("active", c.dataset.row === rowId);
+        const star = c.querySelector(".star");
+        star.classList.toggle("cleared", clearedRows.has(c.dataset.row));
+      }
     }
-  }
 
-  function stepFx(ts){
-    if (!fx.ctx) return requestAnimationFrame(stepFx);
-    const ctx = fx.ctx;
-    const dt = Math.min(34, ts - (fx.last || ts));
-    fx.last = ts;
+    function setHint(text){
+      els.hint.textContent = text;
+    }
 
-    ctx.clearRect(0,0,fx.w,fx.h);
+    // ===========
+    // Game flow
+    // ===========
+    function setCourse(newCourse){
+      course = newCourse;
+      clearedRows = new Set();
+      rowOrder = COURSE_ROWS[course].map(r=>r.id);
+      rowIndex = 0;
+      rowId = rowOrder[0];
+      buildRowSelector();
+      buildRowBar();
+      hardResetView();
+    }
 
-    const now = ts;
-    fx.particles = fx.particles.filter(p => {
-      const age = now - p.born;
-      if (age > p.life) return false;
+    function setMode(newMode){
+      mode = newMode;
+      const showRow = (mode === "row");
+      els.rowSel.style.display = showRow ? "" : "none";
 
-      const t = age / p.life;
-      p.vy += 0.0035 * dt * devicePixelRatio;
-      p.x += p.vx * (dt/16);
-      p.y += p.vy * (dt/16);
+      if(mode === "normal"){
+        rowOrder = COURSE_ROWS[course].map(r=>r.id);
+        rowIndex = 0;
+        rowId = rowOrder[0];
+      }else{
+        rowId = els.rowSel.value || COURSE_ROWS[course][0].id;
+      }
+      buildRowBar();
+      hardResetView();
+    }
 
-      const alpha = Math.pow(1 - t, 1.6);
-      ctx.beginPath();
-      ctx.fillStyle = `hsla(${p.hue}, 95%, 55%, ${alpha})`;
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fill();
+    function startGame(){
+      running = true;
+      setHint("いまは入力中（Enterはスタート専用）");
+      if(mode === "normal"){
+        rowIndex = 0;
+        rowId = rowOrder[rowIndex];
+        startRow(rowId, true);
+      }else{
+        rowId = els.rowSel.value || rowId;
+        startRow(rowId, true);
+      }
+    }
 
-      ctx.strokeStyle = `hsla(${p.hue}, 95%, 55%, ${alpha*0.35})`;
-      ctx.lineWidth = 2 * devicePixelRatio;
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-      ctx.lineTo(p.x - p.vx*0.10, p.y - p.vy*0.10);
-      ctx.stroke();
+    function startRow(rid, resetClear=false){
+      if(resetClear){
+        // keep clearedRows as is; only reset per-row progress
+      }
+      rowId = rid;
+      updateRowBarActive();
 
-      return true;
+      pool = ALL.filter(e => e.course === course && e.row === rowId);
+      itemIndex = 0;
+      nextItem(true);
+
+      els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong> をれんしゅう`;
+    }
+
+    function getRowLabel(course, rid){
+      const r = COURSE_ROWS[course].find(x=>x.id===rid);
+      return r ? r.label : rid;
+    }
+
+    function nextItem(forceNew=false){
+      if(pool.length === 0){
+        els.kana.textContent = "—";
+        els.romaji.innerHTML = "";
+        els.fingers.innerHTML = "";
+        els.status.textContent = "この行の問題がありません";
+        return;
+      }
+
+      if(!forceNew){
+        itemIndex++;
+      }
+      if(itemIndex >= pool.length){
+        // Row cleared
+        clearedRows.add(rowId);
+        buildRowBar();
+        updateRowBarActive();
+        clearRowSound();
+
+        if(mode === "normal"){
+          rowIndex++;
+          if(rowIndex >= rowOrder.length){
+            running = false;
+            setHint("Enterでスタート");
+            els.status.innerHTML = `<strong>コース クリア！</strong> もういちど Enter`;
+            // keep current display
+            return;
+          }
+          startRow(rowOrder[rowIndex], true);
+          return;
+        }else{
+          // row practice: loop same row
+          itemIndex = 0;
+        }
+      }
+
+      const cur = pool[itemIndex];
+      els.kana.textContent = cur.kana;
+
+      accepted = cur.accepts.slice();
+      progress = "";
+      target = ""; // decide dynamically as user types
+
+      renderRomaji();
+      renderFingerSigns();
+      renderKeyboardHighlight();
+    }
+
+    // Decide which accepted romaji we are aiming for (based on typed prefix)
+    function pickTargetForPrefix(prefix){
+      if(prefix.length === 0) return ""; // none yet
+      const candidates = accepted.filter(t => t.startsWith(prefix));
+      if(candidates.length === 0) return "";
+      // choose shortest (easiest)
+      candidates.sort((a,b)=>a.length-b.length);
+      return candidates[0];
+    }
+
+    function currentExpectedChar(){
+      // if no target chosen yet, any first char from any accepted
+      if(target){
+        return target[progress.length] || "";
+      }
+      // gather possible next char for current progress among all accepted
+      const candidates = accepted.filter(t => t.startsWith(progress));
+      if(candidates.length === 0) return "";
+      const chars = new Set();
+      for(const c of candidates){
+        const ch = c[progress.length];
+        if(ch) chars.add(ch);
+      }
+      // If multiple, we highlight none on keyboard (still show finger if possible)
+      if(chars.size === 1) return [...chars][0];
+      return "";
+    }
+
+    function nextExpectedChar(){
+      const ch = currentExpectedChar();
+      if(!ch) return "";
+      // next char after that, only if deterministic
+      const p2 = progress + ch;
+      const candidates = accepted.filter(t => t.startsWith(p2));
+      if(candidates.length === 0) return "";
+      if(target){
+        return target[p2.length] || "";
+      }
+      const chars = new Set();
+      for(const c of candidates){
+        const c2 = c[p2.length];
+        if(c2) chars.add(c2);
+      }
+      if(chars.size === 1) return [...chars][0];
+      return "";
+    }
+
+    // ===========
+    // Rendering
+    // ===========
+    function renderRomaji(){
+      els.romaji.innerHTML = "";
+
+      // Choose a display template: show the shortest accepted as "guide"
+      const guide = accepted.slice().sort((a,b)=>a.length-b.length)[0] || "";
+      const letters = guide.toUpperCase().split("");
+
+      for(let i=0;i<letters.length;i++){
+        const div = document.createElement("div");
+        div.className = "letter";
+        div.textContent = letters[i];
+
+        if(i < progress.length){
+          div.classList.add("done");
+        }else if(i === progress.length){
+          div.classList.add("cur");
+        }else if(i === progress.length + 1){
+          div.classList.add("next");
+        }
+
+        els.romaji.appendChild(div);
+      }
+
+      // If multiple romanizations, show small hint in status line (light)
+      const uniq = [...new Set(accepted)].sort((a,b)=>a.length-b.length);
+      if(uniq.length > 1){
+        const shown = uniq.slice(0,4).map(s=>s.toUpperCase()).join(" / ");
+        els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong>　（OK: ${shown}${uniq.length>4 ? " …" : ""}）`;
+      }else{
+        els.status.innerHTML = `<strong>${getRowLabel(course,rowId)}</strong>`;
+      }
+    }
+
+    function renderFingerSigns(){
+      els.fingers.innerHTML = "";
+
+      const curChar = currentExpectedChar();
+      const nextChar = nextExpectedChar();
+
+      const curFinger = charToFinger(curChar);
+      const nextFinger = charToFinger(nextChar);
+
+      els.fingers.appendChild(fingerCard("赤", "いま押す", curChar, curFinger, "red"));
+      els.fingers.appendChild(fingerCard("青", "つぎ", nextChar, nextFinger, "blue"));
+    }
+
+    function fingerCard(colorLabel, subtitle, ch, finger, dotClass){
+      const card = document.createElement("div");
+      card.className = "fingerCard";
+
+      const dot = document.createElement("div");
+      dot.className = "dot " + dotClass;
+
+      const col = document.createElement("div");
+      col.className = "fingerCol";
+
+      const t1 = document.createElement("div");
+      t1.className = "fingerText";
+      const keyStr = (ch ? ch.toUpperCase() : "—");
+      const fingerStr = (finger ? finger.name : "—");
+      t1.textContent = `${keyStr} → ${fingerStr}`;
+
+      const t2 = document.createElement("div");
+      t2.className = "fingerSub";
+      t2.textContent = `${colorLabel}：${subtitle}`;
+
+      col.appendChild(t1);
+      col.appendChild(t2);
+
+      card.appendChild(dot);
+      card.appendChild(col);
+      return card;
+    }
+
+    function charToFinger(ch){
+      if(!ch) return FINGER.NONE;
+      if(ch === " ") return FINGER.THUMB;
+      const f = KEY_TO_FINGER[ch.toLowerCase()];
+      return f || FINGER.NONE;
+    }
+
+    function clearKeyboardHighlights(){
+      const keys = els.keysRoot.querySelectorAll(".key");
+      keys.forEach(k=>k.classList.remove("cur","next"));
+    }
+
+    function renderKeyboardHighlight(){
+      clearKeyboardHighlights();
+
+      const curChar = currentExpectedChar();
+      const nextChar = nextExpectedChar();
+
+      if(curChar){
+        const el = els.keysRoot.querySelector(`.key[data-k="${cssEscapeKey(curChar)}"]`);
+        if(el) el.classList.add("cur");
+      }
+      if(nextChar){
+        const el2 = els.keysRoot.querySelector(`.key[data-k="${cssEscapeKey(nextChar)}"]`);
+        if(el2) el2.classList.add("next");
+      }
+
+      // Also emphasize zone subtly by adding outline on keyboard (optional, keep simple)
+      // (No extra elements; current key highlight is main)
+    }
+
+    function cssEscapeKey(k){
+      // data-k is simple ("a".."z" or " ")
+      if(k === " ") return " ";
+      return k.toLowerCase();
+    }
+
+    function hardResetView(){
+      running = false;
+      setHint("Enterでスタート");
+      els.kana.textContent = "—";
+      els.romaji.innerHTML = "";
+      els.fingers.innerHTML = "";
+      els.status.textContent = "";
+      clearKeyboardHighlights();
+      updateRowBarActive();
+    }
+
+    function resetAll(){
+      clearedRows = new Set();
+      buildRowBar();
+      hardResetView();
+    }
+
+    // ===========
+    // Input handling
+    // ===========
+    function normalizeKey(e){
+      // Only letters + space
+      if(e.key === " "){ return " "; }
+      const k = e.key.toLowerCase();
+      if(k.length === 1 && k >= "a" && k <= "z") return k;
+      return null;
+    }
+
+    function handleType(k){
+      // Determine if k can be next, across accepted options
+      const nextPrefix = progress + k;
+      const candidates = accepted.filter(t => t.startsWith(nextPrefix));
+      if(candidates.length === 0){
+        // wrong (quiet; keep UI simple)
+        beep(220,70,"sine",0.03);
+        return;
+      }
+
+      progress = nextPrefix;
+
+      // lock-in target if possible
+      const picked = pickTargetForPrefix(progress);
+      if(picked) target = picked;
+
+      renderRomaji();
+      renderFingerSigns();
+      renderKeyboardHighlight();
+
+      // if complete any accepted string => correct
+      const isDone = accepted.some(t => t === progress);
+      if(isDone){
+        beep(660,70,"sine",0.045);
+        // move on
+        nextItem(false);
+      }
+    }
+
+    // ===========
+    // Events
+    // ===========
+    els.courseSel.addEventListener("change", ()=>{
+      setCourse(els.courseSel.value);
     });
 
-    requestAnimationFrame(stepFx);
-  }
-  requestAnimationFrame(stepFx);
+    els.modeSel.addEventListener("change", ()=>{
+      setMode(els.modeSel.value);
+    });
 
-  /* ---------------------------
-     Game
-  --------------------------- */
-
-  let started = false;
-  let iGoju = 0;
-  let current = gojuon[0];
-  let idx = 0;     // expected char index in roma
-  let streak = 0;  // continuous correct kana count
-
-  function renderPrompt(){
-    document.getElementById("kana").textContent = current.kana;
-
-    const r = current.roma.toUpperCase();
-    const c1 = r[0] || "";
-    const c2 = r[1] || "";
-
-    elR1.textContent = c1 || "—";
-    if (c2){
-      elR2.classList.remove("dim");
-      elR2.textContent = c2;
-    } else {
-      elR2.classList.add("dim");
-      elR2.textContent = "—";
-    }
-  }
-
-  function clearTargets(){
-    for (const el of keyElsByCode.values()){
-      el.classList.remove("target1","target2");
-    }
-  }
-
-  function updateTargets(){
-    clearTargets();
-    const roma = current.roma.toLowerCase();
-    const c1 = roma[0];
-    const c2 = roma[1];
-
-    const code1 = charToCode.get(c1);
-    if (code1 && keyElsByCode.has(code1)) keyElsByCode.get(code1).classList.add("target1");
-
-    if (c2){
-      const code2 = charToCode.get(c2);
-      if (code2 && keyElsByCode.has(code2)) keyElsByCode.get(code2).classList.add("target2");
-    }
-  }
-
-  function pickNextSequential(){
-    current = gojuon[iGoju];
-    idx = 0;
-    renderPrompt();
-    updateTargets();
-    iGoju = (iGoju + 1) % gojuon.length; // 連続でループ
-  }
-
-  function pressKeyVisual(code){
-    const el = keyElsByCode.get(code);
-    if (!el) return;
-    el.classList.add("kbDown");
-    setTimeout(() => el.classList.remove("kbDown"), 60);
-  }
-
-  function okVisual(){
-    elKana.classList.remove("pulseOk");
-    void elKana.offsetWidth;
-    elKana.classList.add("pulseOk");
-  }
-
-  function missVisual(){
-    elCenter.classList.remove("shake");
-    void elCenter.offsetWidth;
-    elCenter.classList.add("shake");
-  }
-
-  function start(){
-    if (started) return;
-    started = true;
-
-    // ★ここが重要：Space押下＝ユーザー操作直後にAudioContextを解放して、即座に音を鳴らす
-    unlockAudioIfNeeded();
-    beep(660, 0.06, "sine", 0.08); // start音（小さく）
-
-    // 最初は「あ」から
-    iGoju = 0;
-    streak = 0;
-    pickNextSequential();
-  }
-
-  // initial idle
-  renderPrompt();
-  clearTargets();
-
-  document.addEventListener("pointerdown", () => {
-    // mobile対策：ポインタでもアンロック
-    unlockAudioIfNeeded();
-  }, {passive:true});
-
-  document.addEventListener("keydown", (e) => {
-    if (e.code === "Space") e.preventDefault();
-
-    pressKeyVisual(e.code);
-
-    // start by Space
-    if (!started){
-      if (e.code === "Space") start();
-      return;
-    }
-
-    // ignore non-character keys for typing judgement
-    if (e.key.length !== 1) return;
-
-    unlockAudioIfNeeded();
-
-    const expected = current.roma.toLowerCase()[idx];
-    if (!expected) return;
-
-    const got = e.key.toLowerCase();
-    if (got === expected){
-      playOk();
-      idx++;
-      okVisual();
-
-      if (idx >= current.roma.length){
-        streak++;
-        const strength = Math.min(4, 1 + streak * 0.18);
-        spawnFirework(strength);
-        playFirework(strength); // ★花火音（ここで鳴る）
-        pickNextSequential();
+    els.rowSel.addEventListener("change", ()=>{
+      rowId = els.rowSel.value;
+      if(running && mode === "row"){
+        startRow(rowId, true);
+      }else{
+        buildRowBar();
+        updateRowBarActive();
       }
-    } else {
-      streak = 0;
-      playMiss();
-      missVisual();
-    }
-  }, {passive:false});
+    });
 
-})();
-</script>
+    els.resetBtn.addEventListener("click", ()=>{
+      resetAll();
+    });
+
+    window.addEventListener("keydown", (e)=>{
+      // Enter starts (only when not running)
+      if(e.key === "Enter"){
+        e.preventDefault();
+        if(!running){
+          startGame();
+        }
+        return;
+      }
+
+      if(!running) return;
+
+      // Prevent page scroll by space
+      if(e.key === " "){
+        e.preventDefault();
+      }
+
+      const k = normalizeKey(e);
+      if(!k) return;
+
+      handleType(k);
+    }, {passive:false});
+
+    // ===========
+    // Init
+    // ===========
+    (function init(){
+      rowOrder = COURSE_ROWS[course].map(r=>r.id);
+      rowId = rowOrder[0];
+      buildRowSelector();
+      buildRowBar();
+      hardResetView();
+    })();
+  </script>
 </body>
 </html>
