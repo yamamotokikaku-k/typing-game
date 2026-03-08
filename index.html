@@ -3,725 +3,1427 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>かなタイピングれんしゅう</title>
+  <title>こどもローマ字タイピング</title>
   <style>
     :root{
-      --bg:#fcfcff;
-      --card:#ffffff;
-      --text:#111827;
-      --sub:#6b7280;
-      --line:#e5e7eb;
-      --accent:#111827;
-      --ok:#16a34a;
-      --miss:#dc2626;
-      --yellow:#facc15;
-      --blue:#60a5fa;
-      --pink:#f9a8d4;
+      --bg1:#f7fbff;
+      --bg2:#eef7ff;
+      --panel:#ffffff;
+      --line:#d9e7f5;
+      --text:#15314b;
+      --sub:#5e7b96;
+      --accent:#3ba7ff;
+      --accent2:#68d391;
+      --ok:#22c55e;
+      --miss:#ef4444;
+      --warn:#f59e0b;
+      --shadow:0 18px 40px rgba(33, 87, 141, .10);
+      --key:#ffffff;
+      --keyLine:#cfe0f0;
+      --keyActive:#dff3ff;
+      --keyNext:#fff2c7;
+      --fingerL5:#ffd7df;
+      --fingerL4:#ffe6c7;
+      --fingerL3:#fff0b3;
+      --fingerL2:#e8f7c7;
+      --fingerR2:#d6f8dd;
+      --fingerR3:#d8f0ff;
+      --fingerR4:#e5e4ff;
+      --fingerR5:#f1dbff;
     }
-    *{box-sizing:border-box}
-    body{
+
+    *{ box-sizing:border-box; }
+    html,body{
       margin:0;
+      min-height:100%;
       font-family:
-        "Hiragino Sans","Yu Gothic","Meiryo",system-ui,-apple-system,sans-serif;
-      background:linear-gradient(180deg,#ffffff 0%, #f8fbff 100%);
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        "Meiryo",
+        system-ui,
+        sans-serif;
       color:var(--text);
-      min-height:100vh;
+      background:
+        radial-gradient(circle at top left, #ffffff 0%, var(--bg1) 45%, var(--bg2) 100%);
     }
+
+    body{
+      padding:20px;
+    }
+
     .wrap{
-      max-width:920px;
+      max-width:1200px;
       margin:0 auto;
-      padding:20px 16px 40px;
     }
+
     .topbar{
       display:flex;
-      gap:12px;
       flex-wrap:wrap;
+      gap:14px;
       align-items:center;
       justify-content:space-between;
-      margin-bottom:16px;
-    }
-    .title{
-      font-size:20px;
-      font-weight:800;
-      letter-spacing:.04em;
-    }
-    .controls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    button{
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      border-radius:999px;
-      padding:10px 14px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.15s transform,.15s background,.15s border-color,.15s box-shadow;
-      box-shadow:0 1px 0 rgba(0,0,0,.02);
-    }
-    button:hover{transform:translateY(-1px)}
-    button.active{
-      background:var(--accent);
-      color:#fff;
-      border-color:var(--accent);
-    }
-
-    .main{
-      background:rgba(255,255,255,.82);
-      backdrop-filter:blur(8px);
-      border:1px solid rgba(229,231,235,.9);
-      border-radius:28px;
-      padding:20px 18px 28px;
-      position:relative;
-      overflow:hidden;
-      box-shadow:0 10px 30px rgba(17,24,39,.04);
-    }
-
-    .meta{
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
       margin-bottom:18px;
     }
-    .pill{
+
+    .titleBox{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(28px, 4vw, 40px);
+      line-height:1.1;
+      letter-spacing:.03em;
+    }
+
+    .lead{
+      margin:0;
+      color:var(--sub);
+      font-size:14px;
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(150px, 1fr));
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .card{
+      background:var(--panel);
       border:1px solid var(--line);
-      background:#fff;
-      border-radius:999px;
-      padding:8px 12px;
+      border-radius:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .control{
+      padding:14px;
+    }
+
+    .control label{
+      display:block;
       font-size:13px;
       color:var(--sub);
+      margin-bottom:8px;
       font-weight:700;
-      min-width:92px;
-      text-align:center;
+    }
+
+    select, button{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:15px;
+      font-weight:700;
+      outline:none;
+    }
+
+    select{
+      background:#f5faff;
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+
+    button{
+      cursor:pointer;
+      background:linear-gradient(135deg, var(--accent), #76c8ff);
+      color:#fff;
+      box-shadow:0 8px 20px rgba(59,167,255,.25);
+      transition:.15s transform ease, .15s opacity ease;
+    }
+
+    button:hover{ transform:translateY(-1px); }
+    button:active{ transform:translateY(0); }
+
+    .main{
+      display:grid;
+      grid-template-columns:1.2fr .9fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .play{
+      padding:18px;
+    }
+
+    .status{
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .stat{
+      background:#f7fbff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:10px 12px;
+    }
+
+    .stat .k{
+      font-size:12px;
+      color:var(--sub);
+      margin-bottom:6px;
+      font-weight:700;
+    }
+
+    .stat .v{
+      font-size:clamp(16px, 2vw, 24px);
+      font-weight:800;
+      letter-spacing:.02em;
     }
 
     .stage{
       min-height:360px;
       display:flex;
       flex-direction:column;
-      align-items:center;
       justify-content:center;
+      align-items:center;
+      gap:12px;
       text-align:center;
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(245,251,255,.95));
+      padding:20px;
       position:relative;
+      overflow:hidden;
     }
 
-    .countdown{
-      font-size:64px;
-      font-weight:900;
-      line-height:1;
-      letter-spacing:.04em;
-      min-height:76px;
-      margin-bottom:6px;
-    }
-
-    .kana{
-      font-size:clamp(56px, 12vw, 120px);
-      font-weight:900;
-      line-height:1.05;
-      letter-spacing:.04em;
-      margin:8px 0;
-    }
-
-    .romaji{
-      font-size:clamp(22px, 4vw, 34px);
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#eef8ff;
+      border:1px solid #d4eafa;
+      padding:8px 12px;
+      border-radius:999px;
+      color:#2a5d82;
       font-weight:800;
-      letter-spacing:.14em;
-      color:var(--sub);
-      min-height:44px;
-      margin-top:6px;
+      font-size:13px;
+    }
+
+    .questionKana{
+      font-size:clamp(42px, 8vw, 84px);
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:.08em;
+      margin:6px 0 0;
+      word-break:break-word;
+    }
+
+    .questionRoma{
+      font-size:clamp(18px, 3vw, 30px);
+      color:#2a6ea1;
+      font-weight:800;
+      letter-spacing:.08em;
+      word-break:break-all;
     }
 
     .typed{
-      margin-top:12px;
-      min-height:34px;
-      font-size:24px;
-      font-weight:900;
-      letter-spacing:.08em;
+      width:min(100%, 760px);
+      min-height:68px;
+      border-radius:18px;
+      border:2px solid #d7eafb;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      text-align:left;
+      padding:16px 18px;
+      font-size:clamp(18px, 3vw, 32px);
+      font-weight:800;
+      line-height:1.4;
+      letter-spacing:.04em;
+      word-break:break-all;
+      box-shadow:inset 0 2px 10px rgba(76,136,192,.05);
     }
-    .typed .done{color:var(--ok)}
-    .typed .rest{color:#cbd5e1}
-    .typed.missFlash{animation:shake .18s linear 1}
-    @keyframes shake{
-      0%{transform:translateX(0)}
-      25%{transform:translateX(-5px)}
-      50%{transform:translateX(5px)}
-      75%{transform:translateX(-4px)}
-      100%{transform:translateX(0)}
+
+    .done{ color:#1f8d4b; }
+    .rest{ color:#9fb5c8; }
+    .caret{
+      display:inline-block;
+      width:2px;
+      height:1.2em;
+      background:var(--accent);
+      margin:0 2px;
+      vertical-align:-0.18em;
+      animation:blink 1s steps(1) infinite;
     }
+
+    .notice{
+      min-height:28px;
+      font-size:15px;
+      font-weight:800;
+    }
+    .notice.ok{ color:var(--ok); }
+    .notice.miss{ color:var(--miss); }
+    .notice.warn{ color:var(--warn); }
 
     .hint{
-      margin-top:18px;
       color:var(--sub);
       font-size:14px;
-      font-weight:700;
+      line-height:1.7;
     }
 
-    .progressWrap{
-      margin:20px auto 0;
-      max-width:560px;
-    }
-    .progressText{
+    .side{
       display:flex;
-      justify-content:space-between;
-      font-size:13px;
-      color:var(--sub);
-      font-weight:700;
-      margin-bottom:8px;
-    }
-    .bar{
-      height:14px;
-      background:#eef2f7;
-      border-radius:999px;
-      overflow:hidden;
-      border:1px solid #e5e7eb;
-    }
-    .fill{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg,var(--blue),var(--pink),var(--yellow));
-      transition:width .2s ease;
+      flex-direction:column;
+      gap:16px;
     }
 
-    .result{
-      display:none;
-      margin-top:22px;
-      border-top:1px solid var(--line);
-      padding-top:18px;
-    }
-    .result.show{display:block}
-    .resultTitle{
-      font-size:24px;
-      font-weight:900;
-      text-align:center;
-      margin-bottom:14px;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:12px;
-    }
-    .box{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:20px;
+    .keyboardCard,
+    .listCard,
+    .resultCard{
       padding:16px;
-      text-align:center;
     }
-    .label{
-      color:var(--sub);
-      font-size:13px;
-      font-weight:700;
-      margin-bottom:8px;
-    }
-    .value{
-      font-size:28px;
+
+    .sectionTitle{
+      margin:0 0 12px;
+      font-size:18px;
       font-weight:900;
     }
 
-    .best{
-      margin-top:16px;
+    .keyboardWrap{
+      overflow:auto;
+      padding-bottom:6px;
+    }
+
+    .kb{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:700px;
+    }
+
+    .row{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+    }
+
+    .key{
+      min-width:44px;
+      height:48px;
+      padding:4px 6px;
+      border-radius:12px;
+      background:var(--key);
+      border:1px solid var(--keyLine);
+      box-shadow:0 4px 10px rgba(0,0,0,.04);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      font-size:13px;
+      font-weight:800;
+      position:relative;
+      transition:.1s ease;
+      user-select:none;
+    }
+
+    .key small{
+      display:block;
+      font-size:10px;
+      font-weight:700;
+      color:var(--sub);
+      line-height:1;
+      margin-top:3px;
+    }
+
+    .key.wide2{ min-width:70px; }
+    .key.wide3{ min-width:92px; }
+    .key.wide4{ min-width:120px; }
+    .key.space{ min-width:300px; }
+
+    .finger-l5{ background:var(--fingerL5); }
+    .finger-l4{ background:var(--fingerL4); }
+    .finger-l3{ background:var(--fingerL3); }
+    .finger-l2{ background:var(--fingerL2); }
+    .finger-r2{ background:var(--fingerR2); }
+    .finger-r3{ background:var(--fingerR3); }
+    .finger-r4{ background:var(--fingerR4); }
+    .finger-r5{ background:var(--fingerR5); }
+
+    .key.home{
+      outline:2px dashed rgba(0,0,0,.12);
+      outline-offset:-6px;
+    }
+
+    .key.active{
+      transform:translateY(-2px) scale(1.03);
+      border-color:#69beff;
+      box-shadow:0 10px 20px rgba(74,161,255,.22);
+      background:var(--keyActive);
+    }
+
+    .key.next{
+      border-color:#e2b832;
+      background:var(--keyNext);
+      box-shadow:0 0 0 3px rgba(242,194,52,.14);
+    }
+
+    .fingerLegend{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:repeat(4, 1fr);
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .legendItem{
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(0,0,0,.05);
+      text-align:center;
+    }
+
+    .listCard .menu{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:8px;
+    }
+
+    .menuBtn{
+      border:1px solid var(--line);
+      background:#f8fbff;
+      color:var(--text);
+      box-shadow:none;
+      font-size:14px;
+      padding:12px 10px;
+    }
+
+    .menuBtn.active{
+      background:linear-gradient(135deg, var(--accent2), #9ee6ba);
+      color:#0f3d28;
+      border-color:transparent;
+    }
+
+    .resultCard{
+      display:none;
+    }
+
+    .resultCard.show{
+      display:block;
+    }
+
+    .resultGrid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
       gap:12px;
     }
 
-    .footerNote{
-      margin-top:16px;
-      text-align:center;
+    .bigResult{
+      background:#f7fbff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .bigResult .rKey{
       color:var(--sub);
-      font-size:13px;
-      font-weight:700;
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:8px;
     }
 
-    .burst{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      overflow:hidden;
-    }
-    .star{
-      position:absolute;
-      width:12px;
-      height:12px;
-      border-radius:50%;
-      opacity:.95;
-      animation:pop .7s ease-out forwards;
-    }
-    @keyframes pop{
-      0%{transform:translate(0,0) scale(.2); opacity:0}
-      12%{opacity:1}
-      100%{transform:translate(var(--dx), var(--dy)) scale(1.1); opacity:0}
-    }
-
-    .sparkle{
-      position:absolute;
-      font-size:28px;
+    .bigResult .rVal{
+      font-size:clamp(24px, 4vw, 42px);
       font-weight:900;
-      animation:floatUp .8s ease-out forwards;
-      pointer-events:none;
-    }
-    @keyframes floatUp{
-      0%{transform:translateY(10px) scale(.7); opacity:0}
-      15%{opacity:1}
-      100%{transform:translateY(-48px) scale(1.15); opacity:0}
     }
 
-    @media (max-width:700px){
-      .grid,.best{grid-template-columns:1fr}
-      .main{padding:16px 14px 24px}
-      .kana{margin-top:2px}
-      .countdown{font-size:52px}
+    .bottomGuide{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px dashed #cfe1f0;
+      background:#fbfdff;
+      color:#4d6a83;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    @keyframes blink{
+      0%, 49%{ opacity:1; }
+      50%, 100%{ opacity:0; }
+    }
+
+    @media (max-width: 980px){
+      .main{
+        grid-template-columns:1fr;
+      }
+      .controls{
+        grid-template-columns:repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px){
+      body{ padding:12px; }
+      .controls{
+        grid-template-columns:1fr;
+      }
+      .status{
+        grid-template-columns:repeat(2, 1fr);
+      }
+      .fingerLegend{
+        grid-template-columns:repeat(2, 1fr);
+      }
+      .resultGrid{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">かなタイピングれんしゅう</div>
-      <div class="controls">
-        <button class="modeBtn active" data-mode="basic">50音</button>
-        <button class="modeBtn" data-mode="daku">だくおん</button>
-        <button class="modeBtn" data-mode="youon">きゃきゅきょ</button>
-        <button class="modeBtn" data-mode="all">ぜんぶ</button>
-        <button id="restartBtn">さいしょから</button>
+      <div class="titleBox">
+        <h1>こどもローマ字タイピング</h1>
+        <p class="lead">ひらがなを見て、ローマ字でうってれんしゅうしよう</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control card">
+        <label for="modeSelect">もんだいモード</label>
+        <select id="modeSelect">
+          <option value="random10">ランダム 10もん</option>
+          <option value="random20">ランダム 20もん</option>
+          <option value="random30">ランダム 30もん</option>
+          <option value="random50">ランダム 50もん</option>
+          <option value="endless">エンドレス</option>
+        </select>
+      </div>
+
+      <div class="control card">
+        <label for="groupSelect">れんしゅうする かな</label>
+        <select id="groupSelect">
+          <option value="all">ぜんぶ</option>
+          <option value="basic">あいうえお〜わ を ん</option>
+          <option value="a">あ行</option>
+          <option value="ka">か行</option>
+          <option value="sa">さ行</option>
+          <option value="ta">た行</option>
+          <option value="na">な行</option>
+          <option value="ha">は行</option>
+          <option value="ma">ま行</option>
+          <option value="ya">や行</option>
+          <option value="ra">ら行</option>
+          <option value="wa">わ行・ん</option>
+          <option value="dakuon">だく音・はんだく音</option>
+          <option value="youon">きゃ きゅ きょ など</option>
+          <option value="small">ゃ ゅ ょ っ をふくむ</option>
+          <option value="words">ことば</option>
+        </select>
+      </div>
+
+      <div class="control card">
+        <label for="soundSelect">おと</label>
+        <select id="soundSelect">
+          <option value="dry">ドライ</option>
+          <option value="soft">ソフト</option>
+          <option value="retro">レトロ</option>
+          <option value="off">オフ</option>
+        </select>
+      </div>
+
+      <div class="control card">
+        <label>&nbsp;</label>
+        <button id="startBtn">スタート</button>
       </div>
     </div>
 
     <div class="main">
-      <div class="meta">
-        <div class="pill" id="modeLabel">50音</div>
-        <div class="pill" id="qLabel">0 / 0</div>
-        <div class="pill" id="accLabel">せいかくりつ 100%</div>
-      </div>
-
-      <div class="stage">
-        <div class="burst" id="burst"></div>
-        <div class="countdown" id="countdown"></div>
-        <div class="kana" id="kana">ひらがな</div>
-        <div class="romaji" id="romaji">PRESS ENTER</div>
-        <div class="typed" id="typed"></div>
-        <div class="hint" id="hint">Enterキーでスタート</div>
-      </div>
-
-      <div class="progressWrap">
-        <div class="progressText">
-          <span>しんちょく</span>
-          <span id="progressText">0%</span>
-        </div>
-        <div class="bar">
-          <div class="fill" id="fill"></div>
-        </div>
-      </div>
-
-      <div class="result" id="result">
-        <div class="resultTitle">できた！</div>
-        <div class="grid">
-          <div class="box">
-            <div class="label">せいかくりつ</div>
-            <div class="value" id="finalAcc">0%</div>
+      <section class="play card">
+        <div class="status">
+          <div class="stat">
+            <div class="k">もんだい</div>
+            <div class="v" id="qNo">0 / 0</div>
           </div>
-          <div class="box">
-            <div class="label">ミス</div>
-            <div class="value" id="finalMiss">0</div>
+          <div class="stat">
+            <div class="k">せいかいキー</div>
+            <div class="v" id="correctKeys">0</div>
           </div>
-          <div class="box">
-            <div class="label">かかったじかん</div>
-            <div class="value" id="finalTime">0.0s</div>
+          <div class="stat">
+            <div class="k">ミス</div>
+            <div class="v" id="missKeys">0</div>
           </div>
-          <div class="box">
-            <div class="label">れんしゅうした もじ</div>
-            <div class="value" id="finalCount">0</div>
+          <div class="stat">
+            <div class="k">せいかくりつ</div>
+            <div class="v" id="accuracy">100%</div>
+          </div>
+          <div class="stat">
+            <div class="k">じかん</div>
+            <div class="v" id="timer">0.0s</div>
           </div>
         </div>
 
-        <div class="best">
-          <div class="box">
-            <div class="label">ベスト せいかくりつ</div>
-            <div class="value" id="bestAcc">-</div>
+        <div class="stage">
+          <div class="badge" id="nowMode">スタートを おして はじめよう</div>
+          <div class="questionKana" id="questionKana">あ</div>
+          <div class="questionRoma" id="questionRoma">a</div>
+          <div class="typed" id="typedView">
+            <span class="done"></span><span class="caret"></span><span class="rest">a</span>
           </div>
-          <div class="box">
-            <div class="label">ベスト ミスすくなさ</div>
-            <div class="value" id="bestMiss">-</div>
-          </div>
+          <div class="notice warn" id="notice">ひらがなを ローマ字で うとう</div>
+          <div class="hint" id="hintText">つぎに おすキーが キーボードで ひかるよ</div>
         </div>
 
-        <div class="footerNote">Enterキーでもういちど</div>
-      </div>
+        <div class="bottomGuide">
+          ・表示ローマ字は <strong>訓令式ベース</strong> です。<br>
+          ・入力は <strong>ヘボン式・訓令式など複数対応</strong>。<br>
+          ・「っ」「ん」も、できるだけ迷いにくいように判定しています。<br>
+          ・最初のキーを押したときから時間を計ります。
+        </div>
+
+        <section class="resultCard card" id="resultCard" style="margin-top:16px;">
+          <h2 class="sectionTitle">けっか</h2>
+          <div class="resultGrid">
+            <div class="bigResult">
+              <div class="rKey">せいかくりつ</div>
+              <div class="rVal" id="finalAcc">0%</div>
+            </div>
+            <div class="bigResult">
+              <div class="rKey">タイム</div>
+              <div class="rVal" id="finalTime">0.0s</div>
+            </div>
+            <div class="bigResult">
+              <div class="rKey">せいかいキー</div>
+              <div class="rVal" id="finalCorrect">0</div>
+            </div>
+            <div class="bigResult">
+              <div class="rKey">ミスキー</div>
+              <div class="rVal" id="finalMiss">0</div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side">
+        <section class="keyboardCard card">
+          <h2 class="sectionTitle">キーボードガイド</h2>
+          <div class="keyboardWrap">
+            <div class="kb" id="keyboard"></div>
+          </div>
+          <div class="fingerLegend">
+            <div class="legendItem" style="background:var(--fingerL5)">ひだり こゆび</div>
+            <div class="legendItem" style="background:var(--fingerL4)">ひだり くすりゆび</div>
+            <div class="legendItem" style="background:var(--fingerL3)">ひだり なかゆび</div>
+            <div class="legendItem" style="background:var(--fingerL2)">ひだり ひとさしゆび</div>
+            <div class="legendItem" style="background:var(--fingerR2)">みぎ ひとさしゆび</div>
+            <div class="legendItem" style="background:var(--fingerR3)">みぎ なかゆび</div>
+            <div class="legendItem" style="background:var(--fingerR4)">みぎ くすりゆび</div>
+            <div class="legendItem" style="background:var(--fingerR5)">みぎ こゆび</div>
+          </div>
+        </section>
+
+        <section class="listCard card">
+          <h2 class="sectionTitle">れんしゅうショートカット</h2>
+          <div class="menu">
+            <button class="menuBtn" data-group="a">あ行</button>
+            <button class="menuBtn" data-group="ka">か行</button>
+            <button class="menuBtn" data-group="sa">さ行</button>
+            <button class="menuBtn" data-group="ta">た行</button>
+            <button class="menuBtn" data-group="na">な行</button>
+            <button class="menuBtn" data-group="ha">は行</button>
+            <button class="menuBtn" data-group="ma">ま行</button>
+            <button class="menuBtn" data-group="ya">や行</button>
+            <button class="menuBtn" data-group="ra">ら行</button>
+            <button class="menuBtn" data-group="wa">わ行</button>
+            <button class="menuBtn" data-group="dakuon">だく音</button>
+            <button class="menuBtn" data-group="youon">きゃ行</button>
+            <button class="menuBtn" data-group="small">っ ゃ ゅ ょ</button>
+            <button class="menuBtn" data-group="words">ことば</button>
+          </div>
+        </section>
+      </aside>
     </div>
   </div>
 
   <script>
-    const BASIC = [
-      ["あ",["a"]],["い",["i","yi"]],["う",["u","wu","whu"]],["え",["e"]],["お",["o"]],
-      ["か",["ka","ca"]],["き",["ki"]],["く",["ku","cu","qu"]],["け",["ke"]],["こ",["ko","co"]],
-      ["さ",["sa"]],["し",["shi","si","ci"]],["す",["su"]],["せ",["se","ce"]],["そ",["so"]],
-      ["た",["ta"]],["ち",["chi","ti"]],["つ",["tsu","tu"]],["て",["te"]],["と",["to"]],
-      ["な",["na"]],["に",["ni"]],["ぬ",["nu"]],["ね",["ne"]],["の",["no"]],
-      ["は",["ha"]],["ひ",["hi"]],["ふ",["fu","hu"]],["へ",["he"]],["ほ",["ho"]],
-      ["ま",["ma"]],["み",["mi"]],["む",["mu"]],["め",["me"]],["も",["mo"]],
-      ["や",["ya"]],["ゆ",["yu"]],["よ",["yo"]],
-      ["ら",["ra"]],["り",["ri"]],["る",["ru"]],["れ",["re"]],["ろ",["ro"]],
-      ["わ",["wa"]],["を",["wo","o"]],
-      ["ん",["nn","xn"]]
-    ];
-
-    const DAKU = [
-      ["が",["ga"]],["ぎ",["gi"]],["ぐ",["gu"]],["げ",["ge"]],["ご",["go"]],
-      ["ざ",["za"]],["じ",["ji","zi"]],["ず",["zu"]],["ぜ",["ze"]],["ぞ",["zo"]],
-      ["だ",["da"]],["ぢ",["di","ji"]],["づ",["du","zu"]],["で",["de"]],["ど",["do"]],
-      ["ば",["ba"]],["び",["bi"]],["ぶ",["bu"]],["べ",["be"]],["ぼ",["bo"]],
-      ["ぱ",["pa"]],["ぴ",["pi"]],["ぷ",["pu"]],["ぺ",["pe"]],["ぽ",["po"]]
-    ];
-
-    const YOUON = [
-      ["きゃ",["kya"]],["きゅ",["kyu"]],["きょ",["kyo"]],
-      ["しゃ",["sha","sya"]],["しゅ",["shu","syu"]],["しょ",["sho","syo"]],
-      ["ちゃ",["cha","tya","cya"]],["ちゅ",["chu","tyu","cyu"]],["ちょ",["cho","tyo","cyo"]],
-      ["にゃ",["nya"]],["にゅ",["nyu"]],["にょ",["nyo"]],
-      ["ひゃ",["hya"]],["ひゅ",["hyu"]],["ひょ",["hyo"]],
-      ["みゃ",["mya"]],["みゅ",["myu"]],["みょ",["myo"]],
-      ["りゃ",["rya"]],["りゅ",["ryu"]],["りょ",["ryo"]],
-      ["ぎゃ",["gya"]],["ぎゅ",["gyu"]],["ぎょ",["gyo"]],
-      ["じゃ",["ja","jya","zya"]],["じゅ",["ju","jyu","zyu"]],["じょ",["jo","jyo","zyo"]],
-      ["びゃ",["bya"]],["びゅ",["byu"]],["びょ",["byo"]],
-      ["ぴゃ",["pya"]],["ぴゅ",["pyu"]],["ぴょ",["pyo"]]
-    ];
-
-    const MODES = {
-      basic:{ label:"50音", list:BASIC },
-      daku:{ label:"だくおん", list:DAKU },
-      youon:{ label:"きゃきゅきょ", list:YOUON },
-      all:{ label:"ぜんぶ", list:[...BASIC, ...DAKU, ...YOUON] }
+    // =========================
+    // かな辞書
+    // =========================
+    const GROUPS = {
+      a: [
+        "あ","い","う","え","お"
+      ],
+      ka: [
+        "か","き","く","け","こ"
+      ],
+      sa: [
+        "さ","し","す","せ","そ"
+      ],
+      ta: [
+        "た","ち","つ","て","と"
+      ],
+      na: [
+        "な","に","ぬ","ね","の"
+      ],
+      ha: [
+        "は","ひ","ふ","へ","ほ"
+      ],
+      ma: [
+        "ま","み","む","め","も"
+      ],
+      ya: [
+        "や","ゆ","よ"
+      ],
+      ra: [
+        "ら","り","る","れ","ろ"
+      ],
+      wa: [
+        "わ","を","ん"
+      ],
+      dakuon: [
+        "が","ぎ","ぐ","げ","ご",
+        "ざ","じ","ず","ぜ","ぞ",
+        "だ","ぢ","づ","で","ど",
+        "ば","び","ぶ","べ","ぼ",
+        "ぱ","ぴ","ぷ","ぺ","ぽ"
+      ],
+      youon: [
+        "きゃ","きゅ","きょ",
+        "ぎゃ","ぎゅ","ぎょ",
+        "しゃ","しゅ","しょ",
+        "じゃ","じゅ","じょ",
+        "ちゃ","ちゅ","ちょ",
+        "にゃ","にゅ","にょ",
+        "ひゃ","ひゅ","ひょ",
+        "びゃ","びゅ","びょ",
+        "ぴゃ","ぴゅ","ぴょ",
+        "みゃ","みゅ","みょ",
+        "りゃ","りゅ","りょ"
+      ],
+      small: [
+        "っか","っき","っく","っけ","っこ",
+        "っさ","っし","っす","っせ","っそ",
+        "った","っち","っつ","って","っと",
+        "っは","っひ","っふ","っへ","っほ",
+        "きゃ","きゅ","きょ","しゃ","しゅ","しょ","ちゃ","ちゅ","ちょ"
+      ],
+      words: [
+        "あさ","いぬ","うみ","えほん","おに",
+        "かさ","きつね","くるま","けしごむ","こあら",
+        "さかな","しろ","すいか","せみ","そら",
+        "たまご","ちず","つくえ","てがみ","とけい",
+        "なつ","にじ","ぬの","ねこ","のはら",
+        "はな","ひこうき","ふね","へび","ほし",
+        "まど","みず","むし","めがね","もも",
+        "やま","ゆき","よる",
+        "らいおん","りんご","るすばん","れもん","ろうそく",
+        "わに","をとこ","んまん？".replace("？",""), // "ん"開始回避用ダミー除去
+        "がっこう","ぎゅうにゅう","ぐみ","げんき","ごはん",
+        "ざっし","じてんしゃ","ずこう","ぜりー","ぞう",
+        "だるま","じゃんぷ","ちょこれーと","ぴあの","びょういん",
+        "きゃんぷ","しゅりけん","ちゅうりっぷ","りょこう"
+      ]
     };
 
-    const modeButtons = document.querySelectorAll(".modeBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const modeLabel = document.getElementById("modeLabel");
-    const qLabel = document.getElementById("qLabel");
-    const accLabel = document.getElementById("accLabel");
-    const countdownEl = document.getElementById("countdown");
-    const kanaEl = document.getElementById("kana");
-    const romajiEl = document.getElementById("romaji");
-    const typedEl = document.getElementById("typed");
-    const hintEl = document.getElementById("hint");
-    const fillEl = document.getElementById("fill");
-    const progressText = document.getElementById("progressText");
-    const resultEl = document.getElementById("result");
-    const burstEl = document.getElementById("burst");
+    GROUPS.basic = [
+      ...GROUPS.a, ...GROUPS.ka, ...GROUPS.sa, ...GROUPS.ta, ...GROUPS.na,
+      ...GROUPS.ha, ...GROUPS.ma, ...GROUPS.ya, ...GROUPS.ra, ...GROUPS.wa
+    ];
 
-    const finalAcc = document.getElementById("finalAcc");
-    const finalMiss = document.getElementById("finalMiss");
-    const finalTime = document.getElementById("finalTime");
-    const finalCount = document.getElementById("finalCount");
-    const bestAcc = document.getElementById("bestAcc");
-    const bestMiss = document.getElementById("bestMiss");
+    GROUPS.all = [
+      ...GROUPS.basic,
+      ...GROUPS.dakuon,
+      ...GROUPS.youon,
+      ...GROUPS.small,
+      ...GROUPS.words
+    ];
 
-    let currentMode = "basic";
-    let questions = [];
-    let index = 0;
-    let activeAnswers = [];
-    let typed = "";
-    let started = false;
-    let finished = false;
-    let totalKeys = 0;
-    let missCount = 0;
-    let startTime = 0;
-    let audioCtx = null;
+    // =========================
+    // 表示ローマ字（訓令式ベース）
+    // =========================
+    const DISPLAY_BASE = {
+      "あ":"a","い":"i","う":"u","え":"e","お":"o",
+      "か":"ka","き":"ki","く":"ku","け":"ke","こ":"ko",
+      "さ":"sa","し":"si","す":"su","せ":"se","そ":"so",
+      "た":"ta","ち":"ti","つ":"tu","て":"te","と":"to",
+      "な":"na","に":"ni","ぬ":"nu","ね":"ne","の":"no",
+      "は":"ha","ひ":"hi","ふ":"hu","へ":"he","ほ":"ho",
+      "ま":"ma","み":"mi","む":"mu","め":"me","も":"mo",
+      "や":"ya","ゆ":"yu","よ":"yo",
+      "ら":"ra","り":"ri","る":"ru","れ":"re","ろ":"ro",
+      "わ":"wa","を":"wo","ん":"n",
+      "が":"ga","ぎ":"gi","ぐ":"gu","げ":"ge","ご":"go",
+      "ざ":"za","じ":"zi","ず":"zu","ぜ":"ze","ぞ":"zo",
+      "だ":"da","ぢ":"di","づ":"du","で":"de","ど":"do",
+      "ば":"ba","び":"bi","ぶ":"bu","べ":"be","ぼ":"bo",
+      "ぱ":"pa","ぴ":"pi","ぷ":"pu","ぺ":"pe","ぽ":"po",
+      "ぁ":"xa","ぃ":"xi","ぅ":"xu","ぇ":"xe","ぉ":"xo",
+      "ゃ":"xya","ゅ":"xyu","ょ":"xyo",
+      "っ":"xtu",
+      "ー":"-"
+    };
 
-    function initAudio(){
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const YOON_DISPLAY = {
+      "きゃ":"kya","きゅ":"kyu","きょ":"kyo",
+      "ぎゃ":"gya","ぎゅ":"gyu","ぎょ":"gyo",
+      "しゃ":"sya","しゅ":"syu","しょ":"syo",
+      "じゃ":"zya","じゅ":"zyu","じょ":"zyo",
+      "ちゃ":"tya","ちゅ":"tyu","ちょ":"tyo",
+      "にゃ":"nya","にゅ":"nyu","にょ":"nyo",
+      "ひゃ":"hya","ひゅ":"hyu","ひょ":"hyo",
+      "びゃ":"bya","びゅ":"byu","びょ":"byo",
+      "ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo",
+      "みゃ":"mya","みゅ":"myu","みょ":"myo",
+      "りゃ":"rya","りゅ":"ryu","りょ":"ryo"
+    };
+
+    const HEPBURN_ALT = {
+      "し":"shi","ち":"chi","つ":"tsu","ふ":"fu","じ":"ji","ぢ":"ji","づ":"zu",
+      "しゃ":"sha","しゅ":"shu","しょ":"sho",
+      "じゃ":"ja","じゅ":"ju","じょ":"jo",
+      "ちゃ":"cha","ちゅ":"chu","ちょ":"cho"
+    };
+
+    const DIRECT_ALT = {
+      "を":["wo","o"],
+      "ぢ":["di","ji"],
+      "づ":["du","zu"]
+    };
+
+    // =========================
+    // ユーティリティ
+    // =========================
+    function isVowel(ch){
+      return ["a","i","u","e","o"].includes(ch);
+    }
+
+    function isConsonant(ch){
+      return /^[a-z]$/.test(ch) && !isVowel(ch) && ch !== "n";
+    }
+
+    function kanaToArray(text){
+      const arr = [];
+      for(let i=0;i<text.length;i++){
+        const c = text[i];
+        const next = text[i+1];
+        if(next && ["ゃ","ゅ","ょ"].includes(next) && canPairYoon(c)){
+          arr.push(c + next);
+          i++;
+        }else{
+          arr.push(c);
+        }
       }
-      if (audioCtx.state === "suspended") audioCtx.resume();
+      return arr;
     }
 
-    function tone(freq=440, duration=0.08, type="sine", gainValue=0.05, startAt=0){
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime + startAt;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(gainValue, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
+    function canPairYoon(c){
+      return ["き","ぎ","し","じ","ち","に","ひ","び","ぴ","み","り"].includes(c);
     }
 
-    function playTypeSound(){
-      tone(800,0.035,"square",0.018,0);
-      tone(1200,0.025,"triangle",0.008,0.01);
+    function getDisplayRoma(text){
+      const parts = kanaToArray(text);
+      let out = "";
+      for(let i=0;i<parts.length;i++){
+        const cur = parts[i];
+        const next = parts[i+1] || "";
+
+        if(cur === "っ"){
+          const n = getDisplayRoma(next);
+          const first = [...n].find(ch => /[a-z]/.test(ch)) || "";
+          if(first) out += first;
+          continue;
+        }
+
+        if(cur === "ん"){
+          const nextRoma = getDisplayRoma(next);
+          const first = nextRoma[0] || "";
+          if(first && /[aiueoyn]/.test(first)){
+            out += "n'";
+          }else{
+            out += "n";
+          }
+          continue;
+        }
+
+        if(YOON_DISPLAY[cur]){
+          out += YOON_DISPLAY[cur];
+        }else{
+          out += DISPLAY_BASE[cur] || cur;
+        }
+      }
+      return out;
     }
 
-    function playMissSound(){
-      tone(210,0.09,"sawtooth",0.035,0);
-      tone(170,0.12,"sawtooth",0.025,0.02);
+    function unionSet(arrays){
+      return [...new Set(arrays.flat())];
     }
 
-    function playSuccessSound(){
-      tone(740,0.05,"triangle",0.03,0);
-      tone(988,0.07,"triangle",0.028,0.04);
-      tone(1318,0.10,"triangle",0.026,0.09);
+    function expandKanaOptions(parts, idx=0){
+      if(idx >= parts.length) return [""];
+
+      const cur = parts[idx];
+      const nextPart = parts[idx+1] || "";
+      const tailOptions = expandKanaOptions(parts, idx+1);
+      let headOptions = [];
+
+      if(cur === "っ"){
+        const nextOptions = romanizeUnit(nextPart, parts[idx+2] || "", true);
+        const candidates = new Set(["xtu","ltu","xtsu"]);
+        for(const opt of nextOptions){
+          const ch = opt[0];
+          if(ch && /[a-z]/.test(ch)) candidates.add(ch + opt);
+        }
+        headOptions = [...candidates];
+        return combine(headOptions, expandKanaOptions(parts, idx+1));
+      }
+
+      if(cur === "ん"){
+        const nextOpts = romanizeUnit(nextPart, parts[idx+2] || "", true);
+        const firstLetters = new Set(nextOpts.map(s => s[0]).filter(Boolean));
+        const nOptions = new Set(["nn", "xn"]);
+        let allowSingleN = true;
+        for(const ch of firstLetters){
+          if(/[aiueoyn]/.test(ch)) allowSingleN = false;
+        }
+        if(allowSingleN) nOptions.add("n");
+        nOptions.add("n'");
+        headOptions = [...nOptions];
+        return combine(headOptions, tailOptions);
+      }
+
+      headOptions = romanizeUnit(cur, nextPart, false);
+      return combine(headOptions, tailOptions);
     }
 
-    function playClearFanfare(){
-      tone(523,0.09,"triangle",0.03,0);
-      tone(659,0.10,"triangle",0.03,0.10);
-      tone(784,0.12,"triangle",0.03,0.20);
-      tone(1046,0.18,"triangle",0.04,0.34);
+    function romanizeUnit(unit, nextUnit="", forLookahead=false){
+      if(!unit) return [""];
+
+      let base = [];
+      if(YOON_DISPLAY[unit]){
+        base.push(YOON_DISPLAY[unit]);
+        if(HEPBURN_ALT[unit]) base.push(HEPBURN_ALT[unit]);
+      }else{
+        const kunrei = DISPLAY_BASE[unit];
+        if(kunrei) base.push(kunrei);
+        if(HEPBURN_ALT[unit]) base.push(HEPBURN_ALT[unit]);
+        if(DIRECT_ALT[unit]) base.push(...DIRECT_ALT[unit]);
+      }
+
+      if(unit === "し"){ base.push("ci"); }
+      if(unit === "ち"){ base.push("ti","chi"); }
+      if(unit === "つ"){ base.push("tu","tsu"); }
+      if(unit === "ふ"){ base.push("hu","fu"); }
+      if(unit === "じ"){ base.push("zi","ji"); }
+      if(unit === "しゃ"){ base.push("sya","sha"); }
+      if(unit === "しゅ"){ base.push("syu","shu"); }
+      if(unit === "しょ"){ base.push("syo","sho"); }
+      if(unit === "じゃ"){ base.push("zya","ja","jya"); }
+      if(unit === "じゅ"){ base.push("zyu","ju","jyu"); }
+      if(unit === "じょ"){ base.push("zyo","jo","jyo"); }
+      if(unit === "ちゃ"){ base.push("tya","cha","cya"); }
+      if(unit === "ちゅ"){ base.push("tyu","chu","cyu"); }
+      if(unit === "ちょ"){ base.push("tyo","cho","cyo"); }
+
+      return [...new Set(base.filter(Boolean))];
+    }
+
+    function combine(heads, tails){
+      const out = [];
+      for(const h of heads){
+        for(const t of tails){
+          out.push(h + t);
+        }
+      }
+      return [...new Set(out)];
+    }
+
+    function getAllRomanizations(text){
+      const parts = kanaToArray(text);
+      const result = expandKanaOptions(parts);
+      return [...new Set(result.filter(Boolean))].sort((a,b)=>a.length-b.length || a.localeCompare(b));
+    }
+
+    function prefixMatchInfo(input, targets){
+      let best = null;
+      for(const t of targets){
+        if(t.startsWith(input)){
+          if(!best || t.length < best.length) best = t;
+        }
+      }
+      if(best) return { ok:true, target:best };
+
+      let fallback = null;
+      let longest = -1;
+      for(const t of targets){
+        let same = 0;
+        while(same < input.length && same < t.length && input[same] === t[same]) same++;
+        if(same > longest){
+          longest = same;
+          fallback = t;
+        }
+      }
+      return { ok:false, target:fallback || targets[0] || "" };
     }
 
     function shuffle(arr){
       const a = [...arr];
       for(let i=a.length-1;i>0;i--){
         const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
+        [a[i],a[j]] = [a[j],a[i]];
       }
       return a;
     }
 
-    function setMode(mode){
-      currentMode = mode;
-      modeButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
-      modeLabel.textContent = MODES[mode].label;
-      resetScreenOnly();
-      showIdle();
+    // =========================
+    // キーボード表示
+    // =========================
+    const KEY_LAYOUT = [
+      [
+        {k:"Q", f:"l5"}, {k:"W", f:"l4"}, {k:"E", f:"l3"}, {k:"R", f:"l2"}, {k:"T", f:"l2"},
+        {k:"Y", f:"r2"}, {k:"U", f:"r2"}, {k:"I", f:"r3"}, {k:"O", f:"r4"}, {k:"P", f:"r5"}
+      ],
+      [
+        {k:"A", f:"l5", home:true}, {k:"S", f:"l4", home:true}, {k:"D", f:"l3", home:true}, {k:"F", f:"l2", home:true}, {k:"G", f:"l2"},
+        {k:"H", f:"r2"}, {k:"J", f:"r2", home:true}, {k:"K", f:"r3", home:true}, {k:"L", f:"r4", home:true}
+      ],
+      [
+        {k:"Z", f:"l5"}, {k:"X", f:"l4"}, {k:"C", f:"l3"}, {k:"V", f:"l2"}, {k:"B", f:"l2"},
+        {k:"N", f:"r2"}, {k:"M", f:"r2"}
+      ],
+      [
+        {k:"Space", label:"スペース", f:"r5", wide:"space"}
+      ]
+    ];
+
+    const fingerClassMap = {
+      l5:"finger-l5",
+      l4:"finger-l4",
+      l3:"finger-l3",
+      l2:"finger-l2",
+      r2:"finger-r2",
+      r3:"finger-r3",
+      r4:"finger-r4",
+      r5:"finger-r5"
+    };
+
+    const keyboardEl = document.getElementById("keyboard");
+    const keyMap = {};
+
+    function buildKeyboard(){
+      keyboardEl.innerHTML = "";
+      KEY_LAYOUT.forEach(rowData => {
+        const row = document.createElement("div");
+        row.className = "row";
+        rowData.forEach(info => {
+          const div = document.createElement("div");
+          div.className = `key ${fingerClassMap[info.f] || ""} ${info.home ? "home" : ""} ${info.wide || ""}`;
+          const label = info.label || info.k;
+          div.innerHTML = `<div>${label}</div>${info.k !== "Space" ? `<small>${info.k.toLowerCase()}</small>` : ""}`;
+          row.appendChild(div);
+          keyMap[info.k.toLowerCase()] = div;
+          if(info.k === "Space") keyMap[" "] = div;
+        });
+        keyboardEl.appendChild(row);
+      });
     }
 
-    function resetScreenOnly(){
-      resultEl.classList.remove("show");
-      countdownEl.textContent = "";
-      kanaEl.textContent = "ひらがな";
-      romajiEl.textContent = "PRESS ENTER";
-      typedEl.innerHTML = "";
-      typedEl.classList.remove("missFlash");
-      hintEl.textContent = "Enterキーでスタート";
-      qLabel.textContent = "0 / 0";
-      accLabel.textContent = "せいかくりつ 100%";
-      fillEl.style.width = "0%";
-      progressText.textContent = "0%";
-      burstEl.innerHTML = "";
-      started = false;
-      finished = false;
-      totalKeys = 0;
-      missCount = 0;
-      index = 0;
-      typed = "";
-      activeAnswers = [];
+    function clearKeyboardHighlight(){
+      Object.values(keyMap).forEach(el => {
+        el.classList.remove("active");
+        el.classList.remove("next");
+      });
     }
 
-    function showIdle(){
-      const total = MODES[currentMode].list.length;
-      qLabel.textContent = `0 / ${total}`;
+    function highlightPhysicalKey(key){
+      clearKeyboardHighlight();
+      const lower = (key || "").toLowerCase();
+      if(keyMap[lower]) keyMap[lower].classList.add("next");
+    }
+
+    function activatePhysicalKey(key){
+      const lower = (key || "").toLowerCase();
+      if(keyMap[lower]) keyMap[lower].classList.add("active");
+      setTimeout(() => {
+        if(keyMap[lower]) keyMap[lower].classList.remove("active");
+      }, 120);
+    }
+
+    buildKeyboard();
+
+    // =========================
+    // サウンド
+    // =========================
+    let audioCtx = null;
+
+    function beep(type="dry"){
+      const soundMode = soundSelect.value;
+      if(soundMode === "off") return;
+
+      try{
+        if(!audioCtx){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if(soundMode === "dry"){
+          osc.type = "square";
+          osc.frequency.setValueAtTime(type === "miss" ? 170 : 1900, now);
+          filter.type = "highpass";
+          filter.frequency.setValueAtTime(type === "miss" ? 300 : 1400, now);
+          gain.gain.setValueAtTime(type === "miss" ? 0.04 : 0.035, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + (type === "miss" ? 0.06 : 0.025));
+          osc.start(now);
+          osc.stop(now + (type === "miss" ? 0.06 : 0.025));
+        }else if(soundMode === "soft"){
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(type === "miss" ? 220 : 880, now);
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(2000, now);
+          gain.gain.setValueAtTime(type === "miss" ? 0.06 : 0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }else{
+          osc.type = "square";
+          osc.frequency.setValueAtTime(type === "miss" ? 130 : 980, now);
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(type === "miss" ? 250 : 1200, now);
+          gain.gain.setValueAtTime(type === "miss" ? 0.05 : 0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        }
+      }catch(e){}
+    }
+
+    // =========================
+    // ゲーム状態
+    // =========================
+    const modeSelect = document.getElementById("modeSelect");
+    const groupSelect = document.getElementById("groupSelect");
+    const soundSelect = document.getElementById("soundSelect");
+    const startBtn = document.getElementById("startBtn");
+
+    const qNoEl = document.getElementById("qNo");
+    const correctKeysEl = document.getElementById("correctKeys");
+    const missKeysEl = document.getElementById("missKeys");
+    const accuracyEl = document.getElementById("accuracy");
+    const timerEl = document.getElementById("timer");
+    const nowModeEl = document.getElementById("nowMode");
+    const questionKanaEl = document.getElementById("questionKana");
+    const questionRomaEl = document.getElementById("questionRoma");
+    const typedViewEl = document.getElementById("typedView");
+    const noticeEl = document.getElementById("notice");
+    const hintTextEl = document.getElementById("hintText");
+
+    const resultCard = document.getElementById("resultCard");
+    const finalAcc = document.getElementById("finalAcc");
+    const finalTime = document.getElementById("finalTime");
+    const finalCorrect = document.getElementById("finalCorrect");
+    const finalMiss = document.getElementById("finalMiss");
+
+    const menuBtns = [...document.querySelectorAll(".menuBtn")];
+
+    let state = {
+      questions: [],
+      index: 0,
+      currentKana: "",
+      currentDisplayRoma: "",
+      currentTargets: [],
+      input: "",
+      started: false,
+      finished: false,
+      startTime: 0,
+      timerId: null,
+      correctKeys: 0,
+      missKeys: 0,
+      totalCount: 0,
+      modeLabel: "",
+      endless: false
+    };
+
+    function makeQuestionPool(group){
+      let pool = [...(GROUPS[group] || GROUPS.all)];
+      pool = pool.filter(Boolean);
+      return pool;
+    }
+
+    function getModeCount(mode){
+      if(mode === "random10") return 10;
+      if(mode === "random20") return 20;
+      if(mode === "random30") return 30;
+      if(mode === "random50") return 50;
+      if(mode === "endless") return Infinity;
+      return 10;
+    }
+
+    function createQuestions(group, mode){
+      const pool = makeQuestionPool(group);
+      const count = getModeCount(mode);
+      if(count === Infinity){
+        const questions = [];
+        for(let i=0;i<300;i++){
+          questions.push(pool[Math.floor(Math.random()*pool.length)]);
+        }
+        return questions;
+      }
+
+      const out = [];
+      while(out.length < count){
+        if(pool.length >= count){
+          const shuffled = shuffle(pool);
+          out.push(...shuffled.slice(0, count - out.length));
+        }else{
+          out.push(pool[Math.floor(Math.random()*pool.length)]);
+        }
+      }
+      return out;
+    }
+
+    function resetGame(){
+      clearInterval(state.timerId);
+      state = {
+        questions: [],
+        index: 0,
+        currentKana: "",
+        currentDisplayRoma: "",
+        currentTargets: [],
+        input: "",
+        started: false,
+        finished: false,
+        startTime: 0,
+        timerId: null,
+        correctKeys: 0,
+        missKeys: 0,
+        totalCount: 0,
+        modeLabel: "",
+        endless: modeSelect.value === "endless"
+      };
+      resultCard.classList.remove("show");
     }
 
     function startGame(){
-      initAudio();
-      resetScreenOnly();
-      questions = shuffle(MODES[currentMode].list);
-      qLabel.textContent = `0 / ${questions.length}`;
-      let seq = ["3","2","1","GO!"];
-      let i = 0;
-      hintEl.textContent = "";
-      countdownEl.textContent = seq[0];
-      tone(600,0.06,"square",0.025,0);
-      const timer = setInterval(()=>{
-        i++;
-        if(i < seq.length){
-          countdownEl.textContent = seq[i];
-          if(seq[i] !== "GO!"){
-            tone(600,0.06,"square",0.025,0);
-          }else{
-            tone(720,0.06,"square",0.03,0);
-            tone(980,0.10,"triangle",0.02,0.07);
-          }
-        }else{
-          clearInterval(timer);
-          countdownEl.textContent = "";
-          started = true;
-          startTime = performance.now();
-          nextQuestion();
-        }
-      }, 650);
+      resetGame();
+      const group = groupSelect.value;
+      const mode = modeSelect.value;
+      state.questions = createQuestions(group, mode);
+      state.totalCount = getModeCount(mode) === Infinity ? "∞" : state.questions.length;
+      state.modeLabel = `${groupLabel(group)} / ${modeLabel(mode)}`;
+      nowModeEl.textContent = state.modeLabel;
+      nextQuestion();
+      updateStats();
+      notice("スタートしたよ", "ok");
+    }
+
+    function groupLabel(group){
+      const map = {
+        all:"ぜんぶ", basic:"きほん", a:"あ行", ka:"か行", sa:"さ行", ta:"た行",
+        na:"な行", ha:"は行", ma:"ま行", ya:"や行", ra:"ら行", wa:"わ行",
+        dakuon:"だく音", youon:"きゃ行", small:"っ・ゃゅょ", words:"ことば"
+      };
+      return map[group] || group;
+    }
+
+    function modeLabel(mode){
+      const map = {
+        random10:"10もん", random20:"20もん", random30:"30もん", random50:"50もん", endless:"エンドレス"
+      };
+      return map[mode] || mode;
     }
 
     function nextQuestion(){
-      if(index >= questions.length){
+      if(!state.endless && state.index >= state.questions.length){
         finishGame();
         return;
       }
-      typed = "";
-      activeAnswers = [...questions[index][1]];
-      kanaEl.textContent = questions[index][0];
-      romajiEl.textContent = activeAnswers[0].toUpperCase();
-      renderTyped();
-      qLabel.textContent = `${index + 1} / ${questions.length}`;
-      updateProgress();
-    }
 
-    function renderTyped(){
-      const target = activeAnswers[0];
-      const done = typed;
-      const rest = target.slice(typed.length);
-      typedEl.innerHTML = `<span class="done">${done}</span><span class="rest">${rest}</span>`;
-    }
-
-    function updateProgress(){
-      const p = questions.length ? (index / questions.length) * 100 : 0;
-      fillEl.style.width = `${p}%`;
-      progressText.textContent = `${Math.round(p)}%`;
-      const acc = totalKeys === 0 ? 100 : Math.max(0, Math.round(((totalKeys - missCount) / totalKeys) * 100));
-      accLabel.textContent = `せいかくりつ ${acc}%`;
-    }
-
-    function burst(xRatio=0.5, yRatio=0.5, count=10){
-      const colors = ["#facc15","#60a5fa","#f9a8d4","#86efac","#c4b5fd"];
-      const rect = burstEl.getBoundingClientRect();
-      const baseX = rect.width * xRatio;
-      const baseY = rect.height * yRatio;
-      for(let i=0;i<count;i++){
-        const s = document.createElement("div");
-        s.className = "star";
-        s.style.left = `${baseX}px`;
-        s.style.top = `${baseY}px`;
-        s.style.background = colors[Math.floor(Math.random()*colors.length)];
-        const dx = `${(Math.random()*180 - 90)}px`;
-        const dy = `${(Math.random()*180 - 90)}px`;
-        s.style.setProperty("--dx", dx);
-        s.style.setProperty("--dy", dy);
-        burstEl.appendChild(s);
-        setTimeout(()=>s.remove(), 760);
+      if(state.endless && state.index >= state.questions.length - 20){
+        const pool = makeQuestionPool(groupSelect.value);
+        for(let i=0;i<100;i++){
+          state.questions.push(pool[Math.floor(Math.random()*pool.length)]);
+        }
       }
-    }
 
-    function sparkle(text="◎"){
-      const sp = document.createElement("div");
-      sp.className = "sparkle";
-      sp.textContent = text;
-      sp.style.left = `${50 + (Math.random()*20 - 10)}%`;
-      sp.style.top = `${42 + (Math.random()*10 - 5)}%`;
-      burstEl.appendChild(sp);
-      setTimeout(()=>sp.remove(), 850);
-    }
+      state.currentKana = state.questions[state.index];
+      state.currentDisplayRoma = getDisplayRoma(state.currentKana);
+      state.currentTargets = getAllRomanizations(state.currentKana);
+      state.input = "";
 
-    function saveBest(acc, miss){
-      const key = `kanaTypingBest_${currentMode}`;
-      const prev = JSON.parse(localStorage.getItem(key) || "null");
-      const next = {
-        bestAcc: prev ? Math.max(prev.bestAcc, acc) : acc,
-        bestMiss: prev ? Math.min(prev.bestMiss, miss) : miss
-      };
-      localStorage.setItem(key, JSON.stringify(next));
-      return next;
-    }
-
-    function loadBest(){
-      const key = `kanaTypingBest_${currentMode}`;
-      return JSON.parse(localStorage.getItem(key) || "null");
+      questionKanaEl.textContent = state.currentKana;
+      questionRomaEl.textContent = state.currentDisplayRoma;
+      updateTypedView();
+      updateStats();
+      updateNextKeyHint();
+      hintTextEl.textContent = `れい: ${state.currentTargets.slice(0, 4).join(" / ")}`;
     }
 
     function finishGame(){
-      started = false;
-      finished = true;
-      const elapsed = ((performance.now() - startTime) / 1000);
-      const acc = totalKeys === 0 ? 100 : Math.max(0, Math.round(((totalKeys - missCount) / totalKeys) * 100));
-      const best = saveBest(acc, missCount);
+      state.finished = true;
+      clearInterval(state.timerId);
+      const time = getElapsedSeconds();
+      const total = state.correctKeys + state.missKeys;
+      const acc = total ? Math.round((state.correctKeys / total) * 1000) / 10 : 100;
 
       finalAcc.textContent = `${acc}%`;
-      finalMiss.textContent = `${missCount}`;
-      finalTime.textContent = `${elapsed.toFixed(1)}s`;
-      finalCount.textContent = `${questions.length}`;
-      bestAcc.textContent = `${best.bestAcc}%`;
-      bestMiss.textContent = `${best.bestMiss}`;
-      fillEl.style.width = "100%";
-      progressText.textContent = "100%";
+      finalTime.textContent = `${time.toFixed(1)}s`;
+      finalCorrect.textContent = state.correctKeys;
+      finalMiss.textContent = state.missKeys;
+      resultCard.classList.add("show");
 
-      kanaEl.textContent = "おわり！";
-      romajiEl.textContent = "ENTER";
-      typedEl.innerHTML = "";
-      hintEl.textContent = "";
-      resultEl.classList.add("show");
-
-      playClearFanfare();
-      for(let i=0;i<4;i++){
-        setTimeout(()=>burst(0.5,0.45,18), i*140);
-      }
-      sparkle("★");
-      setTimeout(()=>sparkle("★"),150);
-      setTimeout(()=>sparkle("★"),300);
+      notice("おわり！ もういちどスタートできるよ", "ok");
+      nowModeEl.textContent = "おつかれさま";
+      clearKeyboardHighlight();
     }
 
-    function handleInput(key){
-      if(!started || finished) return;
-      if(key.length !== 1) return;
-      const ch = key.toLowerCase();
-      if(!/^[a-z]$/.test(ch)) return;
-
-      totalKeys++;
-
-      const nextCandidates = activeAnswers.filter(ans => ans.startsWith(typed + ch));
-
-      if(nextCandidates.length > 0){
-        typed += ch;
-        activeAnswers = nextCandidates;
-        renderTyped();
-        playTypeSound();
-
-        if(activeAnswers.some(ans => ans === typed)){
-          playSuccessSound();
-          burst(0.5,0.43,10);
-          sparkle("✦");
-          index++;
-          updateProgress();
-          setTimeout(nextQuestion, 140);
-        }
-      }else{
-        missCount++;
-        typedEl.classList.remove("missFlash");
-        void typedEl.offsetWidth;
-        typedEl.classList.add("missFlash");
-        playMissSound();
-        burst(0.5,0.48,5);
-        updateProgress();
-      }
+    function startTimerIfNeeded(){
+      if(state.started) return;
+      state.started = true;
+      state.startTime = performance.now();
+      state.timerId = setInterval(updateStats, 50);
     }
 
-    modeButtons.forEach(btn=>{
-      btn.addEventListener("click", ()=> setMode(btn.dataset.mode));
-    });
+    function getElapsedSeconds(){
+      if(!state.started) return 0;
+      return (performance.now() - state.startTime) / 1000;
+    }
 
-    restartBtn.addEventListener("click", ()=>{
-      setMode(currentMode);
-    });
+    function updateStats(){
+      const qCurrent = state.finished
+        ? (!state.endless ? state.questions.length : state.index)
+        : Math.min(state.index + 1, state.endless ? state.index + 1 : state.questions.length);
 
-    window.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){
+      qNoEl.textContent = `${qCurrent} / ${state.totalCount}`;
+      correctKeysEl.textContent = state.correctKeys;
+      missKeysEl.textContent = state.missKeys;
+      const total = state.correctKeys + state.missKeys;
+      const acc = total ? Math.round((state.correctKeys / total) * 1000) / 10 : 100;
+      accuracyEl.textContent = `${acc}%`;
+      timerEl.textContent = `${getElapsedSeconds().toFixed(1)}s`;
+    }
+
+    function notice(text, type="warn"){
+      noticeEl.textContent = text;
+      noticeEl.className = `notice ${type}`;
+    }
+
+    function updateTypedView(){
+      const info = prefixMatchInfo(state.input, state.currentTargets);
+      const target = info.target || state.currentDisplayRoma;
+      const done = state.input;
+      const rest = target.slice(state.input.length);
+
+      typedViewEl.innerHTML = `
+        <span class="done">${escapeHtml(done)}</span><span class="caret"></span><span class="rest">${escapeHtml(rest)}</span>
+      `;
+    }
+
+    function updateNextKeyHint(){
+      const info = prefixMatchInfo(state.input, state.currentTargets);
+      const target = info.target || state.currentDisplayRoma;
+      const nextChar = target[state.input.length] || "";
+      highlightPhysicalKey(nextChar);
+    }
+
+    function escapeHtml(s){
+      return s
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+    }
+
+    function handleKeydown(e){
+      if(state.finished) return;
+      if(!state.currentKana) return;
+
+      const key = e.key;
+
+      if(key === "Tab"){
         e.preventDefault();
-        initAudio();
-        if(!started){
-          startGame();
-        }else if(finished){
-          startGame();
-        }
         return;
       }
-      handleInput(e.key);
+
+      if(key === "Escape"){
+        startGame();
+        return;
+      }
+
+      if(key === "Backspace"){
+        e.preventDefault();
+        return;
+      }
+
+      if(key.length !== 1) return;
+      if(!/^[a-zA-Z]$/.test(key)) return;
+
+      e.preventDefault();
+      startTimerIfNeeded();
+
+      const ch = key.toLowerCase();
+      activatePhysicalKey(ch);
+
+      const nextInput = state.input + ch;
+      const info = prefixMatchInfo(nextInput, state.currentTargets);
+
+      if(info.ok){
+        state.input = nextInput;
+        state.correctKeys++;
+        beep("ok");
+        updateTypedView();
+        updateStats();
+        updateNextKeyHint();
+        notice("いいね！", "ok");
+
+        if(state.currentTargets.includes(state.input)){
+          state.index++;
+          setTimeout(() => {
+            nextQuestion();
+          }, 70);
+        }
+      }else{
+        state.missKeys++;
+        beep("miss");
+        updateStats();
+        notice("おしい！", "miss");
+      }
+    }
+
+    startBtn.addEventListener("click", startGame);
+
+    menuBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        menuBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        groupSelect.value = btn.dataset.group;
+        startGame();
+      });
     });
 
+    modeSelect.addEventListener("change", () => {
+      nowModeEl.textContent = `${groupLabel(groupSelect.value)} / ${modeLabel(modeSelect.value)}`;
+    });
+
+    groupSelect.addEventListener("change", () => {
+      menuBtns.forEach(b => b.classList.toggle("active", b.dataset.group === groupSelect.value));
+      nowModeEl.textContent = `${groupLabel(groupSelect.value)} / ${modeLabel(modeSelect.value)}`;
+    });
+
+    document.addEventListener("keydown", handleKeydown);
+
     // 初期表示
-    setMode("basic");
-    const best = loadBest();
-    if(best){
-      bestAcc.textContent = `${best.bestAcc}%`;
-      bestMiss.textContent = `${best.bestMiss}`;
-    }
+    menuBtns.find(b => b.dataset.group === "a")?.classList.add("active");
+    groupSelect.value = "a";
+    nowModeEl.textContent = `${groupLabel(groupSelect.value)} / ${modeLabel(modeSelect.value)}`;
+    questionKanaEl.textContent = "あ";
+    questionRomaEl.textContent = getDisplayRoma("あ");
+    state.currentTargets = getAllRomanizations("あ");
+    updateTypedView();
+    updateNextKeyHint();
   </script>
 </body>
 </html>
