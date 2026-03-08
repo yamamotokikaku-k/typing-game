@@ -246,7 +246,7 @@
       font-weight:800;
       letter-spacing:.04em;
       color:rgba(255,255,255,.28);
-      transition:color .15s, transform .15s, opacity .15s;
+      transition:color .12s, transform .12s, opacity .12s;
       text-transform:lowercase;
     }
     .rchar.done{
@@ -262,7 +262,7 @@
       color:rgba(255,255,255,.28);
     }
     .rchar.wrongFlash{
-      animation:wrongFlash .18s linear 1;
+      animation:wrongFlash .12s linear 1;
     }
     @keyframes wrongFlash{
       0%{color:var(--miss); transform:translateY(0)}
@@ -411,7 +411,7 @@
       width:0%;
       background:linear-gradient(90deg, var(--accent), var(--accent2));
       box-shadow:0 0 20px rgba(101,214,255,.25);
-      transition:width .2s ease;
+      transition:width .12s ease;
     }
 
     .mini{
@@ -868,8 +868,8 @@
     };
 
     const consonants = "bcdfghjklmnpqrstvwxyz";
-
     const $ = (id) => document.getElementById(id);
+
     const kanjiDisplay = $("kanjiDisplay");
     const kanaDisplay = $("kanaDisplay");
     const romajiWrap = $("romajiWrap");
@@ -928,7 +928,7 @@
       notice.textContent = msg;
       notice.classList.add("show");
       clearTimeout(showNotice._t);
-      showNotice._t = setTimeout(() => notice.classList.remove("show"), 1800);
+      showNotice._t = setTimeout(() => notice.classList.remove("show"), 1500);
     }
 
     function escapeHtml(s){
@@ -963,9 +963,7 @@
     }
 
     function getProblemSet(){
-      if(state.selectedRowKey === "all"){
-        return getAllKanaSequential();
-      }
+      if(state.selectedRowKey === "all") return getAllKanaSequential();
       return [...(ROWS[state.selectedRowKey] || [])];
     }
 
@@ -1030,13 +1028,8 @@
       const override = getPaintOverride(display, seq);
       if(override) return override;
 
-      if(seq === display){
-        return [...display].map((_, i) => i);
-      }
-
-      if(seq.length === display.length){
-        return [...seq].map((_, i) => i);
-      }
+      if(seq === display) return [...display].map((_, i) => i);
+      if(seq.length === display.length) return [...seq].map((_, i) => i);
 
       const paint = [];
       const lastIndex = Math.max(0, display.length - 1);
@@ -1097,9 +1090,7 @@
 
         if(ch === "ん"){
           const nextBase = getBaseChunk(chars, i + 1);
-          const nextStarts = new Set(
-            nextBase ? nextBase.inputs.map(v => (v[0] || "").toLowerCase()) : []
-          );
+          const nextStarts = new Set(nextBase ? nextBase.inputs.map(v => (v[0] || "").toLowerCase()) : []);
           const blocked = [...nextStarts].some(c => ["a","i","u","e","o","y","n"].includes(c));
 
           const display = blocked ? "nn" : "n";
@@ -1222,6 +1213,21 @@
       ghostInput.textContent = preview ? `入力中: ${preview}` : "入力待機中";
     }
 
+    function updateStats(){
+      const totalAttempts = state.totalAcceptedChars + state.totalMiss;
+      const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
+      const totalCount = state.problems.length || getProblemSet().length;
+      const currentCount = state.playing ? Math.min(state.currentProblemIndex + 1, totalCount) : 0;
+      const progressPct = totalCount ? (state.currentProblemIndex / totalCount) * 100 : 0;
+
+      progressText.textContent = `${currentCount} / ${totalCount}`;
+      accText.textContent = `${acc.toFixed(2)}%`;
+      typedText.textContent = state.totalAcceptedChars;
+      missText.textContent = state.totalMiss;
+      totalProblemsText.textContent = totalCount;
+      progressBar.style.width = `${Math.max(0, Math.min(100, progressPct))}%`;
+    }
+
     function resetStats(){
       state.playing = false;
       state.problems = [];
@@ -1231,21 +1237,6 @@
       state.currentChunkIndex = 0;
       state.totalMiss = 0;
       state.totalAcceptedChars = 0;
-    }
-
-    function startGame(){
-      resetStats();
-      state.problems = buildProblemList();
-      state.playing = true;
-      stateLabel.textContent = "プレイ中";
-      loadProblem(0);
-      updateStats();
-    }
-
-    function restartCurrentMode(){
-      resultOverlay.classList.remove("show");
-      startGame();
-      showNotice("再スタートしました");
     }
 
     function loadProblem(index){
@@ -1264,19 +1255,19 @@
       updateStats();
     }
 
-    function updateStats(){
-      const totalAttempts = state.totalAcceptedChars + state.totalMiss;
-      const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-      const totalCount = state.problems.length || getProblemSet().length;
-      const currentCount = state.playing ? Math.min(state.currentProblemIndex + 1, totalCount) : 0;
-      const progressPct = totalCount ? (state.currentProblemIndex / totalCount) * 100 : 0;
+    function startGame(){
+      resetStats();
+      state.problems = buildProblemList();
+      state.playing = true;
+      stateLabel.textContent = "プレイ中";
+      loadProblem(0);
+      updateStats();
+    }
 
-      progressText.textContent = `${currentCount} / ${totalCount}`;
-      accText.textContent = `${acc.toFixed(2)}%`;
-      typedText.textContent = state.totalAcceptedChars;
-      missText.textContent = state.totalMiss;
-      totalProblemsText.textContent = totalCount;
-      progressBar.style.width = `${Math.max(0, Math.min(100, progressPct))}%`;
+    function restartCurrentMode(){
+      resultOverlay.classList.remove("show");
+      startGame();
+      showNotice("再スタートしました");
     }
 
     function shatterDoneChars(){
@@ -1309,9 +1300,7 @@
         return;
       }
 
-      setTimeout(() => {
-        loadProblem(state.currentProblemIndex);
-      }, 110);
+      setTimeout(() => loadProblem(state.currentProblemIndex), 70);
     }
 
     function finishGame(){
@@ -1338,7 +1327,6 @@
     function saveRanking(){
       const totalAttempts = state.totalAcceptedChars + state.totalMiss;
       const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-
       const name = (playerNameInput.value || "").trim() || "NO NAME";
       const records = loadRanking();
       const id = Date.now() + "_" + Math.random().toString(36).slice(2, 7);
@@ -1362,8 +1350,7 @@
         return a.createdAt - b.createdAt;
       });
 
-      const top10 = records.slice(0, 10);
-      localStorage.setItem("hiraganaTypingRanking", JSON.stringify(top10));
+      localStorage.setItem("hiraganaTypingRanking", JSON.stringify(records.slice(0, 10)));
       state.latestRankId = id;
       renderRanking();
       resultOverlay.classList.remove("show");
@@ -1401,106 +1388,6 @@
       });
     }
 
-    function handleKeyInput(key){
-      if(!state.playing) return;
-      if(key.length !== 1) return;
-      if(!/^[a-zA-Z\-]$/.test(key)) return;
-
-      const ch = key.toLowerCase();
-      const chunk = state.currentChunks[state.currentChunkIndex];
-      if(!chunk) return;
-
-      const nextTyped = chunk.typed + ch;
-      const matchingPatterns = chunk.patterns.filter(p => p.seq.startsWith(nextTyped));
-      const exactPatterns = chunk.patterns.filter(p => p.seq === nextTyped);
-
-      if(exactPatterns.length){
-        playTypeSound();
-
-        chunk.typed = nextTyped;
-        chunk.accepted = nextTyped;
-        chunk.paintedCount = chunk.display.length;
-        chunk.done = true;
-        chunk.missFlash = false;
-        state.currentChunkIndex++;
-        state.totalAcceptedChars++;
-        renderRoman();
-        updateStats();
-
-        if(state.currentChunkIndex >= state.currentChunks.length){
-          advanceToNextProblem();
-        }
-        return;
-      }
-
-      if(matchingPatterns.length){
-        playTypeSound();
-
-        const best = chooseBestPattern(matchingPatterns, nextTyped) || matchingPatterns[0];
-        chunk.typed = nextTyped;
-        chunk.accepted = nextTyped;
-        chunk.paintedCount = paintToCount(best.paint, nextTyped.length);
-        chunk.missFlash = false;
-        state.totalAcceptedChars++;
-        renderRoman();
-        updateStats();
-        return;
-      }
-
-      playMissSound();
-
-      state.totalMiss++;
-      chunk.missFlash = true;
-      renderRoman();
-      setTimeout(() => {
-        if(state.currentChunks[state.currentChunkIndex] === chunk){
-          chunk.missFlash = false;
-          renderRoman();
-        }
-      }, 120);
-      updateStats();
-    }
-
-    function buildRowModeButtons(){
-      rowModeButtons.innerHTML = "";
-      rowModes.forEach(m => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "modeBtn" + (m.key === state.selectedRowKey ? " active" : "");
-        btn.textContent = m.label;
-        btn.addEventListener("click", () => {
-          unlockAudio();
-          state.selectedRowKey = m.key;
-          state.selectedRowLabel = m.label;
-          rowLabel.textContent = state.selectedRowLabel;
-          buildRowModeButtons();
-          startGame();
-          showNotice(`「${m.label}」で開始`);
-        });
-        rowModeButtons.appendChild(btn);
-      });
-    }
-
-    function buildOrderModeButtons(){
-      orderModeButtons.innerHTML = "";
-      orderModes.forEach(m => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "modeBtn" + (m.key === state.orderMode ? " active" : "");
-        btn.textContent = m.label;
-        btn.addEventListener("click", () => {
-          unlockAudio();
-          state.orderMode = m.key;
-          state.orderModeLabel = m.label;
-          orderLabel.textContent = state.orderModeLabel;
-          buildOrderModeButtons();
-          startGame();
-          showNotice(`「${m.label}」で開始`);
-        });
-        orderModeButtons.appendChild(btn);
-      });
-    }
-
     function previewSelection(){
       const set = getProblemSet();
       const first = set[0] || "あ";
@@ -1519,19 +1406,58 @@
       ghostInput.textContent = "入力待機中";
     }
 
+    function buildRowModeButtons(){
+      rowModeButtons.innerHTML = "";
+      rowModes.forEach(m => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "modeBtn" + (m.key === state.selectedRowKey ? " active" : "");
+        btn.textContent = m.label;
+        btn.addEventListener("pointerdown", unlockAudio, {passive:true});
+        btn.addEventListener("click", () => {
+          state.selectedRowKey = m.key;
+          state.selectedRowLabel = m.label;
+          rowLabel.textContent = state.selectedRowLabel;
+          buildRowModeButtons();
+          startGame();
+          showNotice(`「${m.label}」で開始`);
+        });
+        rowModeButtons.appendChild(btn);
+      });
+    }
+
+    function buildOrderModeButtons(){
+      orderModeButtons.innerHTML = "";
+      orderModes.forEach(m => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "modeBtn" + (m.key === state.orderMode ? " active" : "");
+        btn.textContent = m.label;
+        btn.addEventListener("pointerdown", unlockAudio, {passive:true});
+        btn.addEventListener("click", () => {
+          state.orderMode = m.key;
+          state.orderModeLabel = m.label;
+          orderLabel.textContent = state.orderModeLabel;
+          buildOrderModeButtons();
+          startGame();
+          showNotice(`「${m.label}」で開始`);
+        });
+        orderModeButtons.appendChild(btn);
+      });
+    }
+
     const audioCtxHolder = {
       ctx:null,
       master:null,
       unlocked:false,
-      clickBuffer:null,
-      missBuffer:null
+      clickBuffers:{},
+      missBuffers:{}
     };
 
     function getAudioCtx(){
       if(!audioCtxHolder.ctx){
-        const ctx = new (window.AudioContext || window.webkitAudioContext)({
-          latencyHint:"interactive"
-        });
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AC({ latencyHint:"interactive" });
         const master = ctx.createGain();
         master.gain.value = 1.0;
         master.connect(ctx.destination);
@@ -1541,56 +1467,93 @@
       return audioCtxHolder.ctx;
     }
 
-    function createNoiseBuffer(durationSec, highpassLike = false){
+    function makePercBuffer({ duration=0.006, decayPower=4.0, highpassBlend=0.9 } = {}){
       const ctx = getAudioCtx();
-      const length = Math.max(1, Math.floor(ctx.sampleRate * durationSec));
+      const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
       const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
       const data = buffer.getChannelData(0);
 
+      let prev = 0;
       for(let i = 0; i < length; i++){
         const t = i / length;
-        let v = (Math.random() * 2 - 1) * (1 - t);
-        if(highpassLike){
-          v *= (0.3 + 0.7 * t);
-        }
-        data[i] = v;
+        const env = Math.pow(1 - t, decayPower);
+        const white = Math.random() * 2 - 1;
+        const hp = white - prev * 0.985;
+        prev = white;
+        data[i] = (hp * highpassBlend + white * (1 - highpassBlend)) * env;
       }
       return buffer;
     }
 
     function prepareAudioBuffers(){
-      if(!audioCtxHolder.clickBuffer){
-        audioCtxHolder.clickBuffer = createNoiseBuffer(0.008, true);
+      if(!audioCtxHolder.clickBuffers.click){
+        audioCtxHolder.clickBuffers.click = makePercBuffer({
+          duration:0.0048,
+          decayPower:4.8,
+          highpassBlend:0.97
+        });
       }
-      if(!audioCtxHolder.missBuffer){
-        audioCtxHolder.missBuffer = createNoiseBuffer(0.02, false);
+      if(!audioCtxHolder.clickBuffers.arcade){
+        audioCtxHolder.clickBuffers.arcade = makePercBuffer({
+          duration:0.006,
+          decayPower:4.2,
+          highpassBlend:0.9
+        });
+      }
+      if(!audioCtxHolder.clickBuffers.crystal){
+        audioCtxHolder.clickBuffers.crystal = makePercBuffer({
+          duration:0.0055,
+          decayPower:4.6,
+          highpassBlend:0.98
+        });
+      }
+
+      if(!audioCtxHolder.missBuffers.click){
+        audioCtxHolder.missBuffers.click = makePercBuffer({
+          duration:0.013,
+          decayPower:2.7,
+          highpassBlend:0.35
+        });
+      }
+      if(!audioCtxHolder.missBuffers.arcade){
+        audioCtxHolder.missBuffers.arcade = makePercBuffer({
+          duration:0.015,
+          decayPower:2.5,
+          highpassBlend:0.3
+        });
+      }
+      if(!audioCtxHolder.missBuffers.crystal){
+        audioCtxHolder.missBuffers.crystal = makePercBuffer({
+          duration:0.012,
+          decayPower:3.0,
+          highpassBlend:0.42
+        });
       }
     }
 
     function unlockAudio(){
       const ctx = getAudioCtx();
-      if(ctx.state === "suspended"){
-        ctx.resume();
-      }
+      if(ctx.state === "suspended") ctx.resume();
       prepareAudioBuffers();
 
       if(!audioCtxHolder.unlocked){
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(1400, now);
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.001);
+        gain.gain.linearRampToValueAtTime(0.008, now + 0.001);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.01);
-        osc.frequency.setValueAtTime(880, now);
         osc.connect(gain);
         gain.connect(audioCtxHolder.master);
         osc.start(now);
-        osc.stop(now + 0.012);
+        osc.stop(now + 0.011);
         audioCtxHolder.unlocked = true;
       }
     }
 
-    function playBuffer(buffer, gainValue){
+    function playBuffer(buffer, gainValue=0.02){
       if(!state.soundOn) return;
       const ctx = getAudioCtx();
       if(ctx.state !== "running" || !buffer) return;
@@ -1598,6 +1561,7 @@
       const now = ctx.currentTime;
       const src = ctx.createBufferSource();
       const gain = ctx.createGain();
+
       src.buffer = buffer;
       gain.gain.setValueAtTime(gainValue, now);
       src.connect(gain);
@@ -1605,7 +1569,7 @@
       src.start(now);
     }
 
-    function tone(freq=440, duration=.02, type="square", gainAmount=.04, freqEnd=null){
+    function tone(freq=440, duration=0.008, type="square", gainAmount=0.02, freqEnd=null){
       if(!state.soundOn) return;
       const ctx = getAudioCtx();
       if(ctx.state !== "running") return;
@@ -1626,23 +1590,23 @@
       osc.connect(gain);
       gain.connect(audioCtxHolder.master);
       osc.start(now);
-      osc.stop(now + duration + 0.003);
+      osc.stop(now + duration + 0.002);
     }
 
     function playTypeSound(){
       switch(state.soundType){
         case "arcade":
-          tone(980, 0.015, "square", 0.05, 820);
-          playBuffer(audioCtxHolder.clickBuffer, 0.015);
+          playBuffer(audioCtxHolder.clickBuffers.arcade, 0.022);
+          tone(1100, 0.008, "square", 0.024, 920);
           break;
         case "crystal":
-          tone(1320, 0.02, "triangle", 0.038, 1020);
-          playBuffer(audioCtxHolder.clickBuffer, 0.008);
+          playBuffer(audioCtxHolder.clickBuffers.crystal, 0.014);
+          tone(1500, 0.011, "triangle", 0.018, 1220);
           break;
         case "click":
         default:
-          tone(1650, 0.009, "square", 0.04, 1400);
-          playBuffer(audioCtxHolder.clickBuffer, 0.02);
+          playBuffer(audioCtxHolder.clickBuffers.click, 0.026);
+          tone(1800, 0.005, "square", 0.014, 1500);
           break;
       }
     }
@@ -1650,16 +1614,17 @@
     function playMissSound(){
       switch(state.soundType){
         case "arcade":
-          tone(220, 0.03, "square", 0.055, 150);
-          playBuffer(audioCtxHolder.missBuffer, 0.012);
+          playBuffer(audioCtxHolder.missBuffers.arcade, 0.018);
+          tone(210, 0.024, "square", 0.035, 150);
           break;
         case "crystal":
-          tone(250, 0.03, "sawtooth", 0.045, 180);
+          playBuffer(audioCtxHolder.missBuffers.crystal, 0.014);
+          tone(250, 0.024, "sawtooth", 0.025, 180);
           break;
         case "click":
         default:
-          tone(180, 0.02, "square", 0.05, 120);
-          playBuffer(audioCtxHolder.missBuffer, 0.012);
+          playBuffer(audioCtxHolder.missBuffers.click, 0.015);
+          tone(180, 0.017, "square", 0.032, 120);
           break;
       }
     }
@@ -1682,26 +1647,89 @@
       showNotice("ランキングを初期化しました");
     }
 
-    document.addEventListener("pointerdown", unlockAudio, {passive:true});
-    document.addEventListener("touchstart", unlockAudio, {passive:true});
+    function handleKeyInput(key){
+      if(!state.playing) return false;
+      if(key.length !== 1) return false;
+      if(!/^[a-zA-Z\-]$/.test(key)) return false;
+
+      const ch = key.toLowerCase();
+      const chunk = state.currentChunks[state.currentChunkIndex];
+      if(!chunk) return false;
+
+      const nextTyped = chunk.typed + ch;
+      const matchingPatterns = chunk.patterns.filter(p => p.seq.startsWith(nextTyped));
+      const exactPatterns = chunk.patterns.filter(p => p.seq === nextTyped);
+
+      if(exactPatterns.length || matchingPatterns.length){
+        playTypeSound();
+      }else{
+        playMissSound();
+      }
+
+      if(exactPatterns.length){
+        chunk.typed = nextTyped;
+        chunk.accepted = nextTyped;
+        chunk.paintedCount = chunk.display.length;
+        chunk.done = true;
+        chunk.missFlash = false;
+        state.currentChunkIndex++;
+        state.totalAcceptedChars++;
+        renderRoman();
+        updateStats();
+
+        if(state.currentChunkIndex >= state.currentChunks.length){
+          advanceToNextProblem();
+        }
+        return true;
+      }
+
+      if(matchingPatterns.length){
+        const best = chooseBestPattern(matchingPatterns, nextTyped) || matchingPatterns[0];
+        chunk.typed = nextTyped;
+        chunk.accepted = nextTyped;
+        chunk.paintedCount = paintToCount(best.paint, nextTyped.length);
+        chunk.missFlash = false;
+        state.totalAcceptedChars++;
+        renderRoman();
+        updateStats();
+        return true;
+      }
+
+      state.totalMiss++;
+      chunk.missFlash = true;
+      renderRoman();
+      setTimeout(() => {
+        if(state.currentChunks[state.currentChunkIndex] === chunk){
+          chunk.missFlash = false;
+          renderRoman();
+        }
+      }, 90);
+      updateStats();
+      return true;
+    }
+
+    document.addEventListener("pointerdown", unlockAudio, {passive:true, capture:true});
+    document.addEventListener("touchstart", unlockAudio, {passive:true, capture:true});
 
     document.addEventListener("keydown", (e) => {
-      unlockAudio();
       if(resultOverlay.classList.contains("show")) return;
-      if(/^[a-zA-Z\-]$/.test(e.key)){
-        e.preventDefault();
-      }
-      handleKeyInput(e.key);
-    });
+      if(e.repeat) return;
+      if(!/^[a-zA-Z\-]$/.test(e.key)) return;
 
-    soundBtn.addEventListener("click", () => {
+      e.preventDefault();
       unlockAudio();
+      handleKeyInput(e.key);
+    }, { capture:true });
+
+    soundBtn.addEventListener("pointerdown", unlockAudio, {passive:true});
+    soundBtn.addEventListener("click", () => {
       state.soundOn = !state.soundOn;
       soundBtn.classList.toggle("off", !state.soundOn);
       soundBtn.textContent = state.soundOn ? "🔊 効果音 ON" : "🔈 効果音 OFF";
       if(state.soundOn) previewSound();
     });
 
+    soundTypeSelect.addEventListener("pointerdown", unlockAudio, {passive:true});
     soundTypeSelect.addEventListener("change", () => {
       state.soundType = soundTypeSelect.value;
       updateSoundUI();
