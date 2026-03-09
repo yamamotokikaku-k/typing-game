@@ -6,43 +6,47 @@
   <title>ひらがなローマ字タイピング練習</title>
   <style>
     :root{
-      --bg:#c9ad46;
-      --bg-deep:#b5942f;
-      --bg-light:#d8bf63;
-      --panel:rgba(255,255,255,.14);
-      --panel-strong:rgba(255,255,255,.22);
-      --line:rgba(255,255,255,.16);
-      --text:#111111;
-      --sub:#2d2610;
+      --bg:#7fd8ff;
+      --bg-deep:#5fb8ff;
+      --bg-light:#fff59d;
+      --bg-accent:#ffb3de;
 
-      --display-white:#fffdf6;
-      --display-white-soft:#f8f3e6;
-      --typed-black:#111111;
-      --typed-bg:rgba(0,0,0,.12);
+      --panel:rgba(255,255,255,.28);
+      --panel-strong:rgba(255,255,255,.42);
+      --line:rgba(255,255,255,.32);
+
+      --text:#1e2a56;
+      --sub:#31417d;
+
+      --display-white:#ffffff;
+      --display-white-soft:#fdfcff;
+
+      --typed-black:#ff6b6b;
+      --typed-bg:rgba(255,255,255,.42);
 
       --accent:#ffffff;
-      --ok:#ffffff;
-      --miss:#2b0000;
+      --ok:#14a44d;
+      --miss:#d9366e;
 
-      --shadow:0 14px 34px rgba(0,0,0,.14);
+      --shadow:0 14px 34px rgba(58,83,166,.16);
 
-      --f-lp:#ef8d86;
-      --f-lr:#f4b06c;
-      --f-lm:#f6d67a;
-      --f-li:#d8ee8a;
-      --f-ri:#8fdcb8;
-      --f-rm:#87cde9;
-      --f-rr:#a8b1f2;
-      --f-rp:#d2a0ef;
-      --f-thumb:#f2b9d7;
+      --f-lp:#ff9aa2;
+      --f-lr:#ffb86b;
+      --f-lm:#ffe26f;
+      --f-li:#c5f07d;
+      --f-ri:#88e4c4;
+      --f-rm:#7fd8ff;
+      --f-rr:#9eb2ff;
+      --f-rp:#d8a5ff;
+      --f-thumb:#ffb3de;
 
-      --key-base:rgba(255,255,255,.36);
-      --key-border:rgba(0,0,0,.08);
-      --key-text:#1a1407;
-      --key-shadow:0 5px 10px rgba(0,0,0,.08);
-      --key-active:#1b160c;
-      --key-active-text:#f5e9b1;
-      --key-glow:0 0 0 3px rgba(255,255,255,.55), 0 10px 20px rgba(0,0,0,.18);
+      --key-base:rgba(255,255,255,.72);
+      --key-border:rgba(54,84,173,.12);
+      --key-text:#22316d;
+      --key-shadow:0 5px 10px rgba(74,95,180,.10);
+      --key-active:#ff7eb6;
+      --key-active-text:#ffffff;
+      --key-glow:0 0 0 4px rgba(255,255,255,.6), 0 10px 20px rgba(74,95,180,.22);
     }
 
     *{box-sizing:border-box}
@@ -52,8 +56,10 @@
       min-height:100%;
       font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.14), transparent 32%),
-        linear-gradient(180deg, var(--bg-light) 0%, var(--bg) 45%, var(--bg-deep) 100%);
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.45), transparent 18%),
+        radial-gradient(circle at 84% 18%, rgba(255,255,255,.34), transparent 16%),
+        radial-gradient(circle at 78% 82%, rgba(255,255,255,.24), transparent 18%),
+        linear-gradient(135deg, var(--bg-light) 0%, var(--bg) 45%, var(--bg-deep) 78%, var(--bg-accent) 100%);
       color:var(--text);
     }
 
@@ -83,14 +89,15 @@
       border-radius:22px;
       padding:14px 16px;
       box-shadow:var(--shadow);
-      backdrop-filter:blur(6px);
+      backdrop-filter:blur(8px);
     }
 
     .title{
       font-size:clamp(19px,2.3vw,28px);
       font-weight:900;
       letter-spacing:.05em;
-      color:#1a1407;
+      color:#23306b;
+      text-shadow:0 2px 0 rgba(255,255,255,.45);
     }
 
     .controls{
@@ -101,29 +108,32 @@
       justify-content:flex-end;
     }
 
-    .mode-btn{
+    .mode-btn,
+    .sound-btn{
       border:none;
-      background:rgba(255,255,255,.42);
-      color:#1a1407;
+      background:rgba(255,255,255,.78);
+      color:#243373;
       padding:8px 13px;
       border-radius:999px;
       cursor:pointer;
       font-weight:900;
       letter-spacing:.04em;
-      box-shadow:0 3px 10px rgba(0,0,0,.08);
-      transition:.15s transform,.15s background,.15s box-shadow;
+      box-shadow:0 3px 10px rgba(74,95,180,.10);
+      transition:.15s transform,.15s background,.15s box-shadow,.15s color;
       font-size:14px;
     }
 
-    .mode-btn:hover{
+    .mode-btn:hover,
+    .sound-btn:hover{
       transform:translateY(-1px);
-      background:rgba(255,255,255,.56);
+      background:rgba(255,255,255,.92);
     }
 
-    .mode-btn.active{
-      background:#1b160c;
-      color:#f5e9b1;
-      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    .mode-btn.active,
+    .sound-btn.active{
+      background:#ff7eb6;
+      color:#ffffff;
+      box-shadow:0 8px 18px rgba(255,126,182,.28);
     }
 
     .main{
@@ -138,11 +148,33 @@
       overflow:hidden;
     }
 
+    .main::before{
+      content:"";
+      position:absolute;
+      inset:auto auto -40px -40px;
+      width:220px;
+      height:220px;
+      background:radial-gradient(circle, rgba(255,255,255,.30), transparent 70%);
+      pointer-events:none;
+    }
+
+    .main::after{
+      content:"";
+      position:absolute;
+      inset:-60px -30px auto auto;
+      width:240px;
+      height:240px;
+      background:radial-gradient(circle, rgba(255,255,255,.25), transparent 72%);
+      pointer-events:none;
+    }
+
     .center{
       width:min(1000px,100%);
       text-align:center;
       display:grid;
       gap:12px;
+      position:relative;
+      z-index:1;
     }
 
     .status-line{
@@ -153,13 +185,14 @@
     }
 
     .badge{
-      background:rgba(255,255,255,.26);
-      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.48);
+      border:1px solid rgba(255,255,255,.38);
       border-radius:999px;
       padding:7px 13px;
       font-weight:800;
-      color:#241d0d;
+      color:#2d3d80;
       font-size:14px;
+      box-shadow:0 2px 8px rgba(74,95,180,.08);
     }
 
     .prompt{
@@ -170,8 +203,8 @@
       min-height:1.16em;
       color:var(--display-white);
       text-shadow:
-        0 2px 0 rgba(0,0,0,.08),
-        0 6px 18px rgba(0,0,0,.12);
+        0 3px 0 rgba(61,89,178,.18),
+        0 8px 18px rgba(61,89,178,.20);
       font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
       font-feature-settings:"palt";
     }
@@ -179,26 +212,26 @@
     .reading{
       font-size:clamp(17px,2vw,28px);
       font-weight:900;
-      color:var(--display-white-soft);
+      color:#6b4fe5;
       letter-spacing:.12em;
       min-height:1.35em;
       word-break:break-all;
       text-shadow:
-        0 2px 0 rgba(0,0,0,.07),
-        0 4px 12px rgba(0,0,0,.08);
+        0 2px 0 rgba(255,255,255,.35),
+        0 4px 12px rgba(61,89,178,.08);
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       text-transform:uppercase;
     }
 
     .typing{
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.26);
+      border:1px solid rgba(255,255,255,.28);
       border-radius:22px;
       padding:14px 16px;
       min-height:76px;
       display:grid;
       align-items:center;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
     }
 
     .romaji{
@@ -216,23 +249,24 @@
       background:var(--typed-bg);
       border-radius:10px;
       padding:0 .08em;
+      text-shadow:none;
     }
 
     .rest{
-      color:var(--display-white);
+      color:#ffffff;
       text-shadow:
-        0 2px 0 rgba(0,0,0,.07),
-        0 4px 12px rgba(0,0,0,.08);
+        0 2px 0 rgba(61,89,178,.16),
+        0 4px 12px rgba(61,89,178,.14);
     }
 
     .cursor{
       display:inline-block;
       width:.65em;
       text-align:center;
-      color:var(--display-white);
+      color:#ffffff;
       animation:blink 1s step-end infinite;
       font-weight:900;
-      text-shadow:0 2px 8px rgba(0,0,0,.18);
+      text-shadow:0 2px 8px rgba(74,95,180,.22);
     }
 
     @keyframes blink{
@@ -243,12 +277,12 @@
       min-height:1.5em;
       font-size:clamp(15px,1.7vw,20px);
       font-weight:900;
-      color:#251e0e;
+      color:#31417d;
     }
 
     .message.ok{
-      color:#ffffff;
-      text-shadow:0 2px 8px rgba(0,0,0,.18);
+      color:var(--ok);
+      text-shadow:0 2px 8px rgba(255,255,255,.28);
     }
 
     .message.miss{
@@ -258,11 +292,11 @@
     .keyboard-wrap{
       width:min(940px,100%);
       margin:0 auto;
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.26);
+      border:1px solid rgba(255,255,255,.25);
       border-radius:24px;
       padding:12px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
     }
 
     .keyboard{
@@ -312,7 +346,7 @@
       position:absolute;
       inset:0;
       border-radius:inherit;
-      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+      background:linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0));
       pointer-events:none;
     }
 
@@ -329,9 +363,9 @@
     .key.active{
       background:var(--key-active) !important;
       color:var(--key-active-text);
-      transform:translateY(-2px);
+      transform:translateY(-2px) scale(1.02);
       box-shadow:var(--key-glow);
-      border-color:rgba(255,255,255,.5);
+      border-color:rgba(255,255,255,.64);
     }
 
     .bottom{
@@ -351,7 +385,7 @@
 
     .stat .label{
       font-size:12px;
-      color:#322911;
+      color:#4c5ca0;
       font-weight:900;
       letter-spacing:.08em;
     }
@@ -360,21 +394,21 @@
       margin-top:6px;
       font-size:clamp(20px,2.5vw,32px);
       font-weight:900;
-      color:#171208;
+      color:#22316d;
     }
 
     .help{
       font-size:13px;
-      color:#2c2410;
+      color:#425292;
       margin-top:4px;
       line-height:1.6;
-      font-weight:700;
+      font-weight:800;
     }
 
     .result-panel{
       margin-top:4px;
-      background:rgba(255,255,255,.24);
-      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
       border-radius:20px;
       padding:14px;
       display:none;
@@ -388,7 +422,7 @@
       font-size:22px;
       font-weight:900;
       margin-bottom:8px;
-      color:#1a1407;
+      color:#22316d;
     }
 
     .result-grid{
@@ -398,7 +432,7 @@
     }
 
     .result-card{
-      background:rgba(255,255,255,.28);
+      background:rgba(255,255,255,.44);
       border-radius:16px;
       padding:12px;
     }
@@ -406,14 +440,14 @@
     .result-card .r-label{
       font-size:13px;
       font-weight:900;
-      color:#30270f;
+      color:#4b5b9d;
     }
 
     .result-card .r-value{
       margin-top:6px;
       font-size:28px;
       font-weight:900;
-      color:#140f07;
+      color:#1f2d68;
     }
 
     @media (max-width:980px){
@@ -458,10 +492,11 @@
     <div class="topbar">
       <div>
         <div class="title">ひらがなローマ字タイピング練習</div>
-        <div class="help">モードを選ぶと即開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
+        <div class="help">モードを選ぶと即開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え　/　BGMは右上で切替</div>
       </div>
 
       <div class="controls" id="modeButtons">
+        <button class="sound-btn" id="bgmToggle" type="button">BGM OFF</button>
         <button class="mode-btn active" data-mode="10">10問</button>
         <button class="mode-btn" data-mode="20">20問</button>
         <button class="mode-btn" data-mode="30">30問</button>
@@ -486,6 +521,7 @@
         <div class="status-line">
           <div class="badge" id="modeLabel">モード：10問</div>
           <div class="badge" id="runLabel">プレイ中</div>
+          <div class="badge" id="bgmLabel">BGM：OFF</div>
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
@@ -872,13 +908,18 @@
       endTime:0,
       timerId:null,
       repeatTimer:null,
-      soundStep:0
+      soundStep:0,
+      bgmOn:false,
+      bgmTimer:null,
+      bgmStep:0
     };
 
     const el = {
       modeButtons:document.getElementById("modeButtons"),
       modeLabel:document.getElementById("modeLabel"),
       runLabel:document.getElementById("runLabel"),
+      bgmLabel:document.getElementById("bgmLabel"),
+      bgmToggle:document.getElementById("bgmToggle"),
       promptView:document.getElementById("promptView"),
       reading:document.getElementById("reading"),
       romajiView:document.getElementById("romajiView"),
@@ -907,9 +948,9 @@
       }
       if(!typeBuffers){
         typeBuffers = [
-          createTypeBuffer(audioCtx, 120, 72, 0.16, 0.055),
-          createTypeBuffer(audioCtx, 132, 80, 0.14, 0.05),
-          createTypeBuffer(audioCtx, 108, 64, 0.2, 0.06)
+          createTypeBuffer(audioCtx, 140, 86, 0.14, 0.055),
+          createTypeBuffer(audioCtx, 154, 92, 0.12, 0.05),
+          createTypeBuffer(audioCtx, 124, 74, 0.16, 0.06)
         ];
       }
       if(!missBuffer){
@@ -950,26 +991,26 @@
       for(let i=0;i<length;i++){
         const t = i / sampleRate;
         const env = Math.exp(-28 * t);
-        const tone = Math.sin(2 * Math.PI * 78 * t) * 0.8;
+        const tone = Math.sin(2 * Math.PI * 96 * t) * 0.8;
         const noise = (Math.random() * 2 - 1) * 0.12;
-        data[i] = (tone + noise) * env * 0.55;
+        data[i] = (tone + noise) * env * 0.52;
       }
       return buffer;
     }
 
     function createClearBuffer(ctx){
-      const duration = 0.11;
+      const duration = 0.13;
       const sampleRate = ctx.sampleRate;
       const length = Math.floor(sampleRate * duration);
       const buffer = ctx.createBuffer(1, length, sampleRate);
       const data = buffer.getChannelData(0);
       for(let i=0;i<length;i++){
         const t = i / sampleRate;
-        const env = Math.exp(-16 * t);
+        const env = Math.exp(-14 * t);
         const tone =
-          Math.sin(2 * Math.PI * 540 * t) * 0.45 +
-          Math.sin(2 * Math.PI * 810 * t) * 0.2;
-        data[i] = tone * env * 0.35;
+          Math.sin(2 * Math.PI * 660 * t) * 0.42 +
+          Math.sin(2 * Math.PI * 990 * t) * 0.18;
+        data[i] = tone * env * 0.34;
       }
       return buffer;
     }
@@ -1006,9 +1047,9 @@
       const idx = state.soundStep % typeBuffers.length;
       state.soundStep++;
       const rate = [1, 1.03, 0.97][idx];
-      const freq = [1450, 1650, 1250][idx];
+      const freq = [1500, 1700, 1300][idx];
       playBuffer(typeBuffers[idx], {
-        gainValue:0.74,
+        gainValue:0.72,
         filterType:"lowpass",
         filterFreq:freq,
         filterQ:0.7,
@@ -1019,9 +1060,9 @@
     function playMissSound(){
       if(!audioCtx || !missBuffer) return;
       playBuffer(missBuffer, {
-        gainValue:0.55,
+        gainValue:0.5,
         filterType:"lowpass",
-        filterFreq:900,
+        filterFreq:850,
         filterQ:0.7,
         rate:0.98
       });
@@ -1030,12 +1071,99 @@
     function playClearSound(){
       if(!audioCtx || !clearBuffer) return;
       playBuffer(clearBuffer, {
-        gainValue:0.42,
+        gainValue:0.4,
         filterType:"bandpass",
-        filterFreq:1200,
-        filterQ:0.8,
+        filterFreq:1400,
+        filterQ:0.85,
         rate:1
       });
+    }
+
+    function playBgmNote(freq, duration = 0.13, type = "triangle", volume = 0.03){
+      if(!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(1800, now);
+      filter.Q.setValueAtTime(0.4, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(volume, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.02);
+    }
+
+    function bgmTick(){
+      if(!state.bgmOn) return;
+
+      const pattern = [
+        {kick:true, note:523.25},
+        {note:659.25},
+        {kick:true, note:783.99},
+        {note:659.25},
+        {kick:true, note:523.25},
+        {note:659.25},
+        {kick:true, note:880.00},
+        {note:659.25}
+      ];
+
+      const step = pattern[state.bgmStep % pattern.length];
+      state.bgmStep++;
+
+      if(step.kick){
+        playBgmNote(110, 0.08, "sine", 0.022);
+      }
+      if(step.note){
+        playBgmNote(step.note, 0.11, "triangle", 0.026);
+      }
+
+      state.bgmTimer = setTimeout(bgmTick, 320);
+    }
+
+    function startBgm(){
+      ensureAudio();
+      if(state.bgmOn) return;
+      state.bgmOn = true;
+      state.bgmStep = 0;
+      updateBgmUi();
+      bgmTick();
+    }
+
+    function stopBgm(){
+      state.bgmOn = false;
+      if(state.bgmTimer){
+        clearTimeout(state.bgmTimer);
+        state.bgmTimer = null;
+      }
+      updateBgmUi();
+    }
+
+    function toggleBgm(){
+      ensureAudio();
+      if(state.bgmOn){
+        stopBgm();
+      }else{
+        startBgm();
+      }
+    }
+
+    function updateBgmUi(){
+      el.bgmToggle.textContent = state.bgmOn ? "BGM ON" : "BGM OFF";
+      el.bgmToggle.classList.toggle("active", state.bgmOn);
+      el.bgmLabel.textContent = `BGM：${state.bgmOn ? "ON" : "OFF"}`;
     }
 
     function clearRepeatTimer(){
@@ -1354,6 +1482,11 @@
       setMode(btn.dataset.mode, true);
     });
 
+    el.bgmToggle.addEventListener("click",()=>{
+      toggleBgm();
+    });
+
+    updateBgmUi();
     setMode("10", true);
   </script>
 </body>
