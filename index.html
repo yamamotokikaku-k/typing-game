@@ -108,8 +108,7 @@
       justify-content:flex-end;
     }
 
-    .mode-btn,
-    .sound-btn{
+    .mode-btn{
       border:none;
       background:rgba(255,255,255,.78);
       color:#243373;
@@ -123,14 +122,12 @@
       font-size:14px;
     }
 
-    .mode-btn:hover,
-    .sound-btn:hover{
+    .mode-btn:hover{
       transform:translateY(-1px);
       background:rgba(255,255,255,.92);
     }
 
-    .mode-btn.active,
-    .sound-btn.active{
+    .mode-btn.active{
       background:#ff7eb6;
       color:#ffffff;
       box-shadow:0 8px 18px rgba(255,126,182,.28);
@@ -492,14 +489,14 @@
     <div class="topbar">
       <div>
         <div class="title">ひらがなローマ字タイピング練習</div>
-        <div class="help">モードを選ぶと即開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え　/　BGMは右上で切替</div>
+        <div class="help">モードを選ぶと即開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
       </div>
 
       <div class="controls" id="modeButtons">
-        <button class="sound-btn" id="bgmToggle" type="button">BGM OFF</button>
         <button class="mode-btn active" data-mode="10">10問</button>
         <button class="mode-btn" data-mode="20">20問</button>
         <button class="mode-btn" data-mode="30">30問</button>
+        <button class="mode-btn" data-mode="twochar-noun">二文字名詞100</button>
         <button class="mode-btn" data-mode="row-a">あ行</button>
         <button class="mode-btn" data-mode="row-ka">か行</button>
         <button class="mode-btn" data-mode="row-sa">さ行</button>
@@ -521,7 +518,6 @@
         <div class="status-line">
           <div class="badge" id="modeLabel">モード：10問</div>
           <div class="badge" id="runLabel">プレイ中</div>
-          <div class="badge" id="bgmLabel">BGM：OFF</div>
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
@@ -713,6 +709,109 @@
       {kana:"おもちゃ"}
     ];
 
+    const TWO_CHAR_NOUNS = [
+      {kana:"あめ"},
+      {kana:"いぬ"},
+      {kana:"うみ"},
+      {kana:"えき"},
+      {kana:"おに"},
+      {kana:"かさ"},
+      {kana:"かに"},
+      {kana:"かわ"},
+      {kana:"くま"},
+      {kana:"くつ"},
+      {kana:"くに"},
+      {kana:"けし"},
+      {kana:"こえ"},
+      {kana:"こめ"},
+      {kana:"さけ"},
+      {kana:"さる"},
+      {kana:"しか"},
+      {kana:"しま"},
+      {kana:"すし"},
+      {kana:"すず"},
+      {kana:"せみ"},
+      {kana:"そら"},
+      {kana:"たい"},
+      {kana:"たこ"},
+      {kana:"たね"},
+      {kana:"つき"},
+      {kana:"つる"},
+      {kana:"てら"},
+      {kana:"とら"},
+      {kana:"なし"},
+      {kana:"なつ"},
+      {kana:"にわ"},
+      {kana:"ぬの"},
+      {kana:"ねこ"},
+      {kana:"のり"},
+      {kana:"はな"},
+      {kana:"はる"},
+      {kana:"ひげ"},
+      {kana:"ふね"},
+      {kana:"へや"},
+      {kana:"ほし"},
+      {kana:"まど"},
+      {kana:"まめ"},
+      {kana:"みず"},
+      {kana:"みみ"},
+      {kana:"むし"},
+      {kana:"むね"},
+      {kana:"めし"},
+      {kana:"もも"},
+      {kana:"やま"},
+      {kana:"ゆめ"},
+      {kana:"よる"},
+      {kana:"りす"},
+      {kana:"るす"},
+      {kana:"れき"},
+      {kana:"わに"},
+      {kana:"わた"},
+      {kana:"がら"},
+      {kana:"ぐみ"},
+      {kana:"げた"},
+      {kana:"ごま"},
+      {kana:"ざる"},
+      {kana:"ぜに"},
+      {kana:"ぞう"},
+      {kana:"だし"},
+      {kana:"でこ"},
+      {kana:"どろ"},
+      {kana:"ばら"},
+      {kana:"びわ"},
+      {kana:"ぶた"},
+      {kana:"ぼう"},
+      {kana:"ぱん"},
+      {kana:"ぺん"},
+      {kana:"きり"},
+      {kana:"くも"},
+      {kana:"こま"},
+      {kana:"さめ"},
+      {kana:"しお"},
+      {kana:"すな"},
+      {kana:"せき"},
+      {kana:"たき"},
+      {kana:"たに"},
+      {kana:"つの"},
+      {kana:"てつ"},
+      {kana:"とし"},
+      {kana:"なべ"},
+      {kana:"ぬま"},
+      {kana:"ねつ"},
+      {kana:"はし"},
+      {kana:"ひざ"},
+      {kana:"ふで"},
+      {kana:"へび"},
+      {kana:"ほね"},
+      {kana:"まき"},
+      {kana:"みせ"},
+      {kana:"むぎ"},
+      {kana:"もち"},
+      {kana:"やぎ"},
+      {kana:"ゆか"},
+      {kana:"ろば"}
+    ];
+
     const ROW_ORDER = [
       "row-a",
       "row-ka",
@@ -874,6 +973,7 @@
         "10":"10問",
         "20":"20問",
         "30":"30問",
+        "twochar-noun":"二文字名詞100",
         "row-a":"あ行",
         "row-ka":"か行",
         "row-sa":"さ行",
@@ -908,18 +1008,13 @@
       endTime:0,
       timerId:null,
       repeatTimer:null,
-      soundStep:0,
-      bgmOn:false,
-      bgmTimer:null,
-      bgmStep:0
+      soundStep:0
     };
 
     const el = {
       modeButtons:document.getElementById("modeButtons"),
       modeLabel:document.getElementById("modeLabel"),
       runLabel:document.getElementById("runLabel"),
-      bgmLabel:document.getElementById("bgmLabel"),
-      bgmToggle:document.getElementById("bgmToggle"),
       promptView:document.getElementById("promptView"),
       reading:document.getElementById("reading"),
       romajiView:document.getElementById("romajiView"),
@@ -1079,93 +1174,6 @@
       });
     }
 
-    function playBgmNote(freq, duration = 0.13, type = "triangle", volume = 0.03){
-      if(!audioCtx) return;
-
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-
-      filter.type = "lowpass";
-      filter.frequency.setValueAtTime(1800, now);
-      filter.Q.setValueAtTime(0.4, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(volume, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + duration + 0.02);
-    }
-
-    function bgmTick(){
-      if(!state.bgmOn) return;
-
-      const pattern = [
-        {kick:true, note:523.25},
-        {note:659.25},
-        {kick:true, note:783.99},
-        {note:659.25},
-        {kick:true, note:523.25},
-        {note:659.25},
-        {kick:true, note:880.00},
-        {note:659.25}
-      ];
-
-      const step = pattern[state.bgmStep % pattern.length];
-      state.bgmStep++;
-
-      if(step.kick){
-        playBgmNote(110, 0.08, "sine", 0.022);
-      }
-      if(step.note){
-        playBgmNote(step.note, 0.11, "triangle", 0.026);
-      }
-
-      state.bgmTimer = setTimeout(bgmTick, 320);
-    }
-
-    function startBgm(){
-      ensureAudio();
-      if(state.bgmOn) return;
-      state.bgmOn = true;
-      state.bgmStep = 0;
-      updateBgmUi();
-      bgmTick();
-    }
-
-    function stopBgm(){
-      state.bgmOn = false;
-      if(state.bgmTimer){
-        clearTimeout(state.bgmTimer);
-        state.bgmTimer = null;
-      }
-      updateBgmUi();
-    }
-
-    function toggleBgm(){
-      ensureAudio();
-      if(state.bgmOn){
-        stopBgm();
-      }else{
-        startBgm();
-      }
-    }
-
-    function updateBgmUi(){
-      el.bgmToggle.textContent = state.bgmOn ? "BGM ON" : "BGM OFF";
-      el.bgmToggle.classList.toggle("active", state.bgmOn);
-      el.bgmLabel.textContent = `BGM：${state.bgmOn ? "ON" : "OFF"}`;
-    }
-
     function clearRepeatTimer(){
       if(state.repeatTimer){
         clearTimeout(state.repeatTimer);
@@ -1208,6 +1216,10 @@
           });
         }
         return items;
+      }
+
+      if(state.mode === "twochar-noun"){
+        return shuffle(TWO_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
       }
 
       const count = Number(state.mode);
@@ -1482,11 +1494,6 @@
       setMode(btn.dataset.mode, true);
     });
 
-    el.bgmToggle.addEventListener("click",()=>{
-      toggleBgm();
-    });
-
-    updateBgmUi();
     setMode("10", true);
   </script>
 </body>
