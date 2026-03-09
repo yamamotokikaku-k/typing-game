@@ -24,7 +24,7 @@
       --ok:#ffffff;
       --miss:#2b0000;
 
-      --shadow:0 16px 40px rgba(0,0,0,.16);
+      --shadow:0 14px 34px rgba(0,0,0,.14);
 
       --f-lp:#ef8d86;
       --f-lr:#f4b06c;
@@ -39,10 +39,10 @@
       --key-base:rgba(255,255,255,.36);
       --key-border:rgba(0,0,0,.08);
       --key-text:#1a1407;
-      --key-shadow:0 6px 12px rgba(0,0,0,.08);
+      --key-shadow:0 5px 10px rgba(0,0,0,.08);
       --key-active:#1b160c;
       --key-active-text:#f5e9b1;
-      --key-glow:0 0 0 3px rgba(255,255,255,.55), 0 10px 22px rgba(0,0,0,.18);
+      --key-glow:0 0 0 3px rgba(255,255,255,.55), 0 10px 20px rgba(0,0,0,.18);
     }
 
     *{box-sizing:border-box}
@@ -61,15 +61,15 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:24px;
+      padding:16px;
     }
 
     .app{
       width:min(1240px,100%);
-      min-height:86vh;
+      min-height:calc(100vh - 32px);
       display:grid;
       grid-template-rows:auto 1fr auto;
-      gap:18px;
+      gap:14px;
     }
 
     .topbar{
@@ -77,17 +77,17 @@
       flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
+      gap:12px;
       background:var(--panel);
       border:1px solid var(--line);
       border-radius:22px;
-      padding:16px 18px;
+      padding:14px 16px;
       box-shadow:var(--shadow);
       backdrop-filter:blur(6px);
     }
 
     .title{
-      font-size:clamp(20px,2.6vw,30px);
+      font-size:clamp(19px,2.3vw,28px);
       font-weight:900;
       letter-spacing:.05em;
       color:#1a1407;
@@ -96,7 +96,7 @@
     .controls{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:8px;
       align-items:center;
       justify-content:flex-end;
     }
@@ -105,13 +105,14 @@
       border:none;
       background:rgba(255,255,255,.42);
       color:#1a1407;
-      padding:10px 16px;
+      padding:8px 13px;
       border-radius:999px;
       cursor:pointer;
       font-weight:900;
       letter-spacing:.04em;
       box-shadow:0 3px 10px rgba(0,0,0,.08);
       transition:.15s transform,.15s background,.15s box-shadow;
+      font-size:14px;
     }
 
     .mode-btn:hover{
@@ -130,8 +131,8 @@
       place-items:center;
       background:var(--panel);
       border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px 20px;
+      border-radius:28px;
+      padding:18px 16px;
       box-shadow:var(--shadow);
       position:relative;
       overflow:hidden;
@@ -141,7 +142,7 @@
       width:min(1000px,100%);
       text-align:center;
       display:grid;
-      gap:18px;
+      gap:12px;
     }
 
     .status-line{
@@ -155,17 +156,18 @@
       background:rgba(255,255,255,.26);
       border:1px solid rgba(255,255,255,.14);
       border-radius:999px;
-      padding:8px 14px;
+      padding:7px 13px;
       font-weight:800;
       color:#241d0d;
+      font-size:14px;
     }
 
     .prompt{
-      font-size:clamp(44px,8vw,96px);
+      font-size:clamp(34px,6vw,72px);
       font-weight:900;
-      letter-spacing:.14em;
-      line-height:1.12;
-      min-height:1.2em;
+      letter-spacing:.12em;
+      line-height:1.08;
+      min-height:1.16em;
       color:var(--display-white);
       text-shadow:
         0 2px 0 rgba(0,0,0,.08),
@@ -175,11 +177,11 @@
     }
 
     .reading{
-      font-size:clamp(20px,2.6vw,34px);
+      font-size:clamp(17px,2vw,28px);
       font-weight:900;
       color:var(--display-white-soft);
-      letter-spacing:.14em;
-      min-height:1.4em;
+      letter-spacing:.12em;
+      min-height:1.35em;
       word-break:break-all;
       text-shadow:
         0 2px 0 rgba(0,0,0,.07),
@@ -191,9 +193,9 @@
     .typing{
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.16);
-      border-radius:24px;
-      padding:20px;
-      min-height:96px;
+      border-radius:22px;
+      padding:14px 16px;
+      min-height:76px;
       display:grid;
       align-items:center;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
@@ -201,9 +203,9 @@
 
     .romaji{
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-      font-size:clamp(24px,3vw,40px);
-      line-height:1.5;
-      letter-spacing:.06em;
+      font-size:clamp(22px,2.5vw,34px);
+      line-height:1.45;
+      letter-spacing:.05em;
       word-break:break-all;
       font-weight:900;
       text-transform:uppercase;
@@ -238,8 +240,8 @@
     }
 
     .message{
-      min-height:1.6em;
-      font-size:clamp(16px,2vw,22px);
+      min-height:1.5em;
+      font-size:clamp(15px,1.7vw,20px);
       font-weight:900;
       color:#251e0e;
     }
@@ -254,24 +256,24 @@
     }
 
     .keyboard-wrap{
-      width:min(960px,100%);
+      width:min(940px,100%);
       margin:0 auto;
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.16);
-      border-radius:26px;
-      padding:16px;
+      border-radius:24px;
+      padding:12px;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
     }
 
     .keyboard{
       display:grid;
-      gap:8px;
+      gap:6px;
       width:100%;
     }
 
     .kb-row{
       display:grid;
-      gap:8px;
+      gap:6px;
       align-items:stretch;
     }
 
@@ -283,17 +285,17 @@
 
     .key{
       position:relative;
-      min-height:52px;
+      min-height:44px;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius:14px;
+      border-radius:12px;
       background:var(--key-base);
       border:1px solid var(--key-border);
       color:var(--key-text);
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       font-weight:900;
-      font-size:clamp(14px,1.8vw,20px);
+      font-size:clamp(12px,1.55vw,18px);
       letter-spacing:.05em;
       box-shadow:var(--key-shadow);
       user-select:none;
@@ -302,7 +304,7 @@
     }
 
     .key.small{
-      font-size:clamp(12px,1.4vw,16px);
+      font-size:clamp(11px,1.2vw,14px);
     }
 
     .key::after{
@@ -335,28 +337,28 @@
     .bottom{
       display:grid;
       grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:14px;
+      gap:12px;
     }
 
     .stat{
       background:var(--panel);
       border:1px solid var(--line);
-      border-radius:22px;
-      padding:16px 14px;
+      border-radius:20px;
+      padding:14px 12px;
       box-shadow:var(--shadow);
       text-align:center;
     }
 
     .stat .label{
-      font-size:13px;
+      font-size:12px;
       color:#322911;
       font-weight:900;
       letter-spacing:.08em;
     }
 
     .stat .value{
-      margin-top:8px;
-      font-size:clamp(22px,3vw,36px);
+      margin-top:6px;
+      font-size:clamp(20px,2.5vw,32px);
       font-weight:900;
       color:#171208;
     }
@@ -376,12 +378,12 @@
     }
 
     .count{
-      width:160px;
-      height:160px;
+      width:144px;
+      height:144px;
       border-radius:50%;
       display:grid;
       place-items:center;
-      font-size:72px;
+      font-size:64px;
       font-weight:900;
       background:rgba(255,255,255,.78);
       color:#1a1407;
@@ -389,19 +391,19 @@
     }
 
     .help{
-      font-size:14px;
+      font-size:13px;
       color:#2c2410;
       margin-top:4px;
-      line-height:1.7;
+      line-height:1.6;
       font-weight:700;
     }
 
     .result-panel{
-      margin-top:8px;
+      margin-top:4px;
       background:rgba(255,255,255,.24);
       border:1px solid rgba(255,255,255,.16);
       border-radius:20px;
-      padding:16px;
+      padding:14px;
       display:none;
     }
 
@@ -410,16 +412,16 @@
     }
 
     .result-title{
-      font-size:24px;
+      font-size:22px;
       font-weight:900;
-      margin-bottom:10px;
+      margin-bottom:8px;
       color:#1a1407;
     }
 
     .result-grid{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
+      gap:10px;
     }
 
     .result-card{
@@ -436,7 +438,7 @@
 
     .result-card .r-value{
       margin-top:6px;
-      font-size:30px;
+      font-size:28px;
       font-weight:900;
       color:#140f07;
     }
@@ -448,21 +450,14 @@
       .result-grid{
         grid-template-columns:1fr;
       }
-      .keyboard-wrap{
-        padding:12px;
-      }
-      .kb-row{
-        gap:6px;
-      }
       .key{
-        min-height:44px;
-        border-radius:12px;
+        min-height:40px;
       }
     }
 
     @media (max-width:640px){
       body{
-        padding:14px;
+        padding:10px;
       }
       .topbar{
         justify-content:center;
@@ -477,10 +472,10 @@
         overflow-x:auto;
       }
       .keyboard{
-        min-width:720px;
+        min-width:700px;
       }
       .help{
-        line-height:1.5;
+        line-height:1.45;
       }
     }
   </style>
@@ -490,14 +485,13 @@
     <div class="topbar">
       <div>
         <div class="title">ひらがなローマ字タイピング練習</div>
-        <div class="help">スペースキーで 3 秒後に開始　/　プレイ中にスペースキーで中断　/　無限モードは正解後 Enter で次へ</div>
+        <div class="help">スペースキーで 3 秒後に開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
       </div>
 
       <div class="controls" id="modeButtons">
         <button class="mode-btn active" data-mode="10">10問</button>
+        <button class="mode-btn" data-mode="20">20問</button>
         <button class="mode-btn" data-mode="30">30問</button>
-        <button class="mode-btn" data-mode="50">50問</button>
-        <button class="mode-btn" data-mode="infinite">無限</button>
         <button class="mode-btn" data-mode="row-a">あ行</button>
         <button class="mode-btn" data-mode="row-ka">か行</button>
         <button class="mode-btn" data-mode="row-sa">さ行</button>
@@ -508,11 +502,9 @@
         <button class="mode-btn" data-mode="row-ya">や行</button>
         <button class="mode-btn" data-mode="row-ra">ら行</button>
         <button class="mode-btn" data-mode="row-wa">わ行</button>
-        <button class="mode-btn" data-mode="row-daku">だくおん</button>
-        <button class="mode-btn" data-mode="row-handaku">ぱ行</button>
-        <button class="mode-btn" data-mode="row-small">ゃゅょっー</button>
-        <button class="mode-btn" data-mode="all-kana">通し</button>
-        <button class="mode-btn" data-mode="random-kana">ランダム</button>
+        <button class="mode-btn" data-mode="row-daku">濁音</button>
+        <button class="mode-btn" data-mode="row-pa">ぱぴぷぺぽ</button>
+        <button class="mode-btn" data-mode="row-youon">しゃしゅしょ等</button>
       </div>
     </div>
 
@@ -716,6 +708,22 @@
       {kana:"おもちゃ"}
     ];
 
+    const ROW_ORDER = [
+      "row-a",
+      "row-ka",
+      "row-sa",
+      "row-ta",
+      "row-na",
+      "row-ha",
+      "row-ma",
+      "row-ya",
+      "row-ra",
+      "row-wa",
+      "row-daku",
+      "row-pa",
+      "row-youon"
+    ];
+
     const ROW_SETS = {
       "row-a": ["あ","い","う","え","お"],
       "row-ka": ["か","き","く","け","こ"],
@@ -728,30 +736,21 @@
       "row-ra": ["ら","り","る","れ","ろ"],
       "row-wa": ["わ","を","ん"],
       "row-daku": ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ"],
-      "row-handaku": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
-      "row-small": ["ゃ","ゅ","ょ","っ","ー"]
+      "row-pa": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
+      "row-youon": [
+        "きゃ","きゅ","きょ",
+        "しゃ","しゅ","しょ",
+        "ちゃ","ちゅ","ちょ",
+        "にゃ","にゅ","にょ",
+        "ひゃ","ひゅ","ひょ",
+        "みゃ","みゅ","みょ",
+        "りゃ","りゅ","りょ",
+        "ぎゃ","ぎゅ","ぎょ",
+        "じゃ","じゅ","じょ",
+        "びゃ","びゅ","びょ",
+        "ぴゃ","ぴゅ","ぴょ"
+      ]
     };
-
-    const ALL_KANA_SEQUENCE = [
-      "あ","い","う","え","お",
-      "か","き","く","け","こ",
-      "さ","し","す","せ","そ",
-      "た","ち","つ","て","と",
-      "な","に","ぬ","ね","の",
-      "は","ひ","ふ","へ","ほ",
-      "ま","み","む","め","も",
-      "や","ゆ","よ",
-      "ら","り","る","れ","ろ",
-      "わ","を","ん",
-      "が","ぎ","ぐ","げ","ご",
-      "ざ","じ","ず","ぜ","ぞ",
-      "だ","ぢ","づ","で","ど",
-      "ば","び","ぶ","べ","ぼ",
-      "ぱ","ぴ","ぷ","ぺ","ぽ",
-      "ゃ","ゅ","ょ","っ","ー"
-    ];
-
-    const RANDOM_KANA_POOL = [...ALL_KANA_SEQUENCE];
 
     const BASIC = {
       "あ":"A","い":"I","う":"U","え":"E","お":"O",
@@ -763,7 +762,7 @@
       "ま":"MA","み":"MI","む":"MU","め":"ME","も":"MO",
       "や":"YA","ゆ":"YU","よ":"YO",
       "ら":"RA","り":"RI","る":"RU","れ":"RE","ろ":"RO",
-      "わ":"WA","を":"O",
+      "わ":"WA","を":"WO",
       "が":"GA","ぎ":"GI","ぐ":"GU","げ":"GE","ご":"GO",
       "ざ":"ZA","じ":"ZI","ず":"ZU","ぜ":"ZE","ぞ":"ZO",
       "だ":"DA","ぢ":"DI","づ":"DU","で":"DE","ど":"DO",
@@ -861,16 +860,15 @@
       return a;
     }
 
-    function isSingleKanaMode(mode){
-      return mode.startsWith("row-") || mode === "all-kana" || mode === "random-kana";
+    function isRowChainMode(mode){
+      return ROW_ORDER.includes(mode);
     }
 
     function getModeLabel(mode){
       const map = {
         "10":"10問",
+        "20":"20問",
         "30":"30問",
-        "50":"50問",
-        "infinite":"無限",
         "row-a":"あ行",
         "row-ka":"か行",
         "row-sa":"さ行",
@@ -881,24 +879,19 @@
         "row-ya":"や行",
         "row-ra":"ら行",
         "row-wa":"わ行",
-        "row-daku":"だくおん",
-        "row-handaku":"ぱ行",
-        "row-small":"ゃゅょっー",
-        "all-kana":"通し",
-        "random-kana":"ランダム"
+        "row-daku":"濁音",
+        "row-pa":"ぱぴぷぺぽ",
+        "row-youon":"しゃしゅしょ等"
       };
       return map[mode] || mode;
     }
 
     const state = {
       mode:"10",
+      activeModeLabel:"10問",
       isCounting:false,
       isRunning:false,
       isFinished:false,
-      isInfinite:false,
-      isSingleKana:false,
-      awaitingEnter:false,
-      canAdvanceInfinite:false,
       queue:[],
       current:null,
       currentIndex:0,
@@ -910,8 +903,8 @@
       endTime:0,
       timerId:null,
       countdownTimers:[],
-      repeatCount:0,
-      repeatTimer:null
+      repeatTimer:null,
+      soundStep:0
     };
 
     const el = {
@@ -936,7 +929,9 @@
     };
 
     let audioCtx = null;
-    let punchBuffer = null;
+    let typeBuffers = null;
+    let missBuffer = null;
+    let clearBuffer = null;
 
     function ensureAudio(){
       if(!audioCtx){
@@ -944,16 +939,25 @@
           latencyHint:"interactive"
         });
       }
-      if(!punchBuffer){
-        punchBuffer = createPunchBuffer(audioCtx);
+      if(!typeBuffers){
+        typeBuffers = [
+          createTypeBuffer(audioCtx, 120, 72, 0.16, 0.055),
+          createTypeBuffer(audioCtx, 132, 80, 0.14, 0.05),
+          createTypeBuffer(audioCtx, 108, 64, 0.2, 0.06)
+        ];
+      }
+      if(!missBuffer){
+        missBuffer = createMissBuffer(audioCtx);
+      }
+      if(!clearBuffer){
+        clearBuffer = createClearBuffer(audioCtx);
       }
       if(audioCtx.state === "suspended"){
         audioCtx.resume();
       }
     }
 
-    function createPunchBuffer(ctx){
-      const duration = 0.055;
+    function createTypeBuffer(ctx, freq1, freq2, noiseMix, duration){
       const sampleRate = ctx.sampleRate;
       const length = Math.floor(sampleRate * duration);
       const buffer = ctx.createBuffer(1, length, sampleRate);
@@ -961,34 +965,111 @@
 
       for(let i=0;i<length;i++){
         const t = i / sampleRate;
-        const env = Math.exp(-42 * t);
+        const env = Math.exp(-40 * t);
         const tone =
-          Math.sin(2 * Math.PI * 115 * t) * 0.82 +
-          Math.sin(2 * Math.PI * 78 * t) * 0.42;
-        const noise = (Math.random() * 2 - 1) * 0.18;
-        data[i] = (tone + noise) * env * 0.92;
+          Math.sin(2 * Math.PI * freq1 * t) * 0.82 +
+          Math.sin(2 * Math.PI * freq2 * t) * 0.42;
+        const noise = (Math.random() * 2 - 1) * noiseMix;
+        data[i] = (tone + noise) * env * 0.9;
       }
       return buffer;
     }
 
-    function playPunch(){
-      if(!audioCtx || !punchBuffer) return;
+    function createMissBuffer(ctx){
+      const duration = 0.07;
+      const sampleRate = ctx.sampleRate;
+      const length = Math.floor(sampleRate * duration);
+      const buffer = ctx.createBuffer(1, length, sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<length;i++){
+        const t = i / sampleRate;
+        const env = Math.exp(-28 * t);
+        const tone = Math.sin(2 * Math.PI * 78 * t) * 0.8;
+        const noise = (Math.random() * 2 - 1) * 0.12;
+        data[i] = (tone + noise) * env * 0.55;
+      }
+      return buffer;
+    }
+
+    function createClearBuffer(ctx){
+      const duration = 0.11;
+      const sampleRate = ctx.sampleRate;
+      const length = Math.floor(sampleRate * duration);
+      const buffer = ctx.createBuffer(1, length, sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<length;i++){
+        const t = i / sampleRate;
+        const env = Math.exp(-16 * t);
+        const tone =
+          Math.sin(2 * Math.PI * 540 * t) * 0.45 +
+          Math.sin(2 * Math.PI * 810 * t) * 0.2;
+        data[i] = tone * env * 0.35;
+      }
+      return buffer;
+    }
+
+    function playBuffer(buffer, {
+      gainValue = 0.7,
+      filterType = "lowpass",
+      filterFreq = 1400,
+      filterQ = 0.65,
+      rate = 1
+    } = {}){
+      if(!audioCtx || !buffer) return;
 
       const src = audioCtx.createBufferSource();
       const gain = audioCtx.createGain();
       const filter = audioCtx.createBiquadFilter();
 
-      filter.type = "lowpass";
-      filter.frequency.value = 1450;
-      filter.Q.value = 0.65;
+      filter.type = filterType;
+      filter.frequency.value = filterFreq;
+      filter.Q.value = filterQ;
 
-      gain.gain.value = 0.74;
+      gain.gain.value = gainValue;
+      src.playbackRate.value = rate;
 
-      src.buffer = punchBuffer;
+      src.buffer = buffer;
       src.connect(filter);
       filter.connect(gain);
       gain.connect(audioCtx.destination);
       src.start(audioCtx.currentTime + 0.0005);
+    }
+
+    function playTypeSound(){
+      if(!audioCtx || !typeBuffers) return;
+      const idx = state.soundStep % typeBuffers.length;
+      state.soundStep++;
+      const rate = [1, 1.03, 0.97][idx];
+      const freq = [1450, 1650, 1250][idx];
+      playBuffer(typeBuffers[idx], {
+        gainValue:0.74,
+        filterType:"lowpass",
+        filterFreq:freq,
+        filterQ:0.7,
+        rate
+      });
+    }
+
+    function playMissSound(){
+      if(!audioCtx || !missBuffer) return;
+      playBuffer(missBuffer, {
+        gainValue:0.55,
+        filterType:"lowpass",
+        filterFreq:900,
+        filterQ:0.7,
+        rate:0.98
+      });
+    }
+
+    function playClearSound(){
+      if(!audioCtx || !clearBuffer) return;
+      playBuffer(clearBuffer, {
+        gainValue:0.42,
+        filterType:"bandpass",
+        filterFreq:1200,
+        filterQ:0.8,
+        rate:1
+      });
     }
 
     function clearRepeatTimer(){
@@ -998,32 +1079,42 @@
       }
     }
 
-    function setMode(mode){
-      if(state.isRunning || state.isCounting) return;
-      state.mode = mode;
-      state.isInfinite = mode === "infinite";
-      state.isSingleKana = isSingleKanaMode(mode);
+    function clearCountdownTimers(){
+      state.countdownTimers.forEach(id=>clearTimeout(id));
+      state.countdownTimers = [];
+      el.overlay.classList.remove("show");
+    }
 
+    function updateModeButtons(mode){
       [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
         btn.classList.toggle("active", btn.dataset.mode === mode);
       });
+    }
 
-      el.modeLabel.textContent = `モード：${getModeLabel(mode)}`;
-      resetIdleScreen();
+    function setMode(mode, forceStart=false){
+      state.mode = mode;
+      state.activeModeLabel = getModeLabel(mode);
+      updateModeButtons(mode);
+      el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
+
+      if(forceStart){
+        stopGame(false, true);
+        beginGame();
+      }else{
+        resetIdleScreen();
+      }
     }
 
     function resetIdleScreen(){
       clearRepeatTimer();
+      clearCountdownTimers();
       state.isFinished = false;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
       state.current = null;
       state.currentIndex = 0;
       state.typed = "";
       state.misses = 0;
       state.totalKeys = 0;
       state.correctKeys = 0;
-      state.repeatCount = 0;
       state.startTime = 0;
       state.endTime = 0;
       updateStats();
@@ -1037,32 +1128,23 @@
     }
 
     function buildQueue(){
-      if(state.mode === "infinite"){
-        return shuffle(WORDS.map(w => ({kana:w.kana})));
-      }
-
-      if(state.mode === "all-kana"){
-        return ALL_KANA_SEQUENCE.map(k => ({kana:k}));
-      }
-
-      if(state.mode === "random-kana"){
-        const count = 50;
-        const arr = [];
-        for(let i=0;i<count;i++){
-          arr.push({kana:RANDOM_KANA_POOL[Math.floor(Math.random()*RANDOM_KANA_POOL.length)]});
+      if(isRowChainMode(state.mode)){
+        const startIndex = ROW_ORDER.indexOf(state.mode);
+        const items = [];
+        for(let i=startIndex;i<ROW_ORDER.length;i++){
+          const mode = ROW_ORDER[i];
+          const list = ROW_SETS[mode] || [];
+          list.forEach(kana=>{
+            items.push({kana, groupMode:mode});
+          });
         }
-        return arr;
+        return items;
       }
 
-      if(ROW_SETS[state.mode]){
-        return ROW_SETS[state.mode].map(k => ({kana:k}));
-      }
-
-      const shuffled = shuffle(WORDS.map(w => ({kana:w.kana})));
       const count = Number(state.mode);
       const pool = [];
       while(pool.length < count){
-        pool.push(...shuffle(WORDS.map(w => ({kana:w.kana}))));
+        pool.push(...shuffle(WORDS.map(w => ({kana:w.kana, groupMode:state.mode}))));
       }
       return pool.slice(0, count);
     }
@@ -1071,6 +1153,7 @@
       if(state.isCounting || state.isRunning) return;
 
       clearRepeatTimer();
+      clearCountdownTimers();
       ensureAudio();
       state.isCounting = true;
       el.resultPanel.classList.remove("show");
@@ -1080,9 +1163,6 @@
 
       const seq = ["3","2","1","START"];
       el.countText.textContent = seq[0];
-
-      state.countdownTimers.forEach(id=>clearTimeout(id));
-      state.countdownTimers = [];
 
       seq.forEach((text,idx)=>{
         const id = setTimeout(()=>{
@@ -1101,17 +1181,18 @@
 
     function beginGame(){
       clearRepeatTimer();
+      clearCountdownTimers();
+
       state.queue = buildQueue();
       state.currentIndex = 0;
       state.typed = "";
       state.misses = 0;
       state.totalKeys = 0;
       state.correctKeys = 0;
-      state.repeatCount = 0;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
+      state.soundStep = 0;
       state.isRunning = true;
       state.isFinished = false;
+      state.isCounting = false;
       state.startTime = performance.now();
       state.endTime = 0;
 
@@ -1123,34 +1204,30 @@
       updateStats();
     }
 
-    function stopGame(manual = true){
+    function stopGame(manual = true, silentReset = false){
       clearRepeatTimer();
+      clearCountdownTimers();
+
       state.isCounting = false;
       state.isRunning = false;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
       state.endTime = performance.now();
 
-      state.countdownTimers.forEach(id=>clearTimeout(id));
-      state.countdownTimers = [];
-      el.overlay.classList.remove("show");
-
       if(state.timerId) cancelAnimationFrame(state.timerId);
-      el.runLabel.textContent = manual ? "中断" : "終了";
 
-      if(manual){
-        setMessage("停止しました。スペースキーで最初から再開", "");
+      if(!silentReset){
+        el.runLabel.textContent = manual ? "中断" : "終了";
+        if(manual){
+          setMessage("停止しました。スペースキーで最初から再開", "");
+        }
+        updateStats();
+        updateKeyboardGuide("");
       }
-      updateStats();
-      updateKeyboardGuide("");
     }
 
     function finishGame(){
       clearRepeatTimer();
       state.isRunning = false;
       state.isFinished = true;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
       state.endTime = performance.now();
 
       if(state.timerId) cancelAnimationFrame(state.timerId);
@@ -1184,48 +1261,36 @@
     function nextWord(initial = false){
       clearRepeatTimer();
 
-      if(state.isInfinite){
-        if(initial || !state.current){
-          if(state.currentIndex === 0){
-            state.queue = shuffle(WORDS.map(w => ({kana:w.kana})));
-          }
-          const idx = state.currentIndex % state.queue.length;
-          state.current = state.queue[idx];
-        }
-      }else{
-        if(state.currentIndex >= state.queue.length){
-          finishGame();
-          return;
-        }
-        state.current = state.queue[state.currentIndex];
+      if(state.currentIndex >= state.queue.length){
+        finishGame();
+        return;
       }
 
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
+      state.current = state.queue[state.currentIndex];
       state.current.roman = kanaToRomajiStrict(state.current.kana);
       state.typed = "";
+
+      const currentGroup = state.current.groupMode || state.mode;
+      state.activeModeLabel = getModeLabel(currentGroup);
+      el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
+      updateModeButtons(state.mode);
+
       el.promptView.textContent = state.current.kana;
       el.reading.textContent = state.current.roman;
       renderRomaji();
       updateStats();
       updateKeyboardGuide(state.current.roman[0] || "");
 
-      if(state.isInfinite){
-        setMessage("入力して練習", "");
+      if(isRowChainMode(state.mode)){
+        const isFirstInGroup = initial || state.currentIndex === 0 || state.queue[state.currentIndex - 1].groupMode !== currentGroup;
+        if(isFirstInGroup && currentGroup !== state.mode){
+          setMessage(`${getModeLabel(currentGroup)}へ移行`, "ok");
+        }else{
+          setMessage("入力開始", "");
+        }
       }else{
         setMessage("入力開始", "");
       }
-    }
-
-    function repeatCurrentWord(){
-      clearRepeatTimer();
-      state.awaitingEnter = false;
-      state.typed = "";
-      renderRomaji();
-      state.repeatCount++;
-      updateStats();
-      updateKeyboardGuide(state.current?.roman?.[0] || "");
-      setMessage("もういちど", "");
     }
 
     function renderRomaji(initialText = null){
@@ -1257,9 +1322,6 @@
     }
 
     function getProgressText(){
-      if(state.isInfinite){
-        return `${state.currentIndex} 語クリア / 反復 ${state.repeatCount}`;
-      }
       return `${state.currentIndex} / ${state.queue.length || 0}`;
     }
 
@@ -1277,7 +1339,7 @@
       }
     }
 
-    function advanceWordFinite(){
+    function advanceWord(){
       clearRepeatTimer();
       state.currentIndex++;
       if(state.currentIndex >= state.queue.length){
@@ -1288,43 +1350,17 @@
       updateStats();
     }
 
-    function advanceWordInfinite(){
-      clearRepeatTimer();
-      state.currentIndex++;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
-
-      const idx = state.currentIndex % state.queue.length;
-      if(idx === 0){
-        state.queue = shuffle(WORDS.map(w => ({kana:w.kana})));
-      }
-
-      state.current = state.queue[idx];
-      state.current.roman = kanaToRomajiStrict(state.current.kana);
-      state.typed = "";
-      el.promptView.textContent = state.current.kana;
-      el.reading.textContent = state.current.roman;
-      renderRomaji();
-      updateStats();
-      setMessage("入力して練習", "");
-    }
-
     function onCorrectComplete(){
       clearRepeatTimer();
-      updateKeyboardGuide("Enter");
+      playClearSound();
+      setMessage("正解", "ok");
+      updateKeyboardGuide("");
 
-      if(state.isInfinite){
-        state.awaitingEnter = true;
-        state.canAdvanceInfinite = true;
-        setMessage("正解", "ok");
-      }else{
-        setMessage("正解", "ok");
-        state.repeatTimer = setTimeout(()=>{
-          if(state.isRunning){
-            advanceWordFinite();
-          }
-        }, 220);
-      }
+      state.repeatTimer = setTimeout(()=>{
+        if(state.isRunning){
+          advanceWord();
+        }
+      }, 260);
     }
 
     function keyNameToDataKey(ch){
@@ -1357,14 +1393,9 @@
       if(!state.current) return;
       const target = state.current.roman;
 
-      if(state.awaitingEnter && state.isInfinite && (isAllowedInputKey(key))){
-        repeatCurrentWord();
-      }
-
       if(!isAllowedInputKey(key)) return;
 
       ensureAudio();
-      playPunch();
 
       const inputKey = normalizeInputKey(key);
       state.totalKeys++;
@@ -1373,6 +1404,7 @@
       if(inputKey === expected){
         state.correctKeys++;
         state.typed += inputKey;
+        playTypeSound();
         renderRomaji();
 
         if(state.typed === target){
@@ -1382,6 +1414,7 @@
         }
       }else{
         state.misses++;
+        playMissSound();
         setMessage("ミス", "miss");
         updateKeyboardGuide(expected || "");
       }
@@ -1412,14 +1445,6 @@
 
       if(!state.isRunning) return;
 
-      if(key === "Enter"){
-        e.preventDefault();
-        if(state.isInfinite && state.canAdvanceInfinite){
-          advanceWordInfinite();
-        }
-        return;
-      }
-
       if(isAllowedInputKey(key)){
         e.preventDefault();
         handleTypingKey(key);
@@ -1429,7 +1454,11 @@
     el.modeButtons.addEventListener("click",(e)=>{
       const btn = e.target.closest(".mode-btn");
       if(!btn) return;
-      setMode(btn.dataset.mode);
+      const nextMode = btn.dataset.mode;
+      if(state.mode === nextMode && !state.isRunning && !state.isCounting) return;
+
+      const shouldStartImmediately = state.isRunning || state.isCounting;
+      setMode(nextMode, shouldStartImmediately);
     });
 
     setMode("10");
