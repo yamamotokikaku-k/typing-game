@@ -18,7 +18,6 @@
       --display-white:#fffdf6;
       --display-white-soft:#f8f3e6;
       --typed-black:#111111;
-      --typed-black-soft:#1e1a10;
       --typed-bg:rgba(0,0,0,.12);
 
       --accent:#ffffff;
@@ -66,7 +65,7 @@
     }
 
     .app{
-      width:min(1200px,100%);
+      width:min(1240px,100%);
       min-height:86vh;
       display:grid;
       grid-template-rows:auto 1fr auto;
@@ -99,6 +98,7 @@
       flex-wrap:wrap;
       gap:10px;
       align-items:center;
+      justify-content:flex-end;
     }
 
     .mode-btn{
@@ -138,7 +138,7 @@
     }
 
     .center{
-      width:min(980px,100%);
+      width:min(1000px,100%);
       text-align:center;
       display:grid;
       gap:18px;
@@ -170,11 +170,7 @@
       text-shadow:
         0 2px 0 rgba(0,0,0,.08),
         0 6px 18px rgba(0,0,0,.12);
-      font-family:
-        "Hiragino Sans",
-        "Yu Gothic",
-        "Meiryo",
-        sans-serif;
+      font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
       font-feature-settings:"palt";
     }
 
@@ -258,7 +254,7 @@
     }
 
     .keyboard-wrap{
-      width:min(940px,100%);
+      width:min(960px,100%);
       margin:0 auto;
       background:rgba(255,255,255,.18);
       border:1px solid rgba(255,255,255,.16);
@@ -445,7 +441,7 @@
       color:#140f07;
     }
 
-    @media (max-width:960px){
+    @media (max-width:980px){
       .bottom{
         grid-template-columns:repeat(2,minmax(0,1fr));
       }
@@ -502,6 +498,21 @@
         <button class="mode-btn" data-mode="30">30問</button>
         <button class="mode-btn" data-mode="50">50問</button>
         <button class="mode-btn" data-mode="infinite">無限</button>
+        <button class="mode-btn" data-mode="row-a">あ行</button>
+        <button class="mode-btn" data-mode="row-ka">か行</button>
+        <button class="mode-btn" data-mode="row-sa">さ行</button>
+        <button class="mode-btn" data-mode="row-ta">た行</button>
+        <button class="mode-btn" data-mode="row-na">な行</button>
+        <button class="mode-btn" data-mode="row-ha">は行</button>
+        <button class="mode-btn" data-mode="row-ma">ま行</button>
+        <button class="mode-btn" data-mode="row-ya">や行</button>
+        <button class="mode-btn" data-mode="row-ra">ら行</button>
+        <button class="mode-btn" data-mode="row-wa">わ行</button>
+        <button class="mode-btn" data-mode="row-daku">だくおん</button>
+        <button class="mode-btn" data-mode="row-handaku">ぱ行</button>
+        <button class="mode-btn" data-mode="row-small">ゃゅょっー</button>
+        <button class="mode-btn" data-mode="all-kana">通し</button>
+        <button class="mode-btn" data-mode="random-kana">ランダム</button>
       </div>
     </div>
 
@@ -517,7 +528,7 @@
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
-        <div class="reading" id="reading">HIRAGANA</div>
+        <div class="reading" id="reading">ROMAJI</div>
 
         <div class="typing">
           <div class="romaji" id="romajiView"></div>
@@ -705,6 +716,43 @@
       {kana:"おもちゃ"}
     ];
 
+    const ROW_SETS = {
+      "row-a": ["あ","い","う","え","お"],
+      "row-ka": ["か","き","く","け","こ"],
+      "row-sa": ["さ","し","す","せ","そ"],
+      "row-ta": ["た","ち","つ","て","と"],
+      "row-na": ["な","に","ぬ","ね","の"],
+      "row-ha": ["は","ひ","ふ","へ","ほ"],
+      "row-ma": ["ま","み","む","め","も"],
+      "row-ya": ["や","ゆ","よ"],
+      "row-ra": ["ら","り","る","れ","ろ"],
+      "row-wa": ["わ","を","ん"],
+      "row-daku": ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ"],
+      "row-handaku": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
+      "row-small": ["ゃ","ゅ","ょ","っ","ー"]
+    };
+
+    const ALL_KANA_SEQUENCE = [
+      "あ","い","う","え","お",
+      "か","き","く","け","こ",
+      "さ","し","す","せ","そ",
+      "た","ち","つ","て","と",
+      "な","に","ぬ","ね","の",
+      "は","ひ","ふ","へ","ほ",
+      "ま","み","む","め","も",
+      "や","ゆ","よ",
+      "ら","り","る","れ","ろ",
+      "わ","を","ん",
+      "が","ぎ","ぐ","げ","ご",
+      "ざ","じ","ず","ぜ","ぞ",
+      "だ","ぢ","づ","で","ど",
+      "ば","び","ぶ","べ","ぼ",
+      "ぱ","ぴ","ぷ","ぺ","ぽ",
+      "ゃ","ゅ","ょ","っ","ー"
+    ];
+
+    const RANDOM_KANA_POOL = [...ALL_KANA_SEQUENCE];
+
     const BASIC = {
       "あ":"A","い":"I","う":"U","え":"E","お":"O",
       "か":"KA","き":"KI","く":"KU","け":"KE","こ":"KO",
@@ -722,7 +770,9 @@
       "ば":"BA","び":"BI","ぶ":"BU","べ":"BE","ぼ":"BO",
       "ぱ":"PA","ぴ":"PI","ぷ":"PU","ぺ":"PE","ぽ":"PO",
       "ぁ":"A","ぃ":"I","ぅ":"U","ぇ":"E","ぉ":"O",
-      "ゔ":"VU"
+      "ゃ":"YA","ゅ":"YU","ょ":"YO",
+      "ゔ":"VU",
+      "ー":"-"
     };
 
     const DIGRAPHS = {
@@ -757,13 +807,12 @@
     function getRomanForToken(token){
       if(DIGRAPHS[token]) return DIGRAPHS[token];
       if(BASIC[token]) return BASIC[token];
-      if(token === "ー") return "-";
       return token.toUpperCase();
     }
 
     function getInitialConsonant(roman){
       if(!roman) return "";
-      const m = roman.match(/^[^AEIOU]+/);
+      const m = roman.match(/^[^AEIOU\-]+/);
       return m ? m[0][0] : "";
     }
 
@@ -812,12 +861,42 @@
       return a;
     }
 
+    function isSingleKanaMode(mode){
+      return mode.startsWith("row-") || mode === "all-kana" || mode === "random-kana";
+    }
+
+    function getModeLabel(mode){
+      const map = {
+        "10":"10問",
+        "30":"30問",
+        "50":"50問",
+        "infinite":"無限",
+        "row-a":"あ行",
+        "row-ka":"か行",
+        "row-sa":"さ行",
+        "row-ta":"た行",
+        "row-na":"な行",
+        "row-ha":"は行",
+        "row-ma":"ま行",
+        "row-ya":"や行",
+        "row-ra":"ら行",
+        "row-wa":"わ行",
+        "row-daku":"だくおん",
+        "row-handaku":"ぱ行",
+        "row-small":"ゃゅょっー",
+        "all-kana":"通し",
+        "random-kana":"ランダム"
+      };
+      return map[mode] || mode;
+    }
+
     const state = {
       mode:"10",
       isCounting:false,
       isRunning:false,
       isFinished:false,
       isInfinite:false,
+      isSingleKana:false,
       awaitingEnter:false,
       canAdvanceInfinite:false,
       queue:[],
@@ -923,12 +1002,13 @@
       if(state.isRunning || state.isCounting) return;
       state.mode = mode;
       state.isInfinite = mode === "infinite";
+      state.isSingleKana = isSingleKanaMode(mode);
 
       [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
         btn.classList.toggle("active", btn.dataset.mode === mode);
       });
 
-      el.modeLabel.textContent = `モード：${mode === "infinite" ? "無限" : mode + "問"}`;
+      el.modeLabel.textContent = `モード：${getModeLabel(mode)}`;
       resetIdleScreen();
     }
 
@@ -957,13 +1037,32 @@
     }
 
     function buildQueue(){
-      const shuffled = shuffle(WORDS);
-      if(state.isInfinite) return shuffled;
+      if(state.mode === "infinite"){
+        return shuffle(WORDS.map(w => ({kana:w.kana})));
+      }
 
+      if(state.mode === "all-kana"){
+        return ALL_KANA_SEQUENCE.map(k => ({kana:k}));
+      }
+
+      if(state.mode === "random-kana"){
+        const count = 50;
+        const arr = [];
+        for(let i=0;i<count;i++){
+          arr.push({kana:RANDOM_KANA_POOL[Math.floor(Math.random()*RANDOM_KANA_POOL.length)]});
+        }
+        return arr;
+      }
+
+      if(ROW_SETS[state.mode]){
+        return ROW_SETS[state.mode].map(k => ({kana:k}));
+      }
+
+      const shuffled = shuffle(WORDS.map(w => ({kana:w.kana})));
       const count = Number(state.mode);
       const pool = [];
       while(pool.length < count){
-        pool.push(...shuffle(WORDS));
+        pool.push(...shuffle(WORDS.map(w => ({kana:w.kana}))));
       }
       return pool.slice(0, count);
     }
@@ -1088,11 +1187,10 @@
       if(state.isInfinite){
         if(initial || !state.current){
           if(state.currentIndex === 0){
-            state.queue = shuffle(WORDS);
+            state.queue = shuffle(WORDS.map(w => ({kana:w.kana})));
           }
           const idx = state.currentIndex % state.queue.length;
           state.current = state.queue[idx];
-          state.currentIndex = state.currentIndex || 0;
         }
       }else{
         if(state.currentIndex >= state.queue.length){
@@ -1158,15 +1256,17 @@
       return Math.max(0, Math.round((state.correctKeys / state.totalKeys) * 100));
     }
 
+    function getProgressText(){
+      if(state.isInfinite){
+        return `${state.currentIndex} 語クリア / 反復 ${state.repeatCount}`;
+      }
+      return `${state.currentIndex} / ${state.queue.length || 0}`;
+    }
+
     function updateStats(){
       el.missValue.textContent = String(state.misses);
       el.accValue.textContent = `${calcAccuracy()}%`;
-
-      if(state.isInfinite){
-        el.progressValue.textContent = `${state.currentIndex} 語クリア / 反復 ${state.repeatCount}`;
-      }else{
-        el.progressValue.textContent = `${state.currentIndex} / ${state.mode}`;
-      }
+      el.progressValue.textContent = getProgressText();
 
       if(!state.isRunning){
         if(state.isFinished || state.endTime){
@@ -1196,7 +1296,7 @@
 
       const idx = state.currentIndex % state.queue.length;
       if(idx === 0){
-        state.queue = shuffle(WORDS);
+        state.queue = shuffle(WORDS.map(w => ({kana:w.kana})));
       }
 
       state.current = state.queue[idx];
@@ -1231,6 +1331,7 @@
       if(!ch) return "";
       if(ch === "Enter") return "Enter";
       if(ch === " ") return "Space";
+      if(ch === "-") return "Minus";
       if(/[A-Z]/.test(ch)) return `Key${ch}`;
       if(/[0-9]/.test(ch)) return `Digit${ch}`;
       return "";
@@ -1243,26 +1344,35 @@
       });
     }
 
+    function isAllowedInputKey(key){
+      return /^[a-zA-Z\-]$/.test(key);
+    }
+
+    function normalizeInputKey(key){
+      if(key === "-") return "-";
+      return key.toUpperCase();
+    }
+
     function handleTypingKey(key){
       if(!state.current) return;
       const target = state.current.roman;
 
-      if(state.awaitingEnter && state.isInfinite && /^[a-z]$/.test(key)){
+      if(state.awaitingEnter && state.isInfinite && (isAllowedInputKey(key))){
         repeatCurrentWord();
       }
 
-      if(!/^[a-z]$/.test(key)) return;
+      if(!isAllowedInputKey(key)) return;
 
       ensureAudio();
       playPunch();
 
-      const upperKey = key.toUpperCase();
+      const inputKey = normalizeInputKey(key);
       state.totalKeys++;
       const expected = target[state.typed.length];
 
-      if(upperKey === expected){
+      if(inputKey === expected){
         state.correctKeys++;
-        state.typed += upperKey;
+        state.typed += inputKey;
         renderRomaji();
 
         if(state.typed === target){
@@ -1272,7 +1382,7 @@
         }
       }else{
         state.misses++;
-        setMessage(`ミス`, "miss");
+        setMessage("ミス", "miss");
         updateKeyboardGuide(expected || "");
       }
 
@@ -1310,9 +1420,9 @@
         return;
       }
 
-      if(key.length === 1 && /^[a-zA-Z]$/.test(key)){
+      if(isAllowedInputKey(key)){
         e.preventDefault();
-        handleTypingKey(key.toLowerCase());
+        handleTypingKey(key);
       }
     });
 
