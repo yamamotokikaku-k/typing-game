@@ -1031,9 +1031,6 @@
     };
 
     let audioCtx = null;
-    let typeBuffers = null;
-    let missBuffer = null;
-    let clearBuffer = null;
 
     function ensureAudio(){
       if(!audioCtx){
@@ -1041,137 +1038,107 @@
           latencyHint:"interactive"
         });
       }
-      if(!typeBuffers){
-        typeBuffers = [
-          createTypeBuffer(audioCtx, 140, 86, 0.14, 0.055),
-          createTypeBuffer(audioCtx, 154, 92, 0.12, 0.05),
-          createTypeBuffer(audioCtx, 124, 74, 0.16, 0.06)
-        ];
-      }
-      if(!missBuffer){
-        missBuffer = createMissBuffer(audioCtx);
-      }
-      if(!clearBuffer){
-        clearBuffer = createClearBuffer(audioCtx);
-      }
       if(audioCtx.state === "suspended"){
         audioCtx.resume();
       }
     }
 
-    function createTypeBuffer(ctx, freq1, freq2, noiseMix, duration){
-      const sampleRate = ctx.sampleRate;
-      const length = Math.floor(sampleRate * duration);
-      const buffer = ctx.createBuffer(1, length, sampleRate);
-      const data = buffer.getChannelData(0);
-
-      for(let i=0;i<length;i++){
-        const t = i / sampleRate;
-        const env = Math.exp(-40 * t);
-        const tone =
-          Math.sin(2 * Math.PI * freq1 * t) * 0.82 +
-          Math.sin(2 * Math.PI * freq2 * t) * 0.42;
-        const noise = (Math.random() * 2 - 1) * noiseMix;
-        data[i] = (tone + noise) * env * 0.9;
-      }
-      return buffer;
-    }
-
-    function createMissBuffer(ctx){
-      const duration = 0.07;
-      const sampleRate = ctx.sampleRate;
-      const length = Math.floor(sampleRate * duration);
-      const buffer = ctx.createBuffer(1, length, sampleRate);
-      const data = buffer.getChannelData(0);
-      for(let i=0;i<length;i++){
-        const t = i / sampleRate;
-        const env = Math.exp(-28 * t);
-        const tone = Math.sin(2 * Math.PI * 96 * t) * 0.8;
-        const noise = (Math.random() * 2 - 1) * 0.12;
-        data[i] = (tone + noise) * env * 0.52;
-      }
-      return buffer;
-    }
-
-    function createClearBuffer(ctx){
-      const duration = 0.13;
-      const sampleRate = ctx.sampleRate;
-      const length = Math.floor(sampleRate * duration);
-      const buffer = ctx.createBuffer(1, length, sampleRate);
-      const data = buffer.getChannelData(0);
-      for(let i=0;i<length;i++){
-        const t = i / sampleRate;
-        const env = Math.exp(-14 * t);
-        const tone =
-          Math.sin(2 * Math.PI * 660 * t) * 0.42 +
-          Math.sin(2 * Math.PI * 990 * t) * 0.18;
-        data[i] = tone * env * 0.34;
-      }
-      return buffer;
-    }
-
-    function playBuffer(buffer, {
-      gainValue = 0.7,
-      filterType = "lowpass",
-      filterFreq = 1400,
-      filterQ = 0.65,
-      rate = 1
-    } = {}){
-      if(!audioCtx || !buffer) return;
-
-      const src = audioCtx.createBufferSource();
+    function warmupAudio(){
+      if(!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-
-      filter.type = filterType;
-      filter.frequency.value = filterFreq;
-      filter.Q.value = filterQ;
-
-      gain.gain.value = gainValue;
-      src.playbackRate.value = rate;
-
-      src.buffer = buffer;
-      src.connect(filter);
-      filter.connect(gain);
+      osc.type = "square";
+      osc.frequency.value = 440;
+      gain.gain.setValueAtTime(0.00001, now);
+      osc.connect(gain);
       gain.connect(audioCtx.destination);
-      src.start(audioCtx.currentTime + 0.0005);
+      osc.start(now);
+      osc.stop(now + 0.01);
+    }
+
+    function playSimpleTone({
+      freq = 880,
+      type = "square",
+      gainValue = 0.03,
+      duration = 0.03,
+      attack = 0.001,
+      release = 0.03
+    } = {}){
+      if(!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(gainValue, now + attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(duration, attack + 0.002));
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + Math.max(duration + release, 0.04));
     }
 
     function playTypeSound(){
-      if(!audioCtx || !typeBuffers) return;
-      const idx = state.soundStep % typeBuffers.length;
+      if(!audioCtx) return;
+      const freqs = [980, 1040, 920];
+      const idx = state.soundStep % freqs.length;
       state.soundStep++;
-      const rate = [1, 1.03, 0.97][idx];
-      const freq = [1500, 1700, 1300][idx];
-      playBuffer(typeBuffers[idx], {
-        gainValue:0.72,
-        filterType:"lowpass",
-        filterFreq:freq,
-        filterQ:0.7,
-        rate
+      playSimpleTone({
+        freq:freqs[idx],
+        type:"square",
+        gainValue:0.028,
+        duration:0.024,
+        attack:0.001,
+        release:0.02
       });
     }
 
     function playMissSound(){
-      if(!audioCtx || !missBuffer) return;
-      playBuffer(missBuffer, {
-        gainValue:0.5,
-        filterType:"lowpass",
-        filterFreq:850,
-        filterQ:0.7,
-        rate:0.98
+      if(!audioCtx) return;
+      playSimpleTone({
+        freq:220,
+        type:"sawtooth",
+        gainValue:0.02,
+        duration:0.05,
+        attack:0.001,
+        release:0.04
       });
     }
 
     function playClearSound(){
-      if(!audioCtx || !clearBuffer) return;
-      playBuffer(clearBuffer, {
-        gainValue:0.4,
-        filterType:"bandpass",
-        filterFreq:1400,
-        filterQ:0.85,
-        rate:1
-      });
+      if(!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.type = "square";
+      osc1.frequency.setValueAtTime(880, now);
+      gain1.gain.setValueAtTime(0.0001, now);
+      gain1.gain.linearRampToValueAtTime(0.022, now + 0.001);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.07);
+
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.type = "square";
+      osc2.frequency.setValueAtTime(1320, now + 0.02);
+      gain2.gain.setValueAtTime(0.0001, now + 0.02);
+      gain2.gain.linearRampToValueAtTime(0.018, now + 0.021);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.start(now + 0.02);
+      osc2.stop(now + 0.09);
     }
 
     function clearRepeatTimer(){
@@ -1491,6 +1458,7 @@
       const btn = e.target.closest(".mode-btn");
       if(!btn) return;
       ensureAudio();
+      warmupAudio();
       setMode(btn.dataset.mode, true);
     });
 
