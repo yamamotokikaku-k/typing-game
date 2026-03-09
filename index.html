@@ -363,33 +363,6 @@
       color:#171208;
     }
 
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:none;
-      place-items:center;
-      background:rgba(0,0,0,.20);
-      backdrop-filter:blur(2px);
-      z-index:5;
-    }
-
-    .overlay.show{
-      display:grid;
-    }
-
-    .count{
-      width:144px;
-      height:144px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      font-size:64px;
-      font-weight:900;
-      background:rgba(255,255,255,.78);
-      color:#1a1407;
-      box-shadow:0 18px 40px rgba(0,0,0,.24);
-    }
-
     .help{
       font-size:13px;
       color:#2c2410;
@@ -485,7 +458,7 @@
     <div class="topbar">
       <div>
         <div class="title">ひらがなローマ字タイピング練習</div>
-        <div class="help">スペースキーで 3 秒後に開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
+        <div class="help">モードを選ぶと即開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
       </div>
 
       <div class="controls" id="modeButtons">
@@ -509,14 +482,10 @@
     </div>
 
     <div class="main">
-      <div class="overlay" id="overlay">
-        <div class="count" id="countText">3</div>
-      </div>
-
       <div class="center">
         <div class="status-line">
           <div class="badge" id="modeLabel">モード：10問</div>
-          <div class="badge" id="runLabel">待機中</div>
+          <div class="badge" id="runLabel">プレイ中</div>
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
@@ -607,7 +576,7 @@
           </div>
         </div>
 
-        <div class="message" id="message">スペースキーで開始</div>
+        <div class="message" id="message">入力開始</div>
 
         <div class="result-panel" id="resultPanel">
           <div class="result-title">結果</div>
@@ -888,8 +857,8 @@
 
     const state = {
       mode:"10",
+      activeMode:"10",
       activeModeLabel:"10問",
-      isCounting:false,
       isRunning:false,
       isFinished:false,
       queue:[],
@@ -902,7 +871,6 @@
       startTime:0,
       endTime:0,
       timerId:null,
-      countdownTimers:[],
       repeatTimer:null,
       soundStep:0
     };
@@ -919,8 +887,6 @@
       missValue:document.getElementById("missValue"),
       accValue:document.getElementById("accValue"),
       timeValue:document.getElementById("timeValue"),
-      overlay:document.getElementById("overlay"),
-      countText:document.getElementById("countText"),
       resultPanel:document.getElementById("resultPanel"),
       resultClear:document.getElementById("resultClear"),
       resultAcc:document.getElementById("resultAcc"),
@@ -1079,52 +1045,27 @@
       }
     }
 
-    function clearCountdownTimers(){
-      state.countdownTimers.forEach(id=>clearTimeout(id));
-      state.countdownTimers = [];
-      el.overlay.classList.remove("show");
-    }
-
     function updateModeButtons(mode){
       [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
         btn.classList.toggle("active", btn.dataset.mode === mode);
       });
     }
 
-    function setMode(mode, forceStart=false){
-      state.mode = mode;
+    function syncActiveMode(mode){
+      state.activeMode = mode;
       state.activeModeLabel = getModeLabel(mode);
-      updateModeButtons(mode);
       el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
-
-      if(forceStart){
-        stopGame(false, true);
-        beginGame();
-      }else{
-        resetIdleScreen();
-      }
+      updateModeButtons(mode);
     }
 
-    function resetIdleScreen(){
-      clearRepeatTimer();
-      clearCountdownTimers();
-      state.isFinished = false;
-      state.current = null;
-      state.currentIndex = 0;
-      state.typed = "";
-      state.misses = 0;
-      state.totalKeys = 0;
-      state.correctKeys = 0;
-      state.startTime = 0;
-      state.endTime = 0;
-      updateStats();
-      el.runLabel.textContent = "待機中";
-      el.promptView.textContent = "ひらがな";
-      el.reading.textContent = "ROMAJI";
-      renderRomaji("");
-      setMessage("スペースキーで開始", "");
-      el.resultPanel.classList.remove("show");
-      updateKeyboardGuide("");
+    function setMode(mode, startImmediately = true){
+      state.mode = mode;
+      syncActiveMode(mode);
+
+      if(startImmediately){
+        stopGame(true);
+        beginGame();
+      }
     }
 
     function buildQueue(){
@@ -1149,39 +1090,8 @@
       return pool.slice(0, count);
     }
 
-    function startCountdown(){
-      if(state.isCounting || state.isRunning) return;
-
-      clearRepeatTimer();
-      clearCountdownTimers();
-      ensureAudio();
-      state.isCounting = true;
-      el.resultPanel.classList.remove("show");
-      el.overlay.classList.add("show");
-      el.runLabel.textContent = "カウントダウン";
-      setMessage("開始します", "");
-
-      const seq = ["3","2","1","START"];
-      el.countText.textContent = seq[0];
-
-      seq.forEach((text,idx)=>{
-        const id = setTimeout(()=>{
-          el.countText.textContent = text;
-        }, idx * 700);
-        state.countdownTimers.push(id);
-      });
-
-      const endId = setTimeout(()=>{
-        el.overlay.classList.remove("show");
-        state.isCounting = false;
-        beginGame();
-      }, seq.length * 700);
-      state.countdownTimers.push(endId);
-    }
-
     function beginGame(){
       clearRepeatTimer();
-      clearCountdownTimers();
 
       state.queue = buildQueue();
       state.currentIndex = 0;
@@ -1192,7 +1102,6 @@
       state.soundStep = 0;
       state.isRunning = true;
       state.isFinished = false;
-      state.isCounting = false;
       state.startTime = performance.now();
       state.endTime = 0;
 
@@ -1200,28 +1109,22 @@
       tickTimer();
 
       el.runLabel.textContent = "プレイ中";
+      el.resultPanel.classList.remove("show");
       nextWord(true);
       updateStats();
     }
 
-    function stopGame(manual = true, silentReset = false){
+    function stopGame(resetTime = false){
       clearRepeatTimer();
-      clearCountdownTimers();
-
-      state.isCounting = false;
       state.isRunning = false;
-      state.endTime = performance.now();
+
+      if(resetTime){
+        state.endTime = 0;
+      }else{
+        state.endTime = performance.now();
+      }
 
       if(state.timerId) cancelAnimationFrame(state.timerId);
-
-      if(!silentReset){
-        el.runLabel.textContent = manual ? "中断" : "終了";
-        if(manual){
-          setMessage("停止しました。スペースキーで最初から再開", "");
-        }
-        updateStats();
-        updateKeyboardGuide("");
-      }
     }
 
     function finishGame(){
@@ -1232,7 +1135,7 @@
 
       if(state.timerId) cancelAnimationFrame(state.timerId);
       el.runLabel.textContent = "終了";
-      setMessage("おつかれさまでした。スペースキーで再スタート", "ok");
+      setMessage("おつかれさまでした。モードを選ぶと再スタート", "ok");
 
       const cleared = state.currentIndex;
       const acc = calcAccuracy();
@@ -1271,9 +1174,8 @@
       state.typed = "";
 
       const currentGroup = state.current.groupMode || state.mode;
-      state.activeModeLabel = getModeLabel(currentGroup);
-      el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
-      updateModeButtons(state.mode);
+      const previousGroup = state.currentIndex > 0 ? state.queue[state.currentIndex - 1].groupMode : null;
+      syncActiveMode(currentGroup);
 
       el.promptView.textContent = state.current.kana;
       el.reading.textContent = state.current.roman;
@@ -1282,8 +1184,8 @@
       updateKeyboardGuide(state.current.roman[0] || "");
 
       if(isRowChainMode(state.mode)){
-        const isFirstInGroup = initial || state.currentIndex === 0 || state.queue[state.currentIndex - 1].groupMode !== currentGroup;
-        if(isFirstInGroup && currentGroup !== state.mode){
+        const changedGroup = initial || previousGroup !== currentGroup;
+        if(changedGroup && currentGroup !== state.mode){
           setMessage(`${getModeLabel(currentGroup)}へ移行`, "ok");
         }else{
           setMessage("入力開始", "");
@@ -1426,20 +1328,14 @@
       const key = e.key;
 
       if(key === " " || key === "Spacebar"){
-        e.preventDefault();
-        ensureAudio();
-
-        if(state.isCounting){
-          stopGame(true);
-          return;
-        }
-
         if(state.isRunning){
-          stopGame(true);
-          return;
+          e.preventDefault();
+          stopGame(false);
+          el.runLabel.textContent = "中断";
+          setMessage("停止しました。モードを選ぶと再スタート", "");
+          updateKeyboardGuide("");
+          updateStats();
         }
-
-        startCountdown();
         return;
       }
 
@@ -1454,14 +1350,11 @@
     el.modeButtons.addEventListener("click",(e)=>{
       const btn = e.target.closest(".mode-btn");
       if(!btn) return;
-      const nextMode = btn.dataset.mode;
-      if(state.mode === nextMode && !state.isRunning && !state.isCounting) return;
-
-      const shouldStartImmediately = state.isRunning || state.isCounting;
-      setMode(nextMode, shouldStartImmediately);
+      ensureAudio();
+      setMode(btn.dataset.mode, true);
     });
 
-    setMode("10");
+    setMode("10", true);
   </script>
 </body>
 </html>
