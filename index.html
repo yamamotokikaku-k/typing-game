@@ -3,1766 +3,1326 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ひらがなローマ字タイピング</title>
+  <title>ひらがなローマ字タイピング練習</title>
   <style>
     :root{
-      --bg1:#07111f;
-      --bg2:#0d1b2f;
-      --panel:rgba(255,255,255,.08);
-      --line:rgba(255,255,255,.12);
-      --text:#eef6ff;
-      --sub:#b8c8de;
-      --accent:#65d6ff;
-      --accent2:#8cffc7;
-      --ok:#7dffb2;
-      --miss:#ff7b9d;
-      --warn:#ffd76b;
-      --shadow:0 16px 50px rgba(0,0,0,.35);
+      --bg:#c9ad46;
+      --bg-deep:#b5942f;
+      --bg-light:#d8bf63;
+      --panel:rgba(255,255,255,.14);
+      --panel-strong:rgba(255,255,255,.22);
+      --line:rgba(255,255,255,.16);
+      --text:#111111;
+      --sub:#2d2610;
+
+      --display-white:#fffdf6;
+      --display-white-soft:#f8f3e6;
+      --typed-black:#111111;
+      --typed-black-soft:#1e1a10;
+      --typed-bg:rgba(0,0,0,.12);
+
+      --accent:#ffffff;
+      --ok:#ffffff;
+      --miss:#2b0000;
+
+      --shadow:0 16px 40px rgba(0,0,0,.16);
+
+      --f-lp:#ef8d86;
+      --f-lr:#f4b06c;
+      --f-lm:#f6d67a;
+      --f-li:#d8ee8a;
+      --f-ri:#8fdcb8;
+      --f-rm:#87cde9;
+      --f-rr:#a8b1f2;
+      --f-rp:#d2a0ef;
+      --f-thumb:#f2b9d7;
+
+      --key-base:rgba(255,255,255,.36);
+      --key-border:rgba(0,0,0,.08);
+      --key-text:#1a1407;
+      --key-shadow:0 6px 12px rgba(0,0,0,.08);
+      --key-active:#1b160c;
+      --key-active-text:#f5e9b1;
+      --key-glow:0 0 0 3px rgba(255,255,255,.55), 0 10px 22px rgba(0,0,0,.18);
     }
 
     *{box-sizing:border-box}
+
     html,body{
       margin:0;
       min-height:100%;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.14), transparent 32%),
+        linear-gradient(180deg, var(--bg-light) 0%, var(--bg) 45%, var(--bg-deep) 100%);
       color:var(--text);
-      background:
-        radial-gradient(circle at 20% 20%, rgba(101,214,255,.13), transparent 28%),
-        radial-gradient(circle at 80% 30%, rgba(140,255,199,.10), transparent 30%),
-        radial-gradient(circle at 50% 100%, rgba(125,130,255,.12), transparent 38%),
-        linear-gradient(180deg,var(--bg1),var(--bg2));
-      overflow-x:hidden;
     }
 
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-      background-size:24px 24px;
-      mask-image:linear-gradient(180deg, rgba(0,0,0,.65), transparent);
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
 
-    .wrap{
-      width:min(1240px, calc(100% - 24px));
-      margin:0 auto;
-      padding:18px 0 40px;
+    .app{
+      width:min(1200px,100%);
+      min-height:86vh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:18px;
     }
 
     .topbar{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:12px;
-      align-items:center;
-      margin-bottom:16px;
-    }
-
-    .brand{
       display:flex;
-      align-items:center;
-      gap:12px;
-      padding:14px 16px;
-      background:rgba(255,255,255,.08);
-      border:1px solid var(--line);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(12px);
-    }
-
-    .logo{
-      width:46px;
-      height:46px;
-      border-radius:14px;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 30%),
-        linear-gradient(135deg,var(--accent),#72a5ff 55%, var(--accent2));
-      box-shadow:0 10px 25px rgba(101,214,255,.35);
-      position:relative;
-      overflow:hidden;
-    }
-    .logo::after{
-      content:"あ";
-      position:absolute;
-      inset:0;
-      display:grid;
-      place-items:center;
-      font-weight:800;
-      color:#07111f;
-      font-size:24px;
-    }
-
-    .brand h1{
-      margin:0;
-      font-size:clamp(20px,2.3vw,30px);
-      letter-spacing:.04em;
-    }
-    .brand p{
-      margin:3px 0 0;
-      color:var(--sub);
-      font-size:13px;
-    }
-
-    .topActions{
-      display:flex;
-      gap:10px;
       flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .soundBtn,
-    .soundSelect{
-      color:var(--text);
-      background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border:1px solid var(--line);
-      padding:14px 16px;
-      border-radius:16px;
-      font-weight:700;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(12px);
-    }
-
-    .soundBtn{
-      cursor:pointer;
-      transition:.2s transform,.2s background;
-    }
-    .soundBtn:hover{transform:translateY(-1px)}
-    .soundBtn.off{opacity:.72}
-
-    .soundSelect{
-      cursor:pointer;
-      min-width:170px;
-      outline:none;
-    }
-    .soundSelect option{
-      background:#0d1b2f;
-      color:var(--text);
-    }
-
-    .hero{
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(14px);
-      margin-bottom:18px;
-      overflow:hidden;
-      position:relative;
-      min-height:420px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
       align-items:center;
-    }
-
-    .glow{
-      position:absolute;
-      inset:auto;
-      width:360px;
-      height:360px;
-      background:radial-gradient(circle, rgba(101,214,255,.17), transparent 65%);
-      filter:blur(10px);
-      pointer-events:none;
-      animation:floatGlow 7s ease-in-out infinite;
-    }
-    .glow.g2{
-      width:300px;
-      height:300px;
-      background:radial-gradient(circle, rgba(140,255,199,.12), transparent 65%);
-      animation-duration:9s;
-      animation-delay:-2s;
-    }
-    @keyframes floatGlow{
-      0%,100%{transform:translate(-180px,-120px)}
-      50%{transform:translate(180px,100px)}
-    }
-
-    .centerArea{
-      width:min(940px,100%);
-      position:relative;
-      z-index:2;
-      text-align:center;
-      padding:8px;
-    }
-
-    .statusRow{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .pill{
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      color:var(--sub);
-      font-size:13px;
-      letter-spacing:.03em;
+      justify-content:space-between;
+      gap:14px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px 18px;
+      box-shadow:var(--shadow);
       backdrop-filter:blur(6px);
     }
-    .pill strong{color:var(--text)}
 
-    .kanji{
-      font-size:clamp(44px,8vw,98px);
+    .title{
+      font-size:clamp(20px,2.6vw,30px);
       font-weight:900;
-      letter-spacing:.08em;
-      margin:8px 0 6px;
-      text-shadow:0 0 25px rgba(101,214,255,.12);
-    }
-
-    .kana{
-      font-size:clamp(16px,2.5vw,28px);
-      color:var(--sub);
-      margin-bottom:20px;
-      letter-spacing:.12em;
-    }
-
-    .romajiWrap{
-      position:relative;
-      min-height:88px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
-      gap:6px;
-      padding:10px 14px;
-      border-radius:24px;
-      background:rgba(0,0,0,.14);
-      border:1px solid rgba(255,255,255,.08);
-      overflow:hidden;
-    }
-
-    .rchar{
-      position:relative;
-      display:inline-block;
-      min-width:.55em;
-      font-size:clamp(24px,4vw,42px);
-      font-weight:800;
-      letter-spacing:.04em;
-      color:rgba(255,255,255,.28);
-      transition:color .12s, transform .12s, opacity .12s;
-      text-transform:lowercase;
-    }
-    .rchar.done{
-      color:var(--ok);
-      text-shadow:0 0 12px rgba(125,255,178,.35);
-    }
-    .rchar.current{
-      color:#fff;
-      transform:translateY(-1px) scale(1.05);
-      text-shadow:0 0 16px rgba(255,255,255,.28);
-    }
-    .rchar.pending{
-      color:rgba(255,255,255,.28);
-    }
-    .rchar.wrongFlash{
-      animation:wrongFlash .12s linear 1;
-    }
-    @keyframes wrongFlash{
-      0%{color:var(--miss); transform:translateY(0)}
-      50%{color:#fff; transform:translateY(-2px)}
-      100%{color:#fff}
-    }
-
-    .ghostInput{
-      margin-top:12px;
-      font-size:14px;
-      color:rgba(255,255,255,.58);
-      letter-spacing:.07em;
-      min-height:22px;
-      word-break:break-all;
-    }
-
-    .shatterPiece{
-      position:absolute;
-      font-weight:800;
-      pointer-events:none;
-      white-space:pre;
-      animation:shatter .7s cubic-bezier(.12,.8,.2,1) forwards;
-      text-shadow:0 0 12px rgba(125,255,178,.45);
-    }
-    @keyframes shatter{
-      0%{
-        opacity:1;
-        transform:translate(0,0) rotate(0deg) scale(1);
-        filter:blur(0);
-      }
-      100%{
-        opacity:0;
-        transform:translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(.15);
-        filter:blur(3px);
-      }
-    }
-
-    .controls,.infoGrid,.rankPanel{
-      background:rgba(255,255,255,.08);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(12px);
+      letter-spacing:.05em;
+      color:#1a1407;
     }
 
     .controls{
-      padding:14px;
-      margin-bottom:14px;
-    }
-
-    .controlBlock + .controlBlock{
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px solid rgba(255,255,255,.08);
-    }
-
-    .controlRow{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
       align-items:center;
     }
 
-    .label{
-      font-size:13px;
-      color:var(--sub);
-      margin-right:2px;
-      min-width:64px;
-    }
-
-    .modes{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .modeBtn,.actionBtn{
+    .mode-btn{
       border:none;
-      cursor:pointer;
-      color:var(--text);
-      border-radius:14px;
-      padding:12px 14px;
-      font-weight:800;
-      background:linear-gradient(135deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
-      border:1px solid rgba(255,255,255,.10);
-      transition:transform .18s, background .18s, box-shadow .18s;
-    }
-    .modeBtn:hover,.actionBtn:hover{transform:translateY(-1px)}
-    .modeBtn.active{
-      background:linear-gradient(135deg, rgba(101,214,255,.22), rgba(140,255,199,.15));
-      box-shadow:0 8px 25px rgba(101,214,255,.16);
-      border-color:rgba(101,214,255,.35);
-    }
-
-    .actionBtn.danger{
-      background:linear-gradient(135deg, rgba(255,123,157,.15), rgba(255,123,157,.08));
-      border-color:rgba(255,123,157,.22);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1.25fr .95fr;
-      gap:14px;
-      align-items:start;
-    }
-
-    .infoGrid{
-      padding:16px;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .card{
-      padding:14px;
-      border-radius:18px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
-      min-height:94px;
-    }
-    .card .k{
-      color:var(--sub);
-      font-size:12px;
-      margin-bottom:8px;
-      letter-spacing:.04em;
-    }
-    .card .v{
-      font-weight:900;
-      font-size:clamp(18px,2.7vw,30px);
-    }
-
-    .progressLine{
-      height:14px;
+      background:rgba(255,255,255,.42);
+      color:#1a1407;
+      padding:10px 16px;
       border-radius:999px;
-      background:rgba(255,255,255,.06);
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.06);
-      margin-bottom:12px;
-    }
-    .progressBar{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, var(--accent), var(--accent2));
-      box-shadow:0 0 20px rgba(101,214,255,.25);
-      transition:width .12s ease;
-    }
-
-    .mini{
-      display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:10px;
-    }
-
-    .miniBox{
-      padding:12px 14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.07);
-      color:var(--sub);
-      font-size:13px;
-    }
-    .miniBox strong{
-      display:block;
-      color:var(--text);
-      margin-top:6px;
-      font-size:18px;
-    }
-
-    .rankPanel{
-      padding:16px;
-    }
-
-    .panelTitle{
-      font-size:18px;
+      cursor:pointer;
       font-weight:900;
-      margin:0 0 6px;
-    }
-    .panelSub{
-      color:var(--sub);
-      font-size:13px;
-      margin-bottom:12px;
+      letter-spacing:.04em;
+      box-shadow:0 3px 10px rgba(0,0,0,.08);
+      transition:.15s transform,.15s background,.15s box-shadow;
     }
 
-    .rankList{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
+    .mode-btn:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.56);
     }
 
-    .rankItem{
-      display:grid;
-      grid-template-columns:54px 1fr auto;
-      gap:10px;
-      align-items:center;
-      padding:12px;
-      border-radius:16px;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.08);
+    .mode-btn.active{
+      background:#1b160c;
+      color:#f5e9b1;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
     }
 
-    .rankItem.latest{
-      background:linear-gradient(135deg, rgba(255,215,107,.18), rgba(101,214,255,.12));
-      border-color:rgba(255,215,107,.35);
-      box-shadow:0 0 0 1px rgba(255,215,107,.18) inset;
-    }
-
-    .rankNum{
-      width:42px;
-      height:42px;
-      border-radius:12px;
+    .main{
       display:grid;
       place-items:center;
-      background:rgba(255,255,255,.08);
-      font-weight:900;
-    }
-    .rankName{
-      font-weight:800;
-      font-size:15px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:28px 20px;
+      box-shadow:var(--shadow);
+      position:relative;
       overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .rankMeta{
-      color:var(--sub);
-      font-size:12px;
-      margin-top:3px;
-    }
-    .rankAcc{
-      font-weight:900;
-      white-space:nowrap;
     }
 
-    .empty{
-      padding:14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px dashed rgba(255,255,255,.10);
-      color:var(--sub);
-      font-size:14px;
-    }
-
-    .footerNote{
-      color:rgba(255,255,255,.56);
+    .center{
+      width:min(980px,100%);
       text-align:center;
-      font-size:12px;
-      margin-top:16px;
-      line-height:1.8;
+      display:grid;
+      gap:18px;
+    }
+
+    .status-line{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .badge{
+      background:rgba(255,255,255,.26);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:8px 14px;
+      font-weight:800;
+      color:#241d0d;
+    }
+
+    .prompt{
+      font-size:clamp(44px,8vw,96px);
+      font-weight:900;
+      letter-spacing:.14em;
+      line-height:1.12;
+      min-height:1.2em;
+      color:var(--display-white);
+      text-shadow:
+        0 2px 0 rgba(0,0,0,.08),
+        0 6px 18px rgba(0,0,0,.12);
+      font-family:
+        "Hiragino Sans",
+        "Yu Gothic",
+        "Meiryo",
+        sans-serif;
+      font-feature-settings:"palt";
+    }
+
+    .reading{
+      font-size:clamp(20px,2.6vw,34px);
+      font-weight:900;
+      color:var(--display-white-soft);
+      letter-spacing:.14em;
+      min-height:1.4em;
+      word-break:break-all;
+      text-shadow:
+        0 2px 0 rgba(0,0,0,.07),
+        0 4px 12px rgba(0,0,0,.08);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      text-transform:uppercase;
+    }
+
+    .typing{
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:24px;
+      padding:20px;
+      min-height:96px;
+      display:grid;
+      align-items:center;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .romaji{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:clamp(24px,3vw,40px);
+      line-height:1.5;
+      letter-spacing:.06em;
+      word-break:break-all;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .done{
+      color:var(--typed-black);
+      background:var(--typed-bg);
+      border-radius:10px;
+      padding:0 .08em;
+    }
+
+    .rest{
+      color:var(--display-white);
+      text-shadow:
+        0 2px 0 rgba(0,0,0,.07),
+        0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .cursor{
+      display:inline-block;
+      width:.65em;
+      text-align:center;
+      color:var(--display-white);
+      animation:blink 1s step-end infinite;
+      font-weight:900;
+      text-shadow:0 2px 8px rgba(0,0,0,.18);
+    }
+
+    @keyframes blink{
+      50%{ opacity:0; }
+    }
+
+    .message{
+      min-height:1.6em;
+      font-size:clamp(16px,2vw,22px);
+      font-weight:900;
+      color:#251e0e;
+    }
+
+    .message.ok{
+      color:#ffffff;
+      text-shadow:0 2px 8px rgba(0,0,0,.18);
+    }
+
+    .message.miss{
+      color:var(--miss);
+    }
+
+    .keyboard-wrap{
+      width:min(940px,100%);
+      margin:0 auto;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:26px;
+      padding:16px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .keyboard{
+      display:grid;
+      gap:8px;
+      width:100%;
+    }
+
+    .kb-row{
+      display:grid;
+      gap:8px;
+      align-items:stretch;
+    }
+
+    .kb-row.row-1{ grid-template-columns:repeat(13,1fr) 1.6fr; }
+    .kb-row.row-2{ grid-template-columns:1.45fr repeat(13,1fr) 1.25fr; }
+    .kb-row.row-3{ grid-template-columns:1.7fr repeat(11,1fr) 1.9fr; }
+    .kb-row.row-4{ grid-template-columns:2.15fr repeat(10,1fr) 2.15fr; }
+    .kb-row.row-5{ grid-template-columns:1.25fr 1.25fr 1.25fr 6.2fr 1.25fr 1.25fr 1.25fr 1.25fr; }
+
+    .key{
+      position:relative;
+      min-height:52px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      background:var(--key-base);
+      border:1px solid var(--key-border);
+      color:var(--key-text);
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-weight:900;
+      font-size:clamp(14px,1.8vw,20px);
+      letter-spacing:.05em;
+      box-shadow:var(--key-shadow);
+      user-select:none;
+      text-transform:uppercase;
+      transition:.12s transform,.12s box-shadow,.12s background,.12s color;
+    }
+
+    .key.small{
+      font-size:clamp(12px,1.4vw,16px);
+    }
+
+    .key::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+      pointer-events:none;
+    }
+
+    .finger-lp{ background:color-mix(in srgb, var(--f-lp) 72%, white 28%); }
+    .finger-lr{ background:color-mix(in srgb, var(--f-lr) 72%, white 28%); }
+    .finger-lm{ background:color-mix(in srgb, var(--f-lm) 72%, white 28%); }
+    .finger-li{ background:color-mix(in srgb, var(--f-li) 72%, white 28%); }
+    .finger-ri{ background:color-mix(in srgb, var(--f-ri) 72%, white 28%); }
+    .finger-rm{ background:color-mix(in srgb, var(--f-rm) 72%, white 28%); }
+    .finger-rr{ background:color-mix(in srgb, var(--f-rr) 72%, white 28%); }
+    .finger-rp{ background:color-mix(in srgb, var(--f-rp) 72%, white 28%); }
+    .finger-thumb{ background:color-mix(in srgb, var(--f-thumb) 72%, white 28%); }
+
+    .key.active{
+      background:var(--key-active) !important;
+      color:var(--key-active-text);
+      transform:translateY(-2px);
+      box-shadow:var(--key-glow);
+      border-color:rgba(255,255,255,.5);
+    }
+
+    .bottom{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .stat{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px 14px;
+      box-shadow:var(--shadow);
+      text-align:center;
+    }
+
+    .stat .label{
+      font-size:13px;
+      color:#322911;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+
+    .stat .value{
+      margin-top:8px;
+      font-size:clamp(22px,3vw,36px);
+      font-weight:900;
+      color:#171208;
     }
 
     .overlay{
-      position:fixed;
+      position:absolute;
       inset:0;
-      background:rgba(2,8,20,.62);
       display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      z-index:50;
-      backdrop-filter:blur(7px);
+      place-items:center;
+      background:rgba(0,0,0,.20);
+      backdrop-filter:blur(2px);
+      z-index:5;
     }
-    .overlay.show{display:flex}
 
-    .modal{
-      width:min(460px,100%);
-      background:linear-gradient(180deg, rgba(17,28,47,.96), rgba(9,16,28,.96));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow:var(--shadow);
-      border-radius:24px;
-      padding:20px;
+    .overlay.show{
+      display:grid;
     }
-    .modal h2{
-      margin:0 0 8px;
-      font-size:24px;
+
+    .count{
+      width:160px;
+      height:160px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:72px;
+      font-weight:900;
+      background:rgba(255,255,255,.78);
+      color:#1a1407;
+      box-shadow:0 18px 40px rgba(0,0,0,.24);
     }
-    .modal p{
-      color:var(--sub);
-      line-height:1.7;
-      margin:0 0 14px;
+
+    .help{
       font-size:14px;
-    }
-    .modal input{
-      width:100%;
-      border:none;
-      outline:none;
-      padding:14px 14px;
-      border-radius:14px;
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,.10);
-      font-size:16px;
-      margin-bottom:12px;
-    }
-    .modalBtns{
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-    }
-
-    .notice{
-      position:fixed;
-      top:18px;
-      left:50%;
-      transform:translateX(-50%) translateY(-18px);
-      background:rgba(7,18,33,.92);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:14px;
-      padding:12px 14px;
+      color:#2c2410;
+      margin-top:4px;
+      line-height:1.7;
       font-weight:700;
-      opacity:0;
-      pointer-events:none;
-      box-shadow:var(--shadow);
-      z-index:60;
-      transition:.25s;
-    }
-    .notice.show{
-      opacity:1;
-      transform:translateX(-50%) translateY(0);
     }
 
-    @media (max-width:980px){
-      .grid{grid-template-columns:1fr}
+    .result-panel{
+      margin-top:8px;
+      background:rgba(255,255,255,.24);
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:20px;
+      padding:16px;
+      display:none;
     }
 
-    @media (max-width:720px){
-      .topbar{grid-template-columns:1fr}
-      .topActions{justify-content:flex-start}
-      .cards{grid-template-columns:1fr}
-      .mini{grid-template-columns:1fr}
-      .rankItem{
-        grid-template-columns:46px 1fr;
-        grid-template-areas:
-          "num name"
-          "num acc";
+    .result-panel.show{
+      display:block;
+    }
+
+    .result-title{
+      font-size:24px;
+      font-weight:900;
+      margin-bottom:10px;
+      color:#1a1407;
+    }
+
+    .result-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .result-card{
+      background:rgba(255,255,255,.28);
+      border-radius:16px;
+      padding:12px;
+    }
+
+    .result-card .r-label{
+      font-size:13px;
+      font-weight:900;
+      color:#30270f;
+    }
+
+    .result-card .r-value{
+      margin-top:6px;
+      font-size:30px;
+      font-weight:900;
+      color:#140f07;
+    }
+
+    @media (max-width:960px){
+      .bottom{
+        grid-template-columns:repeat(2,minmax(0,1fr));
       }
-      .rankNum{grid-area:num}
-      .rankMain{grid-area:name}
-      .rankAcc{grid-area:acc}
+      .result-grid{
+        grid-template-columns:1fr;
+      }
+      .keyboard-wrap{
+        padding:12px;
+      }
+      .kb-row{
+        gap:6px;
+      }
+      .key{
+        min-height:44px;
+        border-radius:12px;
+      }
+    }
+
+    @media (max-width:640px){
+      body{
+        padding:14px;
+      }
+      .topbar{
+        justify-content:center;
+      }
+      .bottom{
+        grid-template-columns:1fr;
+      }
+      .prompt{
+        letter-spacing:.08em;
+      }
+      .keyboard-wrap{
+        overflow-x:auto;
+      }
+      .keyboard{
+        min-width:720px;
+      }
+      .help{
+        line-height:1.5;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="notice" id="notice"></div>
-
-  <div class="wrap">
+  <div class="app">
     <div class="topbar">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <h1>ひらがなローマ字タイピング</h1>
-          <p>入力は複数方式対応、表示ローマ字は訓令式で統一</p>
-        </div>
+      <div>
+        <div class="title">ひらがなローマ字タイピング練習</div>
+        <div class="help">スペースキーで 3 秒後に開始　/　プレイ中にスペースキーで中断　/　無限モードは正解後 Enter で次へ</div>
       </div>
 
-      <div class="topActions">
-        <select class="soundSelect" id="soundTypeSelect" title="効果音タイプ">
-          <option value="click">効果音: ドライ</option>
-          <option value="arcade">効果音: アーケード</option>
-          <option value="crystal">効果音: クリスタル</option>
-        </select>
-        <button class="soundBtn" id="soundBtn" type="button">🔊 効果音 ON</button>
+      <div class="controls" id="modeButtons">
+        <button class="mode-btn active" data-mode="10">10問</button>
+        <button class="mode-btn" data-mode="30">30問</button>
+        <button class="mode-btn" data-mode="50">50問</button>
+        <button class="mode-btn" data-mode="infinite">無限</button>
       </div>
     </div>
 
-    <section class="hero">
-      <div class="glow"></div>
-      <div class="glow g2"></div>
-
-      <div class="centerArea">
-        <div class="statusRow">
-          <div class="pill">行モード <strong id="rowLabel">あ行</strong></div>
-          <div class="pill">出題順 <strong id="orderLabel">順番</strong></div>
-          <div class="pill">状態 <strong id="stateLabel">待機中</strong></div>
-          <div class="pill">効果音 <strong id="soundTypeLabel">ドライ</strong></div>
-        </div>
-
-        <div class="kanji" id="kanjiDisplay">あ</div>
-        <div class="kana" id="kanaDisplay">ひらがな</div>
-
-        <div class="romajiWrap" id="romajiWrap"></div>
-        <div class="ghostInput" id="ghostInput">ここに入力状況が表示されます</div>
-      </div>
-    </section>
-
-    <section class="controls">
-      <div class="controlBlock">
-        <div class="controlRow">
-          <span class="label">行選択</span>
-          <div class="modes" id="rowModeButtons"></div>
-        </div>
+    <div class="main">
+      <div class="overlay" id="overlay">
+        <div class="count" id="countText">3</div>
       </div>
 
-      <div class="controlBlock">
-        <div class="controlRow">
-          <span class="label">出題順</span>
-          <div class="modes" id="orderModeButtons"></div>
-          <button class="actionBtn danger" id="resetRankingBtn" type="button">ランキング初期化</button>
+      <div class="center">
+        <div class="status-line">
+          <div class="badge" id="modeLabel">モード：10問</div>
+          <div class="badge" id="runLabel">待機中</div>
+        </div>
+
+        <div class="prompt" id="promptView">ひらがな</div>
+        <div class="reading" id="reading">HIRAGANA</div>
+
+        <div class="typing">
+          <div class="romaji" id="romajiView"></div>
+        </div>
+
+        <div class="keyboard-wrap">
+          <div class="keyboard" id="keyboard">
+            <div class="kb-row row-1">
+              <div class="key finger-lp small" data-key="Backquote">`</div>
+              <div class="key finger-lp" data-key="Digit1">1</div>
+              <div class="key finger-lr" data-key="Digit2">2</div>
+              <div class="key finger-lm" data-key="Digit3">3</div>
+              <div class="key finger-li" data-key="Digit4">4</div>
+              <div class="key finger-li" data-key="Digit5">5</div>
+              <div class="key finger-ri" data-key="Digit6">6</div>
+              <div class="key finger-ri" data-key="Digit7">7</div>
+              <div class="key finger-rm" data-key="Digit8">8</div>
+              <div class="key finger-rr" data-key="Digit9">9</div>
+              <div class="key finger-rp" data-key="Digit0">0</div>
+              <div class="key finger-rp small" data-key="Minus">-</div>
+              <div class="key finger-rp small" data-key="Equal">=</div>
+              <div class="key finger-rp small" data-key="Backspace">BKSP</div>
+            </div>
+
+            <div class="kb-row row-2">
+              <div class="key finger-lp small" data-key="Tab">TAB</div>
+              <div class="key finger-lp" data-key="KeyQ">Q</div>
+              <div class="key finger-lr" data-key="KeyW">W</div>
+              <div class="key finger-lm" data-key="KeyE">E</div>
+              <div class="key finger-li" data-key="KeyR">R</div>
+              <div class="key finger-li" data-key="KeyT">T</div>
+              <div class="key finger-ri" data-key="KeyY">Y</div>
+              <div class="key finger-ri" data-key="KeyU">U</div>
+              <div class="key finger-rm" data-key="KeyI">I</div>
+              <div class="key finger-rr" data-key="KeyO">O</div>
+              <div class="key finger-rp" data-key="KeyP">P</div>
+              <div class="key finger-rp small" data-key="BracketLeft">[</div>
+              <div class="key finger-rp small" data-key="BracketRight">]</div>
+              <div class="key finger-rp small" data-key="Backslash">\</div>
+              <div class="key finger-rp small" data-key="Delete">DEL</div>
+            </div>
+
+            <div class="kb-row row-3">
+              <div class="key finger-lp small" data-key="CapsLock">CAPS</div>
+              <div class="key finger-lp" data-key="KeyA">A</div>
+              <div class="key finger-lr" data-key="KeyS">S</div>
+              <div class="key finger-lm" data-key="KeyD">D</div>
+              <div class="key finger-li" data-key="KeyF">F</div>
+              <div class="key finger-li" data-key="KeyG">G</div>
+              <div class="key finger-ri" data-key="KeyH">H</div>
+              <div class="key finger-ri" data-key="KeyJ">J</div>
+              <div class="key finger-rm" data-key="KeyK">K</div>
+              <div class="key finger-rr" data-key="KeyL">L</div>
+              <div class="key finger-rp small" data-key="Semicolon">;</div>
+              <div class="key finger-rp small" data-key="Quote">'</div>
+              <div class="key finger-rp small" data-key="Enter">ENTER</div>
+            </div>
+
+            <div class="kb-row row-4">
+              <div class="key finger-lp small" data-key="ShiftLeft">SHIFT</div>
+              <div class="key finger-lp" data-key="KeyZ">Z</div>
+              <div class="key finger-lr" data-key="KeyX">X</div>
+              <div class="key finger-lm" data-key="KeyC">C</div>
+              <div class="key finger-li" data-key="KeyV">V</div>
+              <div class="key finger-li" data-key="KeyB">B</div>
+              <div class="key finger-ri" data-key="KeyN">N</div>
+              <div class="key finger-ri" data-key="KeyM">M</div>
+              <div class="key finger-rm small" data-key="Comma">,</div>
+              <div class="key finger-rr small" data-key="Period">.</div>
+              <div class="key finger-rp small" data-key="Slash">/</div>
+              <div class="key finger-rp small" data-key="ShiftRight">SHIFT</div>
+            </div>
+
+            <div class="kb-row row-5">
+              <div class="key finger-lp small" data-key="ControlLeft">CTRL</div>
+              <div class="key finger-lp small" data-key="MetaLeft">CMD</div>
+              <div class="key finger-lp small" data-key="AltLeft">ALT</div>
+              <div class="key finger-thumb small" data-key="Space">SPACE</div>
+              <div class="key finger-rp small" data-key="AltRight">ALT</div>
+              <div class="key finger-rp small" data-key="MetaRight">CMD</div>
+              <div class="key finger-rp small" data-key="ContextMenu">MENU</div>
+              <div class="key finger-rp small" data-key="ControlRight">CTRL</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="message" id="message">スペースキーで開始</div>
+
+        <div class="result-panel" id="resultPanel">
+          <div class="result-title">結果</div>
+          <div class="result-grid">
+            <div class="result-card">
+              <div class="r-label">クリア数</div>
+              <div class="r-value" id="resultClear">0</div>
+            </div>
+            <div class="result-card">
+              <div class="r-label">正確率</div>
+              <div class="r-value" id="resultAcc">0%</div>
+            </div>
+            <div class="result-card">
+              <div class="r-label">タイム</div>
+              <div class="r-value" id="resultTime">0.0s</div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
-
-    <div class="grid">
-      <section class="infoGrid">
-        <h2 class="panelTitle">プレイ情報</h2>
-        <div class="panelSub">モードを選ぶと即スタートします。タイム計測はなくし、正確率のみを表示します。</div>
-
-        <div class="cards">
-          <div class="card">
-            <div class="k">進行</div>
-            <div class="v" id="progressText">0 / 0</div>
-          </div>
-          <div class="card">
-            <div class="k">正確率</div>
-            <div class="v" id="accText">100.00%</div>
-          </div>
-          <div class="card">
-            <div class="k">現在の表示ローマ字</div>
-            <div class="v" id="candidateText" style="font-size:clamp(16px,2.1vw,26px)">-</div>
-          </div>
-        </div>
-
-        <div class="progressLine">
-          <div class="progressBar" id="progressBar"></div>
-        </div>
-
-        <div class="mini">
-          <div class="miniBox">入力文字数<strong id="typedText">0</strong></div>
-          <div class="miniBox">ミス数<strong id="missText">0</strong></div>
-          <div class="miniBox">総問題数<strong id="totalProblemsText">0</strong></div>
-        </div>
-      </section>
-
-      <aside class="rankPanel">
-        <h2 class="panelTitle">ランキング TOP10</h2>
-        <div class="panelSub">正確率が高い順。直近結果は色付き表示。</div>
-        <div class="rankList" id="rankList"></div>
-      </aside>
     </div>
 
-    <div class="footerNote">
-      入力対応例: し = si / shi、ち = ti / chi、つ = tu / tsu、ふ = hu / fu、じ = zi / ji など。<br>
-      「ん」は表示も実入力に合わせて n / nn を切り替えます。画面に表示するローマ字は訓令式で統一しています。
-    </div>
-  </div>
-
-  <div class="overlay" id="resultOverlay">
-    <div class="modal">
-      <h2 id="resultTitle">結果</h2>
-      <p id="resultSummary">結果がここに表示されます。</p>
-      <input id="playerNameInput" type="text" maxlength="16" placeholder="ランキング名を入力（省略で NO NAME）" />
-      <div class="modalBtns">
-        <button class="actionBtn" id="closeResultBtn" type="button">閉じる</button>
-        <button class="actionBtn" id="retryBtn" type="button">もう一回</button>
-        <button class="actionBtn" id="saveResultBtn" type="button">ランキング保存</button>
+    <div class="bottom">
+      <div class="stat">
+        <div class="label">進行</div>
+        <div class="value" id="progressValue">0 / 10</div>
+      </div>
+      <div class="stat">
+        <div class="label">ミス</div>
+        <div class="value" id="missValue">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">正確率</div>
+        <div class="value" id="accValue">100%</div>
+      </div>
+      <div class="stat">
+        <div class="label">経過時間</div>
+        <div class="value" id="timeValue">0.0s</div>
       </div>
     </div>
   </div>
 
   <script>
-  (() => {
-    const ROWS = {
-      a: ["あ","い","う","え","お"],
-      ka: ["か","き","く","け","こ"],
-      sa: ["さ","し","す","せ","そ"],
-      ta: ["た","ち","つ","て","と"],
-      na: ["な","に","ぬ","ね","の"],
-      ha: ["は","ひ","ふ","へ","ほ"],
-      ma: ["ま","み","む","め","も"],
-      ya: ["や","ゆ","よ"],
-      ra: ["ら","り","る","れ","ろ"],
-      wa: ["わ","を","ん"],
-      ga: ["が","ぎ","ぐ","げ","ご"],
-      za: ["ざ","じ","ず","ぜ","ぞ"],
-      da: ["だ","ぢ","づ","で","ど"],
-      ba: ["ば","び","ぶ","べ","ぼ"],
-      pa: ["ぱ","ぴ","ぷ","ぺ","ぽ"],
-      yoon: [
-        "きゃ","きゅ","きょ",
-        "しゃ","しゅ","しょ",
-        "ちゃ","ちゅ","ちょ",
-        "にゃ","にゅ","にょ",
-        "ひゃ","ひゅ","ひょ",
-        "みゃ","みゅ","みょ",
-        "りゃ","りゅ","りょ",
-        "ぎゃ","ぎゅ","ぎょ",
-        "じゃ","じゅ","じょ",
-        "びゃ","びゅ","びょ",
-        "ぴゃ","ぴゅ","ぴょ"
-      ]
-    };
-
-    const rowModes = [
-      {key:"a", label:"あ行"},
-      {key:"ka", label:"か行"},
-      {key:"sa", label:"さ行"},
-      {key:"ta", label:"た行"},
-      {key:"na", label:"な行"},
-      {key:"ha", label:"は行"},
-      {key:"ma", label:"ま行"},
-      {key:"ya", label:"や行"},
-      {key:"ra", label:"ら行"},
-      {key:"wa", label:"わ行"},
-      {key:"ga", label:"が行"},
-      {key:"za", label:"ざ行"},
-      {key:"da", label:"だ行"},
-      {key:"ba", label:"ば行"},
-      {key:"pa", label:"ぱ行"},
-      {key:"yoon", label:"拗音"},
-      {key:"all", label:"全部通し"}
+    const WORDS = [
+      {kana:"あさ"},
+      {kana:"いぬ"},
+      {kana:"うみ"},
+      {kana:"えき"},
+      {kana:"おに"},
+      {kana:"さかな"},
+      {kana:"ねこ"},
+      {kana:"くるま"},
+      {kana:"たまご"},
+      {kana:"ひこうき"},
+      {kana:"やま"},
+      {kana:"ゆき"},
+      {kana:"よる"},
+      {kana:"かわ"},
+      {kana:"ほし"},
+      {kana:"すいか"},
+      {kana:"りんご"},
+      {kana:"おちゃ"},
+      {kana:"きって"},
+      {kana:"がっこう"},
+      {kana:"じてんしゃ"},
+      {kana:"しんごう"},
+      {kana:"でんしゃ"},
+      {kana:"ちず"},
+      {kana:"てがみ"},
+      {kana:"かぞく"},
+      {kana:"こうえん"},
+      {kana:"おんがく"},
+      {kana:"はなび"},
+      {kana:"きょうしつ"},
+      {kana:"にわとり"},
+      {kana:"しんかんせん"},
+      {kana:"ひまわり"},
+      {kana:"きゅうり"},
+      {kana:"しゃしん"},
+      {kana:"じゅうしょ"},
+      {kana:"びょういん"},
+      {kana:"りょこう"},
+      {kana:"がっき"},
+      {kana:"きんぎょ"},
+      {kana:"みかん"},
+      {kana:"しゅくだい"},
+      {kana:"ちょこれーと"},
+      {kana:"ぎゅうにゅう"},
+      {kana:"ぴょんぴょん"},
+      {kana:"きゃべつ"},
+      {kana:"しょくどう"},
+      {kana:"にゅうがく"},
+      {kana:"きょうりゅう"},
+      {kana:"りっぱ"},
+      {kana:"はっぱ"},
+      {kana:"ざっし"},
+      {kana:"かんたん"},
+      {kana:"てんき"},
+      {kana:"おもちゃ"}
     ];
 
-    const orderModes = [
-      {key:"sequential", label:"順番"},
-      {key:"random", label:"ランダム"}
-    ];
-
-    const kanaMap = {
-      "あ":["a"],"い":["i","yi"],"う":["u","wu"],"え":["e"],"お":["o"],
-      "か":["ka","ca"],"き":["ki"],"く":["ku","cu","qu"],"け":["ke"],"こ":["ko","co"],
-      "さ":["sa"],"し":["si","shi","ci"],"す":["su"],"せ":["se","ce"],"そ":["so"],
-      "た":["ta"],"ち":["ti","chi"],"つ":["tu","tsu"],"て":["te"],"と":["to"],
-      "な":["na"],"に":["ni"],"ぬ":["nu"],"ね":["ne"],"の":["no"],
-      "は":["ha"],"ひ":["hi"],"ふ":["hu","fu"],"へ":["he"],"ほ":["ho"],
-      "ま":["ma"],"み":["mi"],"む":["mu"],"め":["me"],"も":["mo"],
-      "や":["ya"],"ゆ":["yu"],"よ":["yo"],
-      "ら":["ra"],"り":["ri"],"る":["ru"],"れ":["re"],"ろ":["ro"],
-      "わ":["wa"],"を":["wo","o"],
-      "ん":["n","nn","xn"],
-      "が":["ga"],"ぎ":["gi"],"ぐ":["gu"],"げ":["ge"],"ご":["go"],
-      "ざ":["za"],"じ":["zi","ji"],"ず":["zu"],"ぜ":["ze"],"ぞ":["zo"],
-      "だ":["da"],"ぢ":["di","ji"],"づ":["du","zu"],"で":["de"],"ど":["do"],
-      "ば":["ba"],"び":["bi"],"ぶ":["bu"],"べ":["be"],"ぼ":["bo"],
-      "ぱ":["pa"],"ぴ":["pi"],"ぷ":["pu"],"ぺ":["pe"],"ぽ":["po"],
-      "ぁ":["xa","la"],"ぃ":["xi","li","xyi","lyi"],"ぅ":["xu","lu"],"ぇ":["xe","le","xye","lye"],"ぉ":["xo","lo"],
-      "ゃ":["xya","lya","ya"],"ゅ":["xyu","lyu","yu"],"ょ":["xyo","lyo","yo"],
-      "ゔ":["vu"],
-      "ー":["-"]
+    const BASIC = {
+      "あ":"A","い":"I","う":"U","え":"E","お":"O",
+      "か":"KA","き":"KI","く":"KU","け":"KE","こ":"KO",
+      "さ":"SA","し":"SI","す":"SU","せ":"SE","そ":"SO",
+      "た":"TA","ち":"TI","つ":"TU","て":"TE","と":"TO",
+      "な":"NA","に":"NI","ぬ":"NU","ね":"NE","の":"NO",
+      "は":"HA","ひ":"HI","ふ":"HU","へ":"HE","ほ":"HO",
+      "ま":"MA","み":"MI","む":"MU","め":"ME","も":"MO",
+      "や":"YA","ゆ":"YU","よ":"YO",
+      "ら":"RA","り":"RI","る":"RU","れ":"RE","ろ":"RO",
+      "わ":"WA","を":"O",
+      "が":"GA","ぎ":"GI","ぐ":"GU","げ":"GE","ご":"GO",
+      "ざ":"ZA","じ":"ZI","ず":"ZU","ぜ":"ZE","ぞ":"ZO",
+      "だ":"DA","ぢ":"DI","づ":"DU","で":"DE","ど":"DO",
+      "ば":"BA","び":"BI","ぶ":"BU","べ":"BE","ぼ":"BO",
+      "ぱ":"PA","ぴ":"PI","ぷ":"PU","ぺ":"PE","ぽ":"PO",
+      "ぁ":"A","ぃ":"I","ぅ":"U","ぇ":"E","ぉ":"O",
+      "ゔ":"VU"
     };
 
-    const digraphMap = {
-      "きゃ":["kya"],"きゅ":["kyu"],"きょ":["kyo"],
-      "しゃ":["sya","sha"],"しゅ":["syu","shu"],"しょ":["syo","sho"],
-      "ちゃ":["tya","cha","cya"],"ちゅ":["tyu","chu","cyu"],"ちょ":["tyo","cho","cyo"],
-      "にゃ":["nya"],"にゅ":["nyu"],"にょ":["nyo"],
-      "ひゃ":["hya"],"ひゅ":["hyu"],"ひょ":["hyo"],
-      "みゃ":["mya"],"みゅ":["myu"],"みょ":["myo"],
-      "りゃ":["rya"],"りゅ":["ryu"],"りょ":["ryo"],
-      "ぎゃ":["gya"],"ぎゅ":["gyu"],"ぎょ":["gyo"],
-      "じゃ":["zya","ja","jya"],"じゅ":["zyu","ju","jyu"],"じょ":["zyo","jo","jyo"],
-      "びゃ":["bya"],"びゅ":["byu"],"びょ":["byo"],
-      "ぴゃ":["pya"],"ぴゅ":["pyu"],"ぴょ":["pyo"],
-      "ゔぁ":["va"],"ゔぃ":["vi","vyi"],"ゔぇ":["ve","vye"],"ゔぉ":["vo"],"ゔゅ":["vyu"],
-      "てぃ":["thi"],"でぃ":["dhi"],"とぅ":["twu","tu"],"どぅ":["dwu","du"],
-      "ふぁ":["fa"],"ふぃ":["fi"],"ふぇ":["fe"],"ふぉ":["fo"],"ふゅ":["fyu"],
-      "しぇ":["sye","she"],"じぇ":["zye","je"],"ちぇ":["tye","che","cye"],
-      "うぃ":["wi"],"うぇ":["we"],"うぉ":["who","wo"]
+    const DIGRAPHS = {
+      "きゃ":"KYA","きゅ":"KYU","きょ":"KYO",
+      "しゃ":"SYA","しゅ":"SYU","しょ":"SYO",
+      "ちゃ":"TYA","ちゅ":"TYU","ちょ":"TYO",
+      "にゃ":"NYA","にゅ":"NYU","にょ":"NYO",
+      "ひゃ":"HYA","ひゅ":"HYU","ひょ":"HYO",
+      "みゃ":"MYA","みゅ":"MYU","みょ":"MYO",
+      "りゃ":"RYA","りゅ":"RYU","りょ":"RYO",
+      "ぎゃ":"GYA","ぎゅ":"GYU","ぎょ":"GYO",
+      "じゃ":"ZYA","じゅ":"ZYU","じょ":"ZYO",
+      "ぢゃ":"DYA","ぢゅ":"DYU","ぢょ":"DYO",
+      "びゃ":"BYA","びゅ":"BYU","びょ":"BYO",
+      "ぴゃ":"PYA","ぴゅ":"PYU","ぴょ":"PYO"
     };
 
-    const kunreiSingle = {
-      "あ":"a","い":"i","う":"u","え":"e","お":"o",
-      "か":"ka","き":"ki","く":"ku","け":"ke","こ":"ko",
-      "さ":"sa","し":"si","す":"su","せ":"se","そ":"so",
-      "た":"ta","ち":"ti","つ":"tu","て":"te","と":"to",
-      "な":"na","に":"ni","ぬ":"nu","ね":"ne","の":"no",
-      "は":"ha","ひ":"hi","ふ":"hu","へ":"he","ほ":"ho",
-      "ま":"ma","み":"mi","む":"mu","め":"me","も":"mo",
-      "や":"ya","ゆ":"yu","よ":"yo",
-      "ら":"ra","り":"ri","る":"ru","れ":"re","ろ":"ro",
-      "わ":"wa","を":"o",
-      "ん":"n",
-      "が":"ga","ぎ":"gi","ぐ":"gu","げ":"ge","ご":"go",
-      "ざ":"za","じ":"zi","ず":"zu","ぜ":"ze","ぞ":"zo",
-      "だ":"da","ぢ":"di","づ":"du","で":"de","ど":"do",
-      "ば":"ba","び":"bi","ぶ":"bu","べ":"be","ぼ":"bo",
-      "ぱ":"pa","ぴ":"pi","ぷ":"pu","ぺ":"pe","ぽ":"po",
-      "ぁ":"a","ぃ":"i","ぅ":"u","ぇ":"e","ぉ":"o",
-      "ゃ":"ya","ゅ":"yu","ょ":"yo",
-      "ゔ":"vu",
-      "ー":"-"
-    };
+    function kanaTokenize(str){
+      const arr = [];
+      for(let i=0;i<str.length;i++){
+        const two = str.slice(i,i+2);
+        if(DIGRAPHS[two]){
+          arr.push(two);
+          i++;
+        }else{
+          arr.push(str[i]);
+        }
+      }
+      return arr;
+    }
 
-    const kunreiDigraph = {
-      "きゃ":"kya","きゅ":"kyu","きょ":"kyo",
-      "しゃ":"sya","しゅ":"syu","しょ":"syo",
-      "ちゃ":"tya","ちゅ":"tyu","ちょ":"tyo",
-      "にゃ":"nya","にゅ":"nyu","にょ":"nyo",
-      "ひゃ":"hya","ひゅ":"hyu","ひょ":"hyo",
-      "みゃ":"mya","みゅ":"myu","みょ":"myo",
-      "りゃ":"rya","りゅ":"ryu","りょ":"ryo",
-      "ぎゃ":"gya","ぎゅ":"gyu","ぎょ":"gyo",
-      "じゃ":"zya","じゅ":"zyu","じょ":"zyo",
-      "びゃ":"bya","びゅ":"byu","びょ":"byo",
-      "ぴゃ":"pya","ぴゅ":"pyu","ぴょ":"pyo",
-      "ゔぁ":"va","ゔぃ":"vi","ゔぇ":"ve","ゔぉ":"vo","ゔゅ":"vyu",
-      "てぃ":"thi","でぃ":"dhi","とぅ":"tu","どぅ":"du",
-      "ふぁ":"fa","ふぃ":"fi","ふぇ":"fe","ふぉ":"fo","ふゅ":"fyu",
-      "しぇ":"sye","じぇ":"zye","ちぇ":"tye",
-      "うぃ":"wi","うぇ":"we","うぉ":"wo"
-    };
+    function getRomanForToken(token){
+      if(DIGRAPHS[token]) return DIGRAPHS[token];
+      if(BASIC[token]) return BASIC[token];
+      if(token === "ー") return "-";
+      return token.toUpperCase();
+    }
 
-    const consonants = "bcdfghjklmnpqrstvwxyz";
-    const $ = (id) => document.getElementById(id);
+    function getInitialConsonant(roman){
+      if(!roman) return "";
+      const m = roman.match(/^[^AEIOU]+/);
+      return m ? m[0][0] : "";
+    }
 
-    const kanjiDisplay = $("kanjiDisplay");
-    const kanaDisplay = $("kanaDisplay");
-    const romajiWrap = $("romajiWrap");
-    const ghostInput = $("ghostInput");
-    const progressText = $("progressText");
-    const accText = $("accText");
-    const typedText = $("typedText");
-    const missText = $("missText");
-    const totalProblemsText = $("totalProblemsText");
-    const candidateText = $("candidateText");
-    const progressBar = $("progressBar");
-    const rowLabel = $("rowLabel");
-    const orderLabel = $("orderLabel");
-    const stateLabel = $("stateLabel");
-    const rankList = $("rankList");
-    const rowModeButtons = $("rowModeButtons");
-    const orderModeButtons = $("orderModeButtons");
-    const soundBtn = $("soundBtn");
-    const soundTypeSelect = $("soundTypeSelect");
-    const soundTypeLabel = $("soundTypeLabel");
-    const resetRankingBtn = $("resetRankingBtn");
-    const resultOverlay = $("resultOverlay");
-    const resultSummary = $("resultSummary");
-    const resultTitle = $("resultTitle");
-    const playerNameInput = $("playerNameInput");
-    const saveResultBtn = $("saveResultBtn");
-    const closeResultBtn = $("closeResultBtn");
-    const retryBtn = $("retryBtn");
-    const notice = $("notice");
+    function kanaToRomajiStrict(kana){
+      const tokens = kanaTokenize(kana);
+      let out = "";
 
-    const soundNames = {
-      click:"ドライ",
-      arcade:"アーケード",
-      crystal:"クリスタル"
-    };
+      for(let i=0;i<tokens.length;i++){
+        const t = tokens[i];
+
+        if(t === "っ"){
+          const next = tokens[i+1];
+          const nextRoman = getRomanForToken(next);
+          const c = getInitialConsonant(nextRoman);
+          if(c) out += c;
+          continue;
+        }
+
+        if(t === "ん"){
+          const next = tokens[i+1];
+          if(!next){
+            out += "NN";
+          }else{
+            const nextRoman = getRomanForToken(next);
+            if(/^[AIUEOY]/.test(nextRoman)){
+              out += "NN";
+            }else{
+              out += "N";
+            }
+          }
+          continue;
+        }
+
+        out += getRomanForToken(t);
+      }
+
+      return out;
+    }
+
+    function shuffle(array){
+      const a = [...array];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
 
     const state = {
-      selectedRowKey:"a",
-      selectedRowLabel:"あ行",
-      orderMode:"sequential",
-      orderModeLabel:"順番",
-      playing:false,
-      problems:[],
-      currentProblemIndex:0,
-      currentWord:"",
-      currentChunks:[],
-      currentChunkIndex:0,
-      totalMiss:0,
-      totalAcceptedChars:0,
-      latestRankId:null,
-      soundOn:true,
-      soundType:"click"
+      mode:"10",
+      isCounting:false,
+      isRunning:false,
+      isFinished:false,
+      isInfinite:false,
+      awaitingEnter:false,
+      canAdvanceInfinite:false,
+      queue:[],
+      current:null,
+      currentIndex:0,
+      typed:"",
+      misses:0,
+      totalKeys:0,
+      correctKeys:0,
+      startTime:0,
+      endTime:0,
+      timerId:null,
+      countdownTimers:[],
+      repeatCount:0,
+      repeatTimer:null
     };
 
-    function showNotice(msg){
-      notice.textContent = msg;
-      notice.classList.add("show");
-      clearTimeout(showNotice._t);
-      showNotice._t = setTimeout(() => notice.classList.remove("show"), 1500);
-    }
-
-    function escapeHtml(s){
-      return s.replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[m]));
-    }
-
-    function shortenText(text, max){
-      return text.length > max ? text.slice(0, max - 1) + "…" : text;
-    }
-
-    function getAllKanaSequential(){
-      return [
-        ...ROWS.a,
-        ...ROWS.ka,
-        ...ROWS.sa,
-        ...ROWS.ta,
-        ...ROWS.na,
-        ...ROWS.ha,
-        ...ROWS.ma,
-        ...ROWS.ya,
-        ...ROWS.ra,
-        ...ROWS.wa,
-        ...ROWS.ga,
-        ...ROWS.za,
-        ...ROWS.da,
-        ...ROWS.ba,
-        ...ROWS.pa,
-        ...ROWS.yoon
-      ];
-    }
-
-    function getProblemSet(){
-      if(state.selectedRowKey === "all") return getAllKanaSequential();
-      return [...(ROWS[state.selectedRowKey] || [])];
-    }
-
-    function shuffle(arr){
-      const copy = [...arr];
-      for(let i = copy.length - 1; i > 0; i--){
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    }
-
-    function buildProblemList(){
-      const base = getProblemSet();
-      return state.orderMode === "random" ? shuffle(base) : [...base];
-    }
-
-    function getBaseChunk(chars, index){
-      if(index >= chars.length) return null;
-
-      const pair = (chars[index] || "") + (chars[index + 1] || "");
-      if(digraphMap[pair]){
-        return {
-          kana:pair,
-          display:kunreiDigraph[pair] || digraphMap[pair][0],
-          inputs:[...new Set(digraphMap[pair])]
-        };
-      }
-
-      const ch = chars[index];
-      return {
-        kana:ch,
-        display:kunreiSingle[ch] || ch,
-        inputs:[...new Set(kanaMap[ch] || [ch])]
-      };
-    }
-
-    function getPaintOverride(display, seq){
-      const map = {
-        "si|shi":[0,null,1],
-        "si|ci":[0,1],
-        "ti|chi":[0,null,1],
-        "tu|tsu":[0,null,1],
-        "hu|fu":[0,1],
-        "zi|ji":[0,1],
-        "di|ji":[0,1],
-        "du|zu":[0,1],
-        "sya|sha":[0,null,1,2],
-        "syu|shu":[0,null,1,2],
-        "syo|sho":[0,null,1,2],
-        "tya|cha":[0,null,1,2],
-        "tyu|chu":[0,null,1,2],
-        "tyo|cho":[0,null,1,2],
-        "zya|ja":[0,1,2],
-        "zyu|ju":[0,1,2],
-        "zyo|jo":[0,1,2]
-      };
-      return map[`${display}|${seq}`] || null;
-    }
-
-    function buildPaint(display, seq){
-      const override = getPaintOverride(display, seq);
-      if(override) return override;
-
-      if(seq === display) return [...display].map((_, i) => i);
-      if(seq.length === display.length) return [...seq].map((_, i) => i);
-
-      const paint = [];
-      const lastIndex = Math.max(0, display.length - 1);
-      for(let i = 0; i < seq.length; i++){
-        paint.push(Math.min(i, lastIndex));
-      }
-      return paint;
-    }
-
-    function makePatterns(display, inputs){
-      return [...new Set(inputs)].map(seq => ({
-        seq,
-        paint:buildPaint(display, seq)
-      }));
-    }
-
-    function buildRomanChunks(kana){
-      const chars = [...kana];
-      const chunks = [];
-
-      for(let i = 0; i < chars.length; i++){
-        const ch = chars[i];
-        const pair = (chars[i] || "") + (chars[i + 1] || "");
-
-        if(ch === "っ"){
-          const nextBase = getBaseChunk(chars, i + 1);
-          let inputs = ["xtu","ltu"];
-          let display = "tu";
-
-          if(nextBase && nextBase.inputs.length){
-            const doubledHeads = [];
-            for(const opt of nextBase.inputs){
-              const first = (opt[0] || "").toLowerCase();
-              if(first && consonants.includes(first) && first !== "n"){
-                doubledHeads.push(first);
-              }
-            }
-
-            if(doubledHeads.length){
-              inputs = [...new Set([...doubledHeads, "xtu", "ltu"])];
-              const firstDisplay = (nextBase.display[0] || "").toLowerCase();
-              display = (firstDisplay && consonants.includes(firstDisplay) && firstDisplay !== "n") ? firstDisplay : "tu";
-            }
-          }
-
-          chunks.push({
-            kana:"っ",
-            display,
-            patterns:makePatterns(display, inputs),
-            typed:"",
-            accepted:"",
-            paintedCount:0,
-            done:false,
-            missFlash:false
-          });
-          continue;
-        }
-
-        if(ch === "ん"){
-          const nextBase = getBaseChunk(chars, i + 1);
-          const nextStarts = new Set(nextBase ? nextBase.inputs.map(v => (v[0] || "").toLowerCase()) : []);
-          const blocked = [...nextStarts].some(c => ["a","i","u","e","o","y","n"].includes(c));
-
-          const display = blocked ? "nn" : "n";
-          const inputs = blocked ? ["nn","xn"] : ["n","nn","xn"];
-
-          chunks.push({
-            kana:"ん",
-            display,
-            patterns:makePatterns(display, [...new Set(inputs)]),
-            typed:"",
-            accepted:"",
-            paintedCount:0,
-            done:false,
-            missFlash:false
-          });
-          continue;
-        }
-
-        if(digraphMap[pair]){
-          const display = kunreiDigraph[pair] || digraphMap[pair][0];
-          const inputs = [...new Set(digraphMap[pair])];
-          chunks.push({
-            kana:pair,
-            display,
-            patterns:makePatterns(display, inputs),
-            typed:"",
-            accepted:"",
-            paintedCount:0,
-            done:false,
-            missFlash:false
-          });
-          i++;
-          continue;
-        }
-
-        const singleInputs = kanaMap[ch] || [ch];
-        const display = kunreiSingle[ch] || ch;
-        chunks.push({
-          kana:ch,
-          display,
-          patterns:makePatterns(display, [...new Set(singleInputs)]),
-          typed:"",
-          accepted:"",
-          paintedCount:0,
-          done:false,
-          missFlash:false
-        });
-      }
-
-      return chunks;
-    }
-
-    function paintToCount(paint, typedLen){
-      let max = -1;
-      for(let i = 0; i < typedLen && i < paint.length; i++){
-        const p = paint[i];
-        if(p == null) continue;
-        if(typeof p === "number") max = Math.max(max, p);
-      }
-      return max + 1;
-    }
-
-    function chooseBestPattern(patterns, nextTyped){
-      const exact = patterns.filter(p => p.seq === nextTyped);
-      if(exact.length){
-        return exact.sort((a,b) => a.seq.length - b.seq.length)[0];
-      }
-
-      const partial = patterns.filter(p => p.seq.startsWith(nextTyped));
-      if(!partial.length) return null;
-
-      partial.sort((a,b) => {
-        const ac = paintToCount(a.paint, nextTyped.length);
-        const bc = paintToCount(b.paint, nextTyped.length);
-        if(bc !== ac) return bc - ac;
-        return a.seq.length - b.seq.length;
-      });
-      return partial[0];
-    }
-
-    function getTypedPreview(){
-      let s = "";
-      for(let i = 0; i < state.currentChunks.length; i++){
-        const chunk = state.currentChunks[i];
-        if(chunk.done) s += chunk.accepted;
-        else if(i === state.currentChunkIndex) s += chunk.typed;
-      }
-      return s;
-    }
-
-    function renderRoman(){
-      romajiWrap.innerHTML = "";
-
-      for(let i = 0; i < state.currentChunks.length; i++){
-        const chunk = state.currentChunks[i];
-        const chars = [...chunk.display];
-
-        for(let j = 0; j < chars.length; j++){
-          const span = document.createElement("span");
-          let cls = "pending";
-
-          if(chunk.done || j < chunk.paintedCount){
-            cls = "done";
-          }else if(i === state.currentChunkIndex && j === chunk.paintedCount){
-            cls = "current";
-          }
-
-          span.className = "rchar " + cls;
-
-          if(chunk.missFlash && i === state.currentChunkIndex && j === chunk.paintedCount){
-            span.classList.add("wrongFlash");
-          }
-
-          span.textContent = chars[j];
-          romajiWrap.appendChild(span);
-        }
-      }
-
-      const preview = getTypedPreview();
-      ghostInput.textContent = preview ? `入力中: ${preview}` : "入力待機中";
-    }
-
-    function updateStats(){
-      const totalAttempts = state.totalAcceptedChars + state.totalMiss;
-      const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-      const totalCount = state.problems.length || getProblemSet().length;
-      const currentCount = state.playing ? Math.min(state.currentProblemIndex + 1, totalCount) : 0;
-      const progressPct = totalCount ? (state.currentProblemIndex / totalCount) * 100 : 0;
-
-      progressText.textContent = `${currentCount} / ${totalCount}`;
-      accText.textContent = `${acc.toFixed(2)}%`;
-      typedText.textContent = state.totalAcceptedChars;
-      missText.textContent = state.totalMiss;
-      totalProblemsText.textContent = totalCount;
-      progressBar.style.width = `${Math.max(0, Math.min(100, progressPct))}%`;
-    }
-
-    function resetStats(){
-      state.playing = false;
-      state.problems = [];
-      state.currentProblemIndex = 0;
-      state.currentWord = "";
-      state.currentChunks = [];
-      state.currentChunkIndex = 0;
-      state.totalMiss = 0;
-      state.totalAcceptedChars = 0;
-    }
-
-    function loadProblem(index){
-      const item = state.problems[index];
-      if(!item) return;
-
-      state.currentWord = item;
-      state.currentChunks = buildRomanChunks(item);
-      state.currentChunkIndex = 0;
-
-      kanjiDisplay.textContent = item;
-      kanaDisplay.textContent = state.selectedRowKey === "all" ? "全部通し" : state.selectedRowLabel;
-      ghostInput.textContent = "入力待機中";
-      candidateText.textContent = shortenText(state.currentChunks.map(c => c.display).join(""), 28);
-      renderRoman();
-      updateStats();
-    }
-
-    function startGame(){
-      resetStats();
-      state.problems = buildProblemList();
-      state.playing = true;
-      stateLabel.textContent = "プレイ中";
-      loadProblem(0);
-      updateStats();
-    }
-
-    function restartCurrentMode(){
-      resultOverlay.classList.remove("show");
-      startGame();
-      showNotice("再スタートしました");
-    }
-
-    function shatterDoneChars(){
-      const chars = [...romajiWrap.querySelectorAll(".rchar.done")];
-      const rectBase = romajiWrap.getBoundingClientRect();
-
-      chars.forEach((el) => {
-        const r = el.getBoundingClientRect();
-        const piece = document.createElement("span");
-        piece.className = "shatterPiece";
-        piece.textContent = el.textContent;
-        piece.style.left = `${r.left - rectBase.left}px`;
-        piece.style.top = `${r.top - rectBase.top}px`;
-        piece.style.fontSize = getComputedStyle(el).fontSize;
-        piece.style.color = getComputedStyle(el).color;
-        piece.style.setProperty("--tx", `${(Math.random() - .5) * 150}px`);
-        piece.style.setProperty("--ty", `${-20 - Math.random() * 85}px`);
-        piece.style.setProperty("--rot", `${(Math.random() - .5) * 220}deg`);
-        romajiWrap.appendChild(piece);
-        setTimeout(() => piece.remove(), 760);
-      });
-    }
-
-    function advanceToNextProblem(){
-      shatterDoneChars();
-      state.currentProblemIndex++;
-
-      if(state.currentProblemIndex >= state.problems.length){
-        finishGame();
-        return;
-      }
-
-      setTimeout(() => loadProblem(state.currentProblemIndex), 70);
-    }
-
-    function finishGame(){
-      state.playing = false;
-      stateLabel.textContent = "終了";
-      updateStats();
-
-      const totalAttempts = state.totalAcceptedChars + state.totalMiss;
-      const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-
-      resultTitle.textContent = "プレイ結果";
-      resultSummary.innerHTML = `
-        行モード: <strong>${escapeHtml(state.selectedRowLabel)}</strong><br>
-        出題順: <strong>${escapeHtml(state.orderModeLabel)}</strong><br>
-        総問題数: <strong>${state.problems.length}</strong><br>
-        正確率: <strong>${acc.toFixed(2)}%</strong><br>
-        ミス数: <strong>${state.totalMiss}</strong><br>
-        入力文字数: <strong>${state.totalAcceptedChars}</strong>
-      `;
-      playerNameInput.value = "";
-      resultOverlay.classList.add("show");
-    }
-
-    function saveRanking(){
-      const totalAttempts = state.totalAcceptedChars + state.totalMiss;
-      const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-      const name = (playerNameInput.value || "").trim() || "NO NAME";
-      const records = loadRanking();
-      const id = Date.now() + "_" + Math.random().toString(36).slice(2, 7);
-
-      records.push({
-        id,
-        name,
-        row:state.selectedRowLabel,
-        order:state.orderModeLabel,
-        accuracy:Number(acc.toFixed(2)),
-        misses:state.totalMiss,
-        typed:state.totalAcceptedChars,
-        total:state.problems.length,
-        createdAt:Date.now()
-      });
-
-      records.sort((a,b) => {
-        if(b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;
-        if(a.misses !== b.misses) return a.misses - b.misses;
-        if(b.typed !== a.typed) return b.typed - a.typed;
-        return a.createdAt - b.createdAt;
-      });
-
-      localStorage.setItem("hiraganaTypingRanking", JSON.stringify(records.slice(0, 10)));
-      state.latestRankId = id;
-      renderRanking();
-      resultOverlay.classList.remove("show");
-      showNotice("ランキングを保存しました");
-    }
-
-    function loadRanking(){
-      try{
-        return JSON.parse(localStorage.getItem("hiraganaTypingRanking") || "[]");
-      }catch{
-        return [];
-      }
-    }
-
-    function renderRanking(){
-      const records = loadRanking();
-      rankList.innerHTML = "";
-      if(!records.length){
-        rankList.innerHTML = `<div class="empty">まだ記録がありません。プレイ後に保存するとここに表示されます。</div>`;
-        return;
-      }
-
-      records.slice(0, 10).forEach((r, idx) => {
-        const div = document.createElement("div");
-        div.className = "rankItem" + (r.id === state.latestRankId ? " latest" : "");
-        div.innerHTML = `
-          <div class="rankNum">${idx + 1}</div>
-          <div class="rankMain">
-            <div class="rankName">${escapeHtml(r.name)}</div>
-            <div class="rankMeta">${escapeHtml(r.row)} / ${escapeHtml(r.order)} / ミス ${r.misses}</div>
-          </div>
-          <div class="rankAcc">${r.accuracy.toFixed(2)}%</div>
-        `;
-        rankList.appendChild(div);
-      });
-    }
-
-    function previewSelection(){
-      const set = getProblemSet();
-      const first = set[0] || "あ";
-      state.currentChunks = buildRomanChunks(first);
-      state.currentChunkIndex = 0;
-      kanjiDisplay.textContent = first;
-      kanaDisplay.textContent = state.selectedRowKey === "all" ? "全部通し" : state.selectedRowLabel;
-      candidateText.textContent = state.currentChunks.map(c => c.display).join("");
-      renderRoman();
-      progressText.textContent = `0 / ${set.length}`;
-      totalProblemsText.textContent = set.length;
-      progressBar.style.width = "0%";
-      accText.textContent = "100.00%";
-      typedText.textContent = "0";
-      missText.textContent = "0";
-      ghostInput.textContent = "入力待機中";
-    }
-
-    function buildRowModeButtons(){
-      rowModeButtons.innerHTML = "";
-      rowModes.forEach(m => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "modeBtn" + (m.key === state.selectedRowKey ? " active" : "");
-        btn.textContent = m.label;
-        btn.addEventListener("pointerdown", unlockAudio, {passive:true});
-        btn.addEventListener("click", () => {
-          state.selectedRowKey = m.key;
-          state.selectedRowLabel = m.label;
-          rowLabel.textContent = state.selectedRowLabel;
-          buildRowModeButtons();
-          startGame();
-          showNotice(`「${m.label}」で開始`);
-        });
-        rowModeButtons.appendChild(btn);
-      });
-    }
-
-    function buildOrderModeButtons(){
-      orderModeButtons.innerHTML = "";
-      orderModes.forEach(m => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "modeBtn" + (m.key === state.orderMode ? " active" : "");
-        btn.textContent = m.label;
-        btn.addEventListener("pointerdown", unlockAudio, {passive:true});
-        btn.addEventListener("click", () => {
-          state.orderMode = m.key;
-          state.orderModeLabel = m.label;
-          orderLabel.textContent = state.orderModeLabel;
-          buildOrderModeButtons();
-          startGame();
-          showNotice(`「${m.label}」で開始`);
-        });
-        orderModeButtons.appendChild(btn);
-      });
-    }
-
-    const audioCtxHolder = {
-      ctx:null,
-      master:null,
-      unlocked:false,
-      clickBuffers:{},
-      missBuffers:{}
+    const el = {
+      modeButtons:document.getElementById("modeButtons"),
+      modeLabel:document.getElementById("modeLabel"),
+      runLabel:document.getElementById("runLabel"),
+      promptView:document.getElementById("promptView"),
+      reading:document.getElementById("reading"),
+      romajiView:document.getElementById("romajiView"),
+      message:document.getElementById("message"),
+      progressValue:document.getElementById("progressValue"),
+      missValue:document.getElementById("missValue"),
+      accValue:document.getElementById("accValue"),
+      timeValue:document.getElementById("timeValue"),
+      overlay:document.getElementById("overlay"),
+      countText:document.getElementById("countText"),
+      resultPanel:document.getElementById("resultPanel"),
+      resultClear:document.getElementById("resultClear"),
+      resultAcc:document.getElementById("resultAcc"),
+      resultTime:document.getElementById("resultTime"),
+      keys:[...document.querySelectorAll(".key")]
     };
 
-    function getAudioCtx(){
-      if(!audioCtxHolder.ctx){
-        const AC = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AC({ latencyHint:"interactive" });
-        const master = ctx.createGain();
-        master.gain.value = 1.0;
-        master.connect(ctx.destination);
-        audioCtxHolder.ctx = ctx;
-        audioCtxHolder.master = master;
+    let audioCtx = null;
+    let punchBuffer = null;
+
+    function ensureAudio(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+          latencyHint:"interactive"
+        });
       }
-      return audioCtxHolder.ctx;
+      if(!punchBuffer){
+        punchBuffer = createPunchBuffer(audioCtx);
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume();
+      }
     }
 
-    function makePercBuffer({ duration=0.006, decayPower=4.0, highpassBlend=0.9 } = {}){
-      const ctx = getAudioCtx();
-      const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
-      const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    function createPunchBuffer(ctx){
+      const duration = 0.055;
+      const sampleRate = ctx.sampleRate;
+      const length = Math.floor(sampleRate * duration);
+      const buffer = ctx.createBuffer(1, length, sampleRate);
       const data = buffer.getChannelData(0);
 
-      let prev = 0;
-      for(let i = 0; i < length; i++){
-        const t = i / length;
-        const env = Math.pow(1 - t, decayPower);
-        const white = Math.random() * 2 - 1;
-        const hp = white - prev * 0.985;
-        prev = white;
-        data[i] = (hp * highpassBlend + white * (1 - highpassBlend)) * env;
+      for(let i=0;i<length;i++){
+        const t = i / sampleRate;
+        const env = Math.exp(-42 * t);
+        const tone =
+          Math.sin(2 * Math.PI * 115 * t) * 0.82 +
+          Math.sin(2 * Math.PI * 78 * t) * 0.42;
+        const noise = (Math.random() * 2 - 1) * 0.18;
+        data[i] = (tone + noise) * env * 0.92;
       }
       return buffer;
     }
 
-    function prepareAudioBuffers(){
-      if(!audioCtxHolder.clickBuffers.click){
-        audioCtxHolder.clickBuffers.click = makePercBuffer({
-          duration:0.0048,
-          decayPower:4.8,
-          highpassBlend:0.97
-        });
-      }
-      if(!audioCtxHolder.clickBuffers.arcade){
-        audioCtxHolder.clickBuffers.arcade = makePercBuffer({
-          duration:0.006,
-          decayPower:4.2,
-          highpassBlend:0.9
-        });
-      }
-      if(!audioCtxHolder.clickBuffers.crystal){
-        audioCtxHolder.clickBuffers.crystal = makePercBuffer({
-          duration:0.0055,
-          decayPower:4.6,
-          highpassBlend:0.98
-        });
-      }
+    function playPunch(){
+      if(!audioCtx || !punchBuffer) return;
 
-      if(!audioCtxHolder.missBuffers.click){
-        audioCtxHolder.missBuffers.click = makePercBuffer({
-          duration:0.013,
-          decayPower:2.7,
-          highpassBlend:0.35
-        });
-      }
-      if(!audioCtxHolder.missBuffers.arcade){
-        audioCtxHolder.missBuffers.arcade = makePercBuffer({
-          duration:0.015,
-          decayPower:2.5,
-          highpassBlend:0.3
-        });
-      }
-      if(!audioCtxHolder.missBuffers.crystal){
-        audioCtxHolder.missBuffers.crystal = makePercBuffer({
-          duration:0.012,
-          decayPower:3.0,
-          highpassBlend:0.42
-        });
+      const src = audioCtx.createBufferSource();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      filter.type = "lowpass";
+      filter.frequency.value = 1450;
+      filter.Q.value = 0.65;
+
+      gain.gain.value = 0.74;
+
+      src.buffer = punchBuffer;
+      src.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      src.start(audioCtx.currentTime + 0.0005);
+    }
+
+    function clearRepeatTimer(){
+      if(state.repeatTimer){
+        clearTimeout(state.repeatTimer);
+        state.repeatTimer = null;
       }
     }
 
-    function unlockAudio(){
-      const ctx = getAudioCtx();
-      if(ctx.state === "suspended") ctx.resume();
-      prepareAudioBuffers();
+    function setMode(mode){
+      if(state.isRunning || state.isCounting) return;
+      state.mode = mode;
+      state.isInfinite = mode === "infinite";
 
-      if(!audioCtxHolder.unlocked){
-        const now = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(1400, now);
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(0.008, now + 0.001);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.01);
-        osc.connect(gain);
-        gain.connect(audioCtxHolder.master);
-        osc.start(now);
-        osc.stop(now + 0.011);
-        audioCtxHolder.unlocked = true;
-      }
+      [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+      });
+
+      el.modeLabel.textContent = `モード：${mode === "infinite" ? "無限" : mode + "問"}`;
+      resetIdleScreen();
     }
 
-    function playBuffer(buffer, gainValue=0.02){
-      if(!state.soundOn) return;
-      const ctx = getAudioCtx();
-      if(ctx.state !== "running" || !buffer) return;
-
-      const now = ctx.currentTime;
-      const src = ctx.createBufferSource();
-      const gain = ctx.createGain();
-
-      src.buffer = buffer;
-      gain.gain.setValueAtTime(gainValue, now);
-      src.connect(gain);
-      gain.connect(audioCtxHolder.master);
-      src.start(now);
-    }
-
-    function tone(freq=440, duration=0.008, type="square", gainAmount=0.02, freqEnd=null){
-      if(!state.soundOn) return;
-      const ctx = getAudioCtx();
-      if(ctx.state !== "running") return;
-
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-      if(freqEnd != null){
-        osc.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + duration);
-      }
-
-      gain.gain.setValueAtTime(gainAmount, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      osc.connect(gain);
-      gain.connect(audioCtxHolder.master);
-      osc.start(now);
-      osc.stop(now + duration + 0.002);
-    }
-
-    function playTypeSound(){
-      switch(state.soundType){
-        case "arcade":
-          playBuffer(audioCtxHolder.clickBuffers.arcade, 0.022);
-          tone(1100, 0.008, "square", 0.024, 920);
-          break;
-        case "crystal":
-          playBuffer(audioCtxHolder.clickBuffers.crystal, 0.014);
-          tone(1500, 0.011, "triangle", 0.018, 1220);
-          break;
-        case "click":
-        default:
-          playBuffer(audioCtxHolder.clickBuffers.click, 0.026);
-          tone(1800, 0.005, "square", 0.014, 1500);
-          break;
-      }
-    }
-
-    function playMissSound(){
-      switch(state.soundType){
-        case "arcade":
-          playBuffer(audioCtxHolder.missBuffers.arcade, 0.018);
-          tone(210, 0.024, "square", 0.035, 150);
-          break;
-        case "crystal":
-          playBuffer(audioCtxHolder.missBuffers.crystal, 0.014);
-          tone(250, 0.024, "sawtooth", 0.025, 180);
-          break;
-        case "click":
-        default:
-          playBuffer(audioCtxHolder.missBuffers.click, 0.015);
-          tone(180, 0.017, "square", 0.032, 120);
-          break;
-      }
-    }
-
-    function updateSoundUI(){
-      soundTypeSelect.value = state.soundType;
-      soundTypeLabel.textContent = soundNames[state.soundType];
-    }
-
-    function previewSound(){
-      unlockAudio();
-      playTypeSound();
-    }
-
-    function resetRanking(){
-      if(!confirm("ランキングを初期化しますか？")) return;
-      localStorage.removeItem("hiraganaTypingRanking");
-      state.latestRankId = null;
-      renderRanking();
-      showNotice("ランキングを初期化しました");
-    }
-
-    function handleKeyInput(key){
-      if(!state.playing) return false;
-      if(key.length !== 1) return false;
-      if(!/^[a-zA-Z\-]$/.test(key)) return false;
-
-      const ch = key.toLowerCase();
-      const chunk = state.currentChunks[state.currentChunkIndex];
-      if(!chunk) return false;
-
-      const nextTyped = chunk.typed + ch;
-      const matchingPatterns = chunk.patterns.filter(p => p.seq.startsWith(nextTyped));
-      const exactPatterns = chunk.patterns.filter(p => p.seq === nextTyped);
-
-      if(exactPatterns.length || matchingPatterns.length){
-        playTypeSound();
-      }else{
-        playMissSound();
-      }
-
-      if(exactPatterns.length){
-        chunk.typed = nextTyped;
-        chunk.accepted = nextTyped;
-        chunk.paintedCount = chunk.display.length;
-        chunk.done = true;
-        chunk.missFlash = false;
-        state.currentChunkIndex++;
-        state.totalAcceptedChars++;
-        renderRoman();
-        updateStats();
-
-        if(state.currentChunkIndex >= state.currentChunks.length){
-          advanceToNextProblem();
-        }
-        return true;
-      }
-
-      if(matchingPatterns.length){
-        const best = chooseBestPattern(matchingPatterns, nextTyped) || matchingPatterns[0];
-        chunk.typed = nextTyped;
-        chunk.accepted = nextTyped;
-        chunk.paintedCount = paintToCount(best.paint, nextTyped.length);
-        chunk.missFlash = false;
-        state.totalAcceptedChars++;
-        renderRoman();
-        updateStats();
-        return true;
-      }
-
-      state.totalMiss++;
-      chunk.missFlash = true;
-      renderRoman();
-      setTimeout(() => {
-        if(state.currentChunks[state.currentChunkIndex] === chunk){
-          chunk.missFlash = false;
-          renderRoman();
-        }
-      }, 90);
+    function resetIdleScreen(){
+      clearRepeatTimer();
+      state.isFinished = false;
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+      state.current = null;
+      state.currentIndex = 0;
+      state.typed = "";
+      state.misses = 0;
+      state.totalKeys = 0;
+      state.correctKeys = 0;
+      state.repeatCount = 0;
+      state.startTime = 0;
+      state.endTime = 0;
       updateStats();
-      return true;
+      el.runLabel.textContent = "待機中";
+      el.promptView.textContent = "ひらがな";
+      el.reading.textContent = "ROMAJI";
+      renderRomaji("");
+      setMessage("スペースキーで開始", "");
+      el.resultPanel.classList.remove("show");
+      updateKeyboardGuide("");
     }
 
-    document.addEventListener("pointerdown", unlockAudio, {passive:true, capture:true});
-    document.addEventListener("touchstart", unlockAudio, {passive:true, capture:true});
+    function buildQueue(){
+      const shuffled = shuffle(WORDS);
+      if(state.isInfinite) return shuffled;
 
-    document.addEventListener("keydown", (e) => {
-      if(resultOverlay.classList.contains("show")) return;
-      if(e.repeat) return;
-      if(!/^[a-zA-Z\-]$/.test(e.key)) return;
-
-      e.preventDefault();
-      unlockAudio();
-      handleKeyInput(e.key);
-    }, { capture:true });
-
-    soundBtn.addEventListener("pointerdown", unlockAudio, {passive:true});
-    soundBtn.addEventListener("click", () => {
-      state.soundOn = !state.soundOn;
-      soundBtn.classList.toggle("off", !state.soundOn);
-      soundBtn.textContent = state.soundOn ? "🔊 効果音 ON" : "🔈 効果音 OFF";
-      if(state.soundOn) previewSound();
-    });
-
-    soundTypeSelect.addEventListener("pointerdown", unlockAudio, {passive:true});
-    soundTypeSelect.addEventListener("change", () => {
-      state.soundType = soundTypeSelect.value;
-      updateSoundUI();
-      previewSound();
-      showNotice(`効果音を「${soundNames[state.soundType]}」に変更`);
-    });
-
-    resetRankingBtn.addEventListener("click", resetRanking);
-    closeResultBtn.addEventListener("click", () => resultOverlay.classList.remove("show"));
-    saveResultBtn.addEventListener("click", saveRanking);
-    retryBtn.addEventListener("click", restartCurrentMode);
-
-    playerNameInput.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") saveRanking();
-    });
-
-    resultOverlay.addEventListener("click", (e) => {
-      if(e.target === resultOverlay) resultOverlay.classList.remove("show");
-    });
-
-    function init(){
-      buildRowModeButtons();
-      buildOrderModeButtons();
-      updateSoundUI();
-      rowLabel.textContent = state.selectedRowLabel;
-      orderLabel.textContent = state.orderModeLabel;
-      stateLabel.textContent = "待機中";
-      renderRanking();
-      previewSelection();
+      const count = Number(state.mode);
+      const pool = [];
+      while(pool.length < count){
+        pool.push(...shuffle(WORDS));
+      }
+      return pool.slice(0, count);
     }
 
-    init();
-  })();
+    function startCountdown(){
+      if(state.isCounting || state.isRunning) return;
+
+      clearRepeatTimer();
+      ensureAudio();
+      state.isCounting = true;
+      el.resultPanel.classList.remove("show");
+      el.overlay.classList.add("show");
+      el.runLabel.textContent = "カウントダウン";
+      setMessage("開始します", "");
+
+      const seq = ["3","2","1","START"];
+      el.countText.textContent = seq[0];
+
+      state.countdownTimers.forEach(id=>clearTimeout(id));
+      state.countdownTimers = [];
+
+      seq.forEach((text,idx)=>{
+        const id = setTimeout(()=>{
+          el.countText.textContent = text;
+        }, idx * 700);
+        state.countdownTimers.push(id);
+      });
+
+      const endId = setTimeout(()=>{
+        el.overlay.classList.remove("show");
+        state.isCounting = false;
+        beginGame();
+      }, seq.length * 700);
+      state.countdownTimers.push(endId);
+    }
+
+    function beginGame(){
+      clearRepeatTimer();
+      state.queue = buildQueue();
+      state.currentIndex = 0;
+      state.typed = "";
+      state.misses = 0;
+      state.totalKeys = 0;
+      state.correctKeys = 0;
+      state.repeatCount = 0;
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+      state.isRunning = true;
+      state.isFinished = false;
+      state.startTime = performance.now();
+      state.endTime = 0;
+
+      if(state.timerId) cancelAnimationFrame(state.timerId);
+      tickTimer();
+
+      el.runLabel.textContent = "プレイ中";
+      nextWord(true);
+      updateStats();
+    }
+
+    function stopGame(manual = true){
+      clearRepeatTimer();
+      state.isCounting = false;
+      state.isRunning = false;
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+      state.endTime = performance.now();
+
+      state.countdownTimers.forEach(id=>clearTimeout(id));
+      state.countdownTimers = [];
+      el.overlay.classList.remove("show");
+
+      if(state.timerId) cancelAnimationFrame(state.timerId);
+      el.runLabel.textContent = manual ? "中断" : "終了";
+
+      if(manual){
+        setMessage("停止しました。スペースキーで最初から再開", "");
+      }
+      updateStats();
+      updateKeyboardGuide("");
+    }
+
+    function finishGame(){
+      clearRepeatTimer();
+      state.isRunning = false;
+      state.isFinished = true;
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+      state.endTime = performance.now();
+
+      if(state.timerId) cancelAnimationFrame(state.timerId);
+      el.runLabel.textContent = "終了";
+      setMessage("おつかれさまでした。スペースキーで再スタート", "ok");
+
+      const cleared = state.currentIndex;
+      const acc = calcAccuracy();
+      const time = elapsedSec();
+
+      el.resultClear.textContent = String(cleared);
+      el.resultAcc.textContent = `${acc}%`;
+      el.resultTime.textContent = `${time.toFixed(1)}s`;
+      el.resultPanel.classList.add("show");
+      updateStats();
+      updateKeyboardGuide("");
+    }
+
+    function tickTimer(){
+      if(!state.isRunning) return;
+      el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
+      state.timerId = requestAnimationFrame(tickTimer);
+    }
+
+    function elapsedSec(){
+      if(!state.startTime) return 0;
+      const end = state.isRunning ? performance.now() : (state.endTime || performance.now());
+      return (end - state.startTime) / 1000;
+    }
+
+    function nextWord(initial = false){
+      clearRepeatTimer();
+
+      if(state.isInfinite){
+        if(initial || !state.current){
+          if(state.currentIndex === 0){
+            state.queue = shuffle(WORDS);
+          }
+          const idx = state.currentIndex % state.queue.length;
+          state.current = state.queue[idx];
+          state.currentIndex = state.currentIndex || 0;
+        }
+      }else{
+        if(state.currentIndex >= state.queue.length){
+          finishGame();
+          return;
+        }
+        state.current = state.queue[state.currentIndex];
+      }
+
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+      state.current.roman = kanaToRomajiStrict(state.current.kana);
+      state.typed = "";
+      el.promptView.textContent = state.current.kana;
+      el.reading.textContent = state.current.roman;
+      renderRomaji();
+      updateStats();
+      updateKeyboardGuide(state.current.roman[0] || "");
+
+      if(state.isInfinite){
+        setMessage("入力して練習", "");
+      }else{
+        setMessage("入力開始", "");
+      }
+    }
+
+    function repeatCurrentWord(){
+      clearRepeatTimer();
+      state.awaitingEnter = false;
+      state.typed = "";
+      renderRomaji();
+      state.repeatCount++;
+      updateStats();
+      updateKeyboardGuide(state.current?.roman?.[0] || "");
+      setMessage("もういちど", "");
+    }
+
+    function renderRomaji(initialText = null){
+      const target = initialText !== null ? initialText : (state.current?.roman || "");
+      const done = escapeHtml(target.slice(0, state.typed.length));
+      const rest = escapeHtml(target.slice(state.typed.length));
+
+      el.romajiView.innerHTML = `
+        <span class="done">${done}</span><span class="cursor">|</span><span class="rest">${rest}</span>
+      `;
+      updateKeyboardGuide(target[state.typed.length] || "");
+    }
+
+    function escapeHtml(str){
+      return str
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
+
+    function setMessage(text, type=""){
+      el.message.textContent = text;
+      el.message.className = "message" + (type ? ` ${type}` : "");
+    }
+
+    function calcAccuracy(){
+      if(state.totalKeys === 0) return 100;
+      return Math.max(0, Math.round((state.correctKeys / state.totalKeys) * 100));
+    }
+
+    function updateStats(){
+      el.missValue.textContent = String(state.misses);
+      el.accValue.textContent = `${calcAccuracy()}%`;
+
+      if(state.isInfinite){
+        el.progressValue.textContent = `${state.currentIndex} 語クリア / 反復 ${state.repeatCount}`;
+      }else{
+        el.progressValue.textContent = `${state.currentIndex} / ${state.mode}`;
+      }
+
+      if(!state.isRunning){
+        if(state.isFinished || state.endTime){
+          el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
+        }else{
+          el.timeValue.textContent = "0.0s";
+        }
+      }
+    }
+
+    function advanceWordFinite(){
+      clearRepeatTimer();
+      state.currentIndex++;
+      if(state.currentIndex >= state.queue.length){
+        finishGame();
+      }else{
+        nextWord();
+      }
+      updateStats();
+    }
+
+    function advanceWordInfinite(){
+      clearRepeatTimer();
+      state.currentIndex++;
+      state.awaitingEnter = false;
+      state.canAdvanceInfinite = false;
+
+      const idx = state.currentIndex % state.queue.length;
+      if(idx === 0){
+        state.queue = shuffle(WORDS);
+      }
+
+      state.current = state.queue[idx];
+      state.current.roman = kanaToRomajiStrict(state.current.kana);
+      state.typed = "";
+      el.promptView.textContent = state.current.kana;
+      el.reading.textContent = state.current.roman;
+      renderRomaji();
+      updateStats();
+      setMessage("入力して練習", "");
+    }
+
+    function onCorrectComplete(){
+      clearRepeatTimer();
+      updateKeyboardGuide("Enter");
+
+      if(state.isInfinite){
+        state.awaitingEnter = true;
+        state.canAdvanceInfinite = true;
+        setMessage("正解", "ok");
+      }else{
+        setMessage("正解", "ok");
+        state.repeatTimer = setTimeout(()=>{
+          if(state.isRunning){
+            advanceWordFinite();
+          }
+        }, 220);
+      }
+    }
+
+    function keyNameToDataKey(ch){
+      if(!ch) return "";
+      if(ch === "Enter") return "Enter";
+      if(ch === " ") return "Space";
+      if(/[A-Z]/.test(ch)) return `Key${ch}`;
+      if(/[0-9]/.test(ch)) return `Digit${ch}`;
+      return "";
+    }
+
+    function updateKeyboardGuide(ch){
+      const targetDataKey = keyNameToDataKey(ch);
+      el.keys.forEach(key=>{
+        key.classList.toggle("active", key.dataset.key === targetDataKey);
+      });
+    }
+
+    function handleTypingKey(key){
+      if(!state.current) return;
+      const target = state.current.roman;
+
+      if(state.awaitingEnter && state.isInfinite && /^[a-z]$/.test(key)){
+        repeatCurrentWord();
+      }
+
+      if(!/^[a-z]$/.test(key)) return;
+
+      ensureAudio();
+      playPunch();
+
+      const upperKey = key.toUpperCase();
+      state.totalKeys++;
+      const expected = target[state.typed.length];
+
+      if(upperKey === expected){
+        state.correctKeys++;
+        state.typed += upperKey;
+        renderRomaji();
+
+        if(state.typed === target){
+          onCorrectComplete();
+        }else{
+          setMessage("入力中", "");
+        }
+      }else{
+        state.misses++;
+        setMessage(`ミス`, "miss");
+        updateKeyboardGuide(expected || "");
+      }
+
+      updateStats();
+    }
+
+    document.addEventListener("keydown",(e)=>{
+      const key = e.key;
+
+      if(key === " " || key === "Spacebar"){
+        e.preventDefault();
+        ensureAudio();
+
+        if(state.isCounting){
+          stopGame(true);
+          return;
+        }
+
+        if(state.isRunning){
+          stopGame(true);
+          return;
+        }
+
+        startCountdown();
+        return;
+      }
+
+      if(!state.isRunning) return;
+
+      if(key === "Enter"){
+        e.preventDefault();
+        if(state.isInfinite && state.canAdvanceInfinite){
+          advanceWordInfinite();
+        }
+        return;
+      }
+
+      if(key.length === 1 && /^[a-zA-Z]$/.test(key)){
+        e.preventDefault();
+        handleTypingKey(key.toLowerCase());
+      }
+    });
+
+    el.modeButtons.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".mode-btn");
+      if(!btn) return;
+      setMode(btn.dataset.mode);
+    });
+
+    setMode("10");
   </script>
 </body>
 </html>
