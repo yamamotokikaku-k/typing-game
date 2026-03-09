@@ -650,7 +650,7 @@
     </div>
   </div>
 
-　<script>
+<script>
   const WORDS = [
     {kana:"あさ"},
     {kana:"いぬ"},
@@ -1032,132 +1032,137 @@
 
   let audioCtx = null;
   let masterGain = null;
+  let audioUnlocked = false;
+  let typeBuffers = [];
+  let missBuffer = null;
+  let clearBuffers = [];
 
-  function ensureAudio(){
-    if(!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-        latencyHint:"interactive"
-      });
-
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.9;
-      masterGain.connect(audioCtx.destination);
+  function createNoiseBuffer(ctx, durationSec, generator){
+    const length = Math.max(1, Math.floor(ctx.sampleRate * durationSec));
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<length;i++){
+      const t = i / ctx.sampleRate;
+      data[i] = generator(i, t, length);
     }
+    return buffer;
+  }
 
+  function buildAudioBuffers(){
+    if(!audioCtx) return;
+
+    typeBuffers = [
+      createTypeBuffer(1.00, 1.00),
+      createTypeBuffer(0.96, 0.92),
+      createTypeBuffer(1.04, 1.05),
+      createTypeBuffer(0.99, 0.97)
+    ];
+
+    missBuffer = createMissBuffer();
+
+    clearBuffers = [
+      createClearToneBuffer(1320, 0.050),
+      createClearToneBuffer(1660, 0.050),
+      createClearToneBuffer(2090, 0.060)
+    ];
+  }
+
+  function createTypeBuffer(pitch = 1, brightness = 1){
+    return createNoiseBuffer(audioCtx, 0.018, (i, t, length) => {
+      const decay = Math.exp(-t * 170);
+      const n = (Math.random() * 2 - 1);
+      const s1 = Math.sin(2 * Math.PI * 2400 * pitch * t);
+      const s2 = Math.sin(2 * Math.PI * 3700 * pitch * t) * 0.55;
+      const click = (n * 0.65 + s1 * 0.30 + s2 * 0.18) * decay * brightness;
+      const tail = i > length * 0.55 ? 0.72 : 1;
+      return click * tail;
+    });
+  }
+
+  function createMissBuffer(){
+    return createNoiseBuffer(audioCtx, 0.065, (i, t) => {
+      const env = Math.exp(-t * 34);
+      const low = Math.sin(2 * Math.PI * (240 - t * 900) * t) * 0.55;
+      const noise = (Math.random() * 2 - 1) * 0.10;
+      return (low + noise) * env;
+    });
+  }
+
+  function createClearToneBuffer(freq, durationSec){
+    return createNoiseBuffer(audioCtx, durationSec, (i, t, length) => {
+      const fade = Math.exp(-t * 22);
+      const soft = Math.sin(2 * Math.PI * freq * t);
+      const sparkle = Math.sin(2 * Math.PI * freq * 2 * t) * 0.20;
+      const out = (soft + sparkle) * fade;
+      const tail = i > length - 64 ? (length - i) / 64 : 1;
+      return out * Math.max(0, tail);
+    });
+  }
+
+  function ensureAudioContext(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+      latencyHint:"interactive"
+    });
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.92;
+    masterGain.connect(audioCtx.destination);
+    buildAudioBuffers();
+  }
+
+  async function unlockAudio(){
+    ensureAudioContext();
     if(audioCtx.state === "suspended"){
-      audioCtx.resume();
+      try{
+        await audioCtx.resume();
+      }catch(_e){}
+    }
+    audioUnlocked = audioCtx.state === "running";
+    if(audioUnlocked){
+      primeAudio();
     }
   }
 
-  function warmupAudio(){
+  function primeAudio(){
     if(!audioCtx || !masterGain) return;
-
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
+    const source = audioCtx.createBufferSource();
+    const buffer = audioCtx.createBuffer(1, 1, audioCtx.sampleRate);
+    source.buffer = buffer;
     const gain = audioCtx.createGain();
-
-    osc.type = "square";
-    osc.frequency.setValueAtTime(880, now);
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.03, now + 0.002);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
-
-    osc.connect(gain);
+    gain.gain.value = 0.00001;
+    source.connect(gain);
     gain.connect(masterGain);
-
-    osc.start(now);
-    osc.stop(now + 0.025);
+    source.start(audioCtx.currentTime);
   }
 
-  function playClickSound(freq = 1400, volume = 0.08){
-    if(!audioCtx || !masterGain) return;
-
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
+  function playBuffer(buffer, volume = 1, when = 0){
+    if(!audioUnlocked || !audioCtx || !masterGain || !buffer) return;
+    const source = audioCtx.createBufferSource();
     const gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-
-    osc.type = "square";
-    osc.frequency.setValueAtTime(freq, now);
-    osc.frequency.exponentialRampToValueAtTime(freq * 0.82, now + 0.018);
-
-    filter.type = "highpass";
-    filter.frequency.setValueAtTime(700, now);
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(volume, now + 0.001);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
-
-    osc.connect(filter);
-    filter.connect(gain);
+    source.buffer = buffer;
+    gain.gain.value = volume;
+    source.connect(gain);
     gain.connect(masterGain);
-
-    osc.start(now);
-    osc.stop(now + 0.025);
+    const startAt = audioCtx.currentTime + when;
+    source.start(startAt);
   }
 
   function playTypeSound(){
-    if(!audioCtx || !masterGain) return;
-    const freqs = [1500, 1380, 1600, 1450];
-    const idx = state.soundStep % freqs.length;
+    if(!typeBuffers.length) return;
+    const idx = state.soundStep % typeBuffers.length;
     state.soundStep++;
-    playClickSound(freqs[idx], 0.085);
+    playBuffer(typeBuffers[idx], 0.36);
   }
 
   function playMissSound(){
-    if(!audioCtx || !masterGain) return;
-
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    const filter = audioCtx.createBiquadFilter();
-
-    osc.type = "sawtooth";
-    osc.frequency.setValueAtTime(260, now);
-    osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
-
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(1200, now);
-
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.05, now + 0.002);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(masterGain);
-
-    osc.start(now);
-    osc.stop(now + 0.08);
+    playBuffer(missBuffer, 0.30);
   }
 
   function playClearSound(){
-    if(!audioCtx || !masterGain) return;
-
-    const now = audioCtx.currentTime;
-
-    [
-      {f:1040, t:now, v:0.06},
-      {f:1320, t:now + 0.035, v:0.055},
-      {f:1760, t:now + 0.07, v:0.05}
-    ].forEach(({f, t, v})=>{
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "square";
-      osc.frequency.setValueAtTime(f, t);
-
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(v, t + 0.002);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
-
-      osc.connect(gain);
-      gain.connect(masterGain);
-
-      osc.start(t);
-      osc.stop(t + 0.09);
-    });
+    if(!clearBuffers.length) return;
+    playBuffer(clearBuffers[0], 0.16, 0.000);
+    playBuffer(clearBuffers[1], 0.13, 0.028);
+    playBuffer(clearBuffers[2], 0.11, 0.054);
   }
 
   function clearRepeatTimer(){
@@ -1448,18 +1453,21 @@
     updateStats();
   }
 
-  document.addEventListener("pointerdown", ()=>{
-    ensureAudio();
-    warmupAudio();
-  }, { once:true });
+  function installAudioUnlockEvents(){
+    const unlockOnce = async ()=>{
+      await unlockAudio();
+    };
 
-  document.addEventListener("touchstart", ()=>{
-    ensureAudio();
-    warmupAudio();
-  }, { once:true, passive:true });
+    document.addEventListener("pointerdown", unlockOnce, { once:true });
+    document.addEventListener("touchstart", unlockOnce, { once:true, passive:true });
+  }
 
-  document.addEventListener("keydown",(e)=>{
+  document.addEventListener("keydown", async (e)=>{
     const key = e.key;
+
+    if(!audioUnlocked){
+      await unlockAudio();
+    }
 
     if(key === " " || key === "Spacebar"){
       if(state.isRunning){
@@ -1477,21 +1485,20 @@
 
     if(isAllowedInputKey(key)){
       e.preventDefault();
-      ensureAudio();
       handleTypingKey(key);
     }
   });
 
-  el.modeButtons.addEventListener("click",(e)=>{
+  el.modeButtons.addEventListener("click", async (e)=>{
     const btn = e.target.closest(".mode-btn");
     if(!btn) return;
-    ensureAudio();
-    warmupAudio();
+    if(!audioUnlocked){
+      await unlockAudio();
+    }
     setMode(btn.dataset.mode, true);
   });
 
-  ensureAudio();
-  warmupAudio();
+  installAudioUnlockEvents();
   setMode("10", true);
 </script>
 </body>
