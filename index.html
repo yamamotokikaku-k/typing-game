@@ -650,819 +650,849 @@
     </div>
   </div>
 
-  <script>
-    const WORDS = [
-      {kana:"あさ"},
-      {kana:"いぬ"},
-      {kana:"うみ"},
-      {kana:"えき"},
-      {kana:"おに"},
-      {kana:"さかな"},
-      {kana:"ねこ"},
-      {kana:"くるま"},
-      {kana:"たまご"},
-      {kana:"ひこうき"},
-      {kana:"やま"},
-      {kana:"ゆき"},
-      {kana:"よる"},
-      {kana:"かわ"},
-      {kana:"ほし"},
-      {kana:"すいか"},
-      {kana:"りんご"},
-      {kana:"おちゃ"},
-      {kana:"きって"},
-      {kana:"がっこう"},
-      {kana:"じてんしゃ"},
-      {kana:"しんごう"},
-      {kana:"でんしゃ"},
-      {kana:"ちず"},
-      {kana:"てがみ"},
-      {kana:"かぞく"},
-      {kana:"こうえん"},
-      {kana:"おんがく"},
-      {kana:"はなび"},
-      {kana:"きょうしつ"},
-      {kana:"にわとり"},
-      {kana:"しんかんせん"},
-      {kana:"ひまわり"},
-      {kana:"きゅうり"},
-      {kana:"しゃしん"},
-      {kana:"じゅうしょ"},
-      {kana:"びょういん"},
-      {kana:"りょこう"},
-      {kana:"がっき"},
-      {kana:"きんぎょ"},
-      {kana:"みかん"},
-      {kana:"しゅくだい"},
-      {kana:"ちょこれーと"},
-      {kana:"ぎゅうにゅう"},
-      {kana:"ぴょんぴょん"},
-      {kana:"きゃべつ"},
-      {kana:"しょくどう"},
-      {kana:"にゅうがく"},
-      {kana:"きょうりゅう"},
-      {kana:"りっぱ"},
-      {kana:"はっぱ"},
-      {kana:"ざっし"},
-      {kana:"かんたん"},
-      {kana:"てんき"},
-      {kana:"おもちゃ"}
-    ];
+　<script>
+  const WORDS = [
+    {kana:"あさ"},
+    {kana:"いぬ"},
+    {kana:"うみ"},
+    {kana:"えき"},
+    {kana:"おに"},
+    {kana:"さかな"},
+    {kana:"ねこ"},
+    {kana:"くるま"},
+    {kana:"たまご"},
+    {kana:"ひこうき"},
+    {kana:"やま"},
+    {kana:"ゆき"},
+    {kana:"よる"},
+    {kana:"かわ"},
+    {kana:"ほし"},
+    {kana:"すいか"},
+    {kana:"りんご"},
+    {kana:"おちゃ"},
+    {kana:"きって"},
+    {kana:"がっこう"},
+    {kana:"じてんしゃ"},
+    {kana:"しんごう"},
+    {kana:"でんしゃ"},
+    {kana:"ちず"},
+    {kana:"てがみ"},
+    {kana:"かぞく"},
+    {kana:"こうえん"},
+    {kana:"おんがく"},
+    {kana:"はなび"},
+    {kana:"きょうしつ"},
+    {kana:"にわとり"},
+    {kana:"しんかんせん"},
+    {kana:"ひまわり"},
+    {kana:"きゅうり"},
+    {kana:"しゃしん"},
+    {kana:"じゅうしょ"},
+    {kana:"びょういん"},
+    {kana:"りょこう"},
+    {kana:"がっき"},
+    {kana:"きんぎょ"},
+    {kana:"みかん"},
+    {kana:"しゅくだい"},
+    {kana:"ちょこれーと"},
+    {kana:"ぎゅうにゅう"},
+    {kana:"ぴょんぴょん"},
+    {kana:"きゃべつ"},
+    {kana:"しょくどう"},
+    {kana:"にゅうがく"},
+    {kana:"きょうりゅう"},
+    {kana:"りっぱ"},
+    {kana:"はっぱ"},
+    {kana:"ざっし"},
+    {kana:"かんたん"},
+    {kana:"てんき"},
+    {kana:"おもちゃ"}
+  ];
 
-    const TWO_CHAR_NOUNS = [
-      {kana:"あめ"},
-      {kana:"いぬ"},
-      {kana:"うみ"},
-      {kana:"えき"},
-      {kana:"おに"},
-      {kana:"かさ"},
-      {kana:"かに"},
-      {kana:"かわ"},
-      {kana:"くま"},
-      {kana:"くつ"},
-      {kana:"くに"},
-      {kana:"けし"},
-      {kana:"こえ"},
-      {kana:"こめ"},
-      {kana:"さけ"},
-      {kana:"さる"},
-      {kana:"しか"},
-      {kana:"しま"},
-      {kana:"すし"},
-      {kana:"すず"},
-      {kana:"せみ"},
-      {kana:"そら"},
-      {kana:"たい"},
-      {kana:"たこ"},
-      {kana:"たね"},
-      {kana:"つき"},
-      {kana:"つる"},
-      {kana:"てら"},
-      {kana:"とら"},
-      {kana:"なし"},
-      {kana:"なつ"},
-      {kana:"にわ"},
-      {kana:"ぬの"},
-      {kana:"ねこ"},
-      {kana:"のり"},
-      {kana:"はな"},
-      {kana:"はる"},
-      {kana:"ひげ"},
-      {kana:"ふね"},
-      {kana:"へや"},
-      {kana:"ほし"},
-      {kana:"まど"},
-      {kana:"まめ"},
-      {kana:"みず"},
-      {kana:"みみ"},
-      {kana:"むし"},
-      {kana:"むね"},
-      {kana:"めし"},
-      {kana:"もも"},
-      {kana:"やま"},
-      {kana:"ゆめ"},
-      {kana:"よる"},
-      {kana:"りす"},
-      {kana:"るす"},
-      {kana:"れき"},
-      {kana:"わに"},
-      {kana:"わた"},
-      {kana:"がら"},
-      {kana:"ぐみ"},
-      {kana:"げた"},
-      {kana:"ごま"},
-      {kana:"ざる"},
-      {kana:"ぜに"},
-      {kana:"ぞう"},
-      {kana:"だし"},
-      {kana:"でこ"},
-      {kana:"どろ"},
-      {kana:"ばら"},
-      {kana:"びわ"},
-      {kana:"ぶた"},
-      {kana:"ぼう"},
-      {kana:"ぱん"},
-      {kana:"ぺん"},
-      {kana:"きり"},
-      {kana:"くも"},
-      {kana:"こま"},
-      {kana:"さめ"},
-      {kana:"しお"},
-      {kana:"すな"},
-      {kana:"せき"},
-      {kana:"たき"},
-      {kana:"たに"},
-      {kana:"つの"},
-      {kana:"てつ"},
-      {kana:"とし"},
-      {kana:"なべ"},
-      {kana:"ぬま"},
-      {kana:"ねつ"},
-      {kana:"はし"},
-      {kana:"ひざ"},
-      {kana:"ふで"},
-      {kana:"へび"},
-      {kana:"ほね"},
-      {kana:"まき"},
-      {kana:"みせ"},
-      {kana:"むぎ"},
-      {kana:"もち"},
-      {kana:"やぎ"},
-      {kana:"ゆか"},
-      {kana:"ろば"}
-    ];
+  const TWO_CHAR_NOUNS = [
+    {kana:"あめ"},
+    {kana:"いぬ"},
+    {kana:"うみ"},
+    {kana:"えき"},
+    {kana:"おに"},
+    {kana:"かさ"},
+    {kana:"かに"},
+    {kana:"かわ"},
+    {kana:"くま"},
+    {kana:"くつ"},
+    {kana:"くに"},
+    {kana:"けし"},
+    {kana:"こえ"},
+    {kana:"こめ"},
+    {kana:"さけ"},
+    {kana:"さる"},
+    {kana:"しか"},
+    {kana:"しま"},
+    {kana:"すし"},
+    {kana:"すず"},
+    {kana:"せみ"},
+    {kana:"そら"},
+    {kana:"たい"},
+    {kana:"たこ"},
+    {kana:"たね"},
+    {kana:"つき"},
+    {kana:"つる"},
+    {kana:"てら"},
+    {kana:"とら"},
+    {kana:"なし"},
+    {kana:"なつ"},
+    {kana:"にわ"},
+    {kana:"ぬの"},
+    {kana:"ねこ"},
+    {kana:"のり"},
+    {kana:"はな"},
+    {kana:"はる"},
+    {kana:"ひげ"},
+    {kana:"ふね"},
+    {kana:"へや"},
+    {kana:"ほし"},
+    {kana:"まど"},
+    {kana:"まめ"},
+    {kana:"みず"},
+    {kana:"みみ"},
+    {kana:"むし"},
+    {kana:"むね"},
+    {kana:"めし"},
+    {kana:"もも"},
+    {kana:"やま"},
+    {kana:"ゆめ"},
+    {kana:"よる"},
+    {kana:"りす"},
+    {kana:"るす"},
+    {kana:"れき"},
+    {kana:"わに"},
+    {kana:"わた"},
+    {kana:"がら"},
+    {kana:"ぐみ"},
+    {kana:"げた"},
+    {kana:"ごま"},
+    {kana:"ざる"},
+    {kana:"ぜに"},
+    {kana:"ぞう"},
+    {kana:"だし"},
+    {kana:"でこ"},
+    {kana:"どろ"},
+    {kana:"ばら"},
+    {kana:"びわ"},
+    {kana:"ぶた"},
+    {kana:"ぼう"},
+    {kana:"ぱん"},
+    {kana:"ぺん"},
+    {kana:"きり"},
+    {kana:"くも"},
+    {kana:"こま"},
+    {kana:"さめ"},
+    {kana:"しお"},
+    {kana:"すな"},
+    {kana:"せき"},
+    {kana:"たき"},
+    {kana:"たに"},
+    {kana:"つの"},
+    {kana:"てつ"},
+    {kana:"とし"},
+    {kana:"なべ"},
+    {kana:"ぬま"},
+    {kana:"ねつ"},
+    {kana:"はし"},
+    {kana:"ひざ"},
+    {kana:"ふで"},
+    {kana:"へび"},
+    {kana:"ほね"},
+    {kana:"まき"},
+    {kana:"みせ"},
+    {kana:"むぎ"},
+    {kana:"もち"},
+    {kana:"やぎ"},
+    {kana:"ゆか"},
+    {kana:"ろば"}
+  ];
 
-    const ROW_ORDER = [
-      "row-a",
-      "row-ka",
-      "row-sa",
-      "row-ta",
-      "row-na",
-      "row-ha",
-      "row-ma",
-      "row-ya",
-      "row-ra",
-      "row-wa",
-      "row-daku",
-      "row-pa",
-      "row-youon"
-    ];
+  const ROW_ORDER = [
+    "row-a",
+    "row-ka",
+    "row-sa",
+    "row-ta",
+    "row-na",
+    "row-ha",
+    "row-ma",
+    "row-ya",
+    "row-ra",
+    "row-wa",
+    "row-daku",
+    "row-pa",
+    "row-youon"
+  ];
 
-    const ROW_SETS = {
-      "row-a": ["あ","い","う","え","お"],
-      "row-ka": ["か","き","く","け","こ"],
-      "row-sa": ["さ","し","す","せ","そ"],
-      "row-ta": ["た","ち","つ","て","と"],
-      "row-na": ["な","に","ぬ","ね","の"],
-      "row-ha": ["は","ひ","ふ","へ","ほ"],
-      "row-ma": ["ま","み","む","め","も"],
-      "row-ya": ["や","ゆ","よ"],
-      "row-ra": ["ら","り","る","れ","ろ"],
-      "row-wa": ["わ","を","ん"],
-      "row-daku": ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ"],
-      "row-pa": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
-      "row-youon": [
-        "きゃ","きゅ","きょ",
-        "しゃ","しゅ","しょ",
-        "ちゃ","ちゅ","ちょ",
-        "にゃ","にゅ","にょ",
-        "ひゃ","ひゅ","ひょ",
-        "みゃ","みゅ","みょ",
-        "りゃ","りゅ","りょ",
-        "ぎゃ","ぎゅ","ぎょ",
-        "じゃ","じゅ","じょ",
-        "びゃ","びゅ","びょ",
-        "ぴゃ","ぴゅ","ぴょ"
-      ]
-    };
+  const ROW_SETS = {
+    "row-a": ["あ","い","う","え","お"],
+    "row-ka": ["か","き","く","け","こ"],
+    "row-sa": ["さ","し","す","せ","そ"],
+    "row-ta": ["た","ち","つ","て","と"],
+    "row-na": ["な","に","ぬ","ね","の"],
+    "row-ha": ["は","ひ","ふ","へ","ほ"],
+    "row-ma": ["ま","み","む","め","も"],
+    "row-ya": ["や","ゆ","よ"],
+    "row-ra": ["ら","り","る","れ","ろ"],
+    "row-wa": ["わ","を","ん"],
+    "row-daku": ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ"],
+    "row-pa": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
+    "row-youon": [
+      "きゃ","きゅ","きょ",
+      "しゃ","しゅ","しょ",
+      "ちゃ","ちゅ","ちょ",
+      "にゃ","にゅ","にょ",
+      "ひゃ","ひゅ","ひょ",
+      "みゃ","みゅ","みょ",
+      "りゃ","りゅ","りょ",
+      "ぎゃ","ぎゅ","ぎょ",
+      "じゃ","じゅ","じょ",
+      "びゃ","びゅ","びょ",
+      "ぴゃ","ぴゅ","ぴょ"
+    ]
+  };
 
-    const BASIC = {
-      "あ":"A","い":"I","う":"U","え":"E","お":"O",
-      "か":"KA","き":"KI","く":"KU","け":"KE","こ":"KO",
-      "さ":"SA","し":"SI","す":"SU","せ":"SE","そ":"SO",
-      "た":"TA","ち":"TI","つ":"TU","て":"TE","と":"TO",
-      "な":"NA","に":"NI","ぬ":"NU","ね":"NE","の":"NO",
-      "は":"HA","ひ":"HI","ふ":"HU","へ":"HE","ほ":"HO",
-      "ま":"MA","み":"MI","む":"MU","め":"ME","も":"MO",
-      "や":"YA","ゆ":"YU","よ":"YO",
-      "ら":"RA","り":"RI","る":"RU","れ":"RE","ろ":"RO",
-      "わ":"WA","を":"WO",
-      "が":"GA","ぎ":"GI","ぐ":"GU","げ":"GE","ご":"GO",
-      "ざ":"ZA","じ":"ZI","ず":"ZU","ぜ":"ZE","ぞ":"ZO",
-      "だ":"DA","ぢ":"DI","づ":"DU","で":"DE","ど":"DO",
-      "ば":"BA","び":"BI","ぶ":"BU","べ":"BE","ぼ":"BO",
-      "ぱ":"PA","ぴ":"PI","ぷ":"PU","ぺ":"PE","ぽ":"PO",
-      "ぁ":"A","ぃ":"I","ぅ":"U","ぇ":"E","ぉ":"O",
-      "ゃ":"YA","ゅ":"YU","ょ":"YO",
-      "ゔ":"VU",
-      "ー":"-"
-    };
+  const BASIC = {
+    "あ":"A","い":"I","う":"U","え":"E","お":"O",
+    "か":"KA","き":"KI","く":"KU","け":"KE","こ":"KO",
+    "さ":"SA","し":"SI","す":"SU","せ":"SE","そ":"SO",
+    "た":"TA","ち":"TI","つ":"TU","て":"TE","と":"TO",
+    "な":"NA","に":"NI","ぬ":"NU","ね":"NE","の":"NO",
+    "は":"HA","ひ":"HI","ふ":"HU","へ":"HE","ほ":"HO",
+    "ま":"MA","み":"MI","む":"MU","め":"ME","も":"MO",
+    "や":"YA","ゆ":"YU","よ":"YO",
+    "ら":"RA","り":"RI","る":"RU","れ":"RE","ろ":"RO",
+    "わ":"WA","を":"WO",
+    "が":"GA","ぎ":"GI","ぐ":"GU","げ":"GE","ご":"GO",
+    "ざ":"ZA","じ":"ZI","ず":"ZU","ぜ":"ZE","ぞ":"ZO",
+    "だ":"DA","ぢ":"DI","づ":"DU","で":"DE","ど":"DO",
+    "ば":"BA","び":"BI","ぶ":"BU","べ":"BE","ぼ":"BO",
+    "ぱ":"PA","ぴ":"PI","ぷ":"PU","ぺ":"PE","ぽ":"PO",
+    "ぁ":"A","ぃ":"I","ぅ":"U","ぇ":"E","ぉ":"O",
+    "ゃ":"YA","ゅ":"YU","ょ":"YO",
+    "ゔ":"VU",
+    "ー":"-"
+  };
 
-    const DIGRAPHS = {
-      "きゃ":"KYA","きゅ":"KYU","きょ":"KYO",
-      "しゃ":"SYA","しゅ":"SYU","しょ":"SYO",
-      "ちゃ":"TYA","ちゅ":"TYU","ちょ":"TYO",
-      "にゃ":"NYA","にゅ":"NYU","にょ":"NYO",
-      "ひゃ":"HYA","ひゅ":"HYU","ひょ":"HYO",
-      "みゃ":"MYA","みゅ":"MYU","みょ":"MYO",
-      "りゃ":"RYA","りゅ":"RYU","りょ":"RYO",
-      "ぎゃ":"GYA","ぎゅ":"GYU","ぎょ":"GYO",
-      "じゃ":"ZYA","じゅ":"ZYU","じょ":"ZYO",
-      "ぢゃ":"DYA","ぢゅ":"DYU","ぢょ":"DYO",
-      "びゃ":"BYA","びゅ":"BYU","びょ":"BYO",
-      "ぴゃ":"PYA","ぴゅ":"PYU","ぴょ":"PYO"
-    };
+  const DIGRAPHS = {
+    "きゃ":"KYA","きゅ":"KYU","きょ":"KYO",
+    "しゃ":"SYA","しゅ":"SYU","しょ":"SYO",
+    "ちゃ":"TYA","ちゅ":"TYU","ちょ":"TYO",
+    "にゃ":"NYA","にゅ":"NYU","にょ":"NYO",
+    "ひゃ":"HYA","ひゅ":"HYU","ひょ":"HYO",
+    "みゃ":"MYA","みゅ":"MYU","みょ":"MYO",
+    "りゃ":"RYA","りゅ":"RYU","りょ":"RYO",
+    "ぎゃ":"GYA","ぎゅ":"GYU","ぎょ":"GYO",
+    "じゃ":"ZYA","じゅ":"ZYU","じょ":"ZYO",
+    "ぢゃ":"DYA","ぢゅ":"DYU","ぢょ":"DYO",
+    "びゃ":"BYA","びゅ":"BYU","びょ":"BYO",
+    "ぴゃ":"PYA","ぴゅ":"PYU","ぴょ":"PYO"
+  };
 
-    function kanaTokenize(str){
-      const arr = [];
-      for(let i=0;i<str.length;i++){
-        const two = str.slice(i,i+2);
-        if(DIGRAPHS[two]){
-          arr.push(two);
-          i++;
-        }else{
-          arr.push(str[i]);
-        }
+  function kanaTokenize(str){
+    const arr = [];
+    for(let i=0;i<str.length;i++){
+      const two = str.slice(i,i+2);
+      if(DIGRAPHS[two]){
+        arr.push(two);
+        i++;
+      }else{
+        arr.push(str[i]);
       }
-      return arr;
     }
+    return arr;
+  }
 
-    function getRomanForToken(token){
-      if(DIGRAPHS[token]) return DIGRAPHS[token];
-      if(BASIC[token]) return BASIC[token];
-      return token.toUpperCase();
-    }
+  function getRomanForToken(token){
+    if(DIGRAPHS[token]) return DIGRAPHS[token];
+    if(BASIC[token]) return BASIC[token];
+    return token.toUpperCase();
+  }
 
-    function getInitialConsonant(roman){
-      if(!roman) return "";
-      const m = roman.match(/^[^AEIOU\-]+/);
-      return m ? m[0][0] : "";
-    }
+  function getInitialConsonant(roman){
+    if(!roman) return "";
+    const m = roman.match(/^[^AEIOU\-]+/);
+    return m ? m[0][0] : "";
+  }
 
-    function kanaToRomajiStrict(kana){
-      const tokens = kanaTokenize(kana);
-      let out = "";
+  function kanaToRomajiStrict(kana){
+    const tokens = kanaTokenize(kana);
+    let out = "";
 
-      for(let i=0;i<tokens.length;i++){
-        const t = tokens[i];
+    for(let i=0;i<tokens.length;i++){
+      const t = tokens[i];
 
-        if(t === "っ"){
-          const next = tokens[i+1];
+      if(t === "っ"){
+        const next = tokens[i+1];
+        const nextRoman = getRomanForToken(next);
+        const c = getInitialConsonant(nextRoman);
+        if(c) out += c;
+        continue;
+      }
+
+      if(t === "ん"){
+        const next = tokens[i+1];
+        if(!next){
+          out += "NN";
+        }else{
           const nextRoman = getRomanForToken(next);
-          const c = getInitialConsonant(nextRoman);
-          if(c) out += c;
-          continue;
-        }
-
-        if(t === "ん"){
-          const next = tokens[i+1];
-          if(!next){
+          if(/^[AIUEOY]/.test(nextRoman)){
             out += "NN";
           }else{
-            const nextRoman = getRomanForToken(next);
-            if(/^[AIUEOY]/.test(nextRoman)){
-              out += "NN";
-            }else{
-              out += "N";
-            }
+            out += "N";
           }
-          continue;
         }
-
-        out += getRomanForToken(t);
+        continue;
       }
 
-      return out;
+      out += getRomanForToken(t);
     }
 
-    function shuffle(array){
-      const a = [...array];
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]] = [a[j],a[i]];
-      }
-      return a;
-    }
+    return out;
+  }
 
-    function isRowChainMode(mode){
-      return ROW_ORDER.includes(mode);
+  function shuffle(array){
+    const a = [...array];
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
     }
+    return a;
+  }
 
-    function getModeLabel(mode){
-      const map = {
-        "10":"10問",
-        "20":"20問",
-        "30":"30問",
-        "twochar-noun":"二文字名詞100",
-        "row-a":"あ行",
-        "row-ka":"か行",
-        "row-sa":"さ行",
-        "row-ta":"た行",
-        "row-na":"な行",
-        "row-ha":"は行",
-        "row-ma":"ま行",
-        "row-ya":"や行",
-        "row-ra":"ら行",
-        "row-wa":"わ行",
-        "row-daku":"濁音",
-        "row-pa":"ぱぴぷぺぽ",
-        "row-youon":"しゃしゅしょ等"
-      };
-      return map[mode] || mode;
-    }
+  function isRowChainMode(mode){
+    return ROW_ORDER.includes(mode);
+  }
 
-    const state = {
-      mode:"10",
-      activeMode:"10",
-      activeModeLabel:"10問",
-      isRunning:false,
-      isFinished:false,
-      queue:[],
-      current:null,
-      currentIndex:0,
-      typed:"",
-      misses:0,
-      totalKeys:0,
-      correctKeys:0,
-      startTime:0,
-      endTime:0,
-      timerId:null,
-      repeatTimer:null,
-      soundStep:0
+  function getModeLabel(mode){
+    const map = {
+      "10":"10問",
+      "20":"20問",
+      "30":"30問",
+      "twochar-noun":"二文字名詞100",
+      "row-a":"あ行",
+      "row-ka":"か行",
+      "row-sa":"さ行",
+      "row-ta":"た行",
+      "row-na":"な行",
+      "row-ha":"は行",
+      "row-ma":"ま行",
+      "row-ya":"や行",
+      "row-ra":"ら行",
+      "row-wa":"わ行",
+      "row-daku":"濁音",
+      "row-pa":"ぱぴぷぺぽ",
+      "row-youon":"しゃしゅしょ等"
     };
+    return map[mode] || mode;
+  }
 
-    const el = {
-      modeButtons:document.getElementById("modeButtons"),
-      modeLabel:document.getElementById("modeLabel"),
-      runLabel:document.getElementById("runLabel"),
-      promptView:document.getElementById("promptView"),
-      reading:document.getElementById("reading"),
-      romajiView:document.getElementById("romajiView"),
-      message:document.getElementById("message"),
-      progressValue:document.getElementById("progressValue"),
-      missValue:document.getElementById("missValue"),
-      accValue:document.getElementById("accValue"),
-      timeValue:document.getElementById("timeValue"),
-      resultPanel:document.getElementById("resultPanel"),
-      resultClear:document.getElementById("resultClear"),
-      resultAcc:document.getElementById("resultAcc"),
-      resultTime:document.getElementById("resultTime"),
-      keys:[...document.querySelectorAll(".key")]
-    };
+  const state = {
+    mode:"10",
+    activeMode:"10",
+    activeModeLabel:"10問",
+    isRunning:false,
+    isFinished:false,
+    queue:[],
+    current:null,
+    currentIndex:0,
+    typed:"",
+    misses:0,
+    totalKeys:0,
+    correctKeys:0,
+    startTime:0,
+    endTime:0,
+    timerId:null,
+    repeatTimer:null,
+    soundStep:0
+  };
 
-    let audioCtx = null;
+  const el = {
+    modeButtons:document.getElementById("modeButtons"),
+    modeLabel:document.getElementById("modeLabel"),
+    runLabel:document.getElementById("runLabel"),
+    promptView:document.getElementById("promptView"),
+    reading:document.getElementById("reading"),
+    romajiView:document.getElementById("romajiView"),
+    message:document.getElementById("message"),
+    progressValue:document.getElementById("progressValue"),
+    missValue:document.getElementById("missValue"),
+    accValue:document.getElementById("accValue"),
+    timeValue:document.getElementById("timeValue"),
+    resultPanel:document.getElementById("resultPanel"),
+    resultClear:document.getElementById("resultClear"),
+    resultAcc:document.getElementById("resultAcc"),
+    resultTime:document.getElementById("resultTime"),
+    keys:[...document.querySelectorAll(".key")]
+  };
 
-    function ensureAudio(){
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-          latencyHint:"interactive"
+  let audioCtx = null;
+  let masterGain = null;
+
+  function ensureAudio(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+        latencyHint:"interactive"
+      });
+
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.9;
+      masterGain.connect(audioCtx.destination);
+    }
+
+    if(audioCtx.state === "suspended"){
+      audioCtx.resume();
+    }
+  }
+
+  function warmupAudio(){
+    if(!audioCtx || !masterGain) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(880, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.03, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+    osc.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.025);
+  }
+
+  function playClickSound(freq = 1400, volume = 0.08){
+    if(!audioCtx || !masterGain) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(freq, now);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.82, now + 0.018);
+
+    filter.type = "highpass";
+    filter.frequency.setValueAtTime(700, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(volume, now + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.025);
+  }
+
+  function playTypeSound(){
+    if(!audioCtx || !masterGain) return;
+    const freqs = [1500, 1380, 1600, 1450];
+    const idx = state.soundStep % freqs.length;
+    state.soundStep++;
+    playClickSound(freqs[idx], 0.085);
+  }
+
+  function playMissSound(){
+    if(!audioCtx || !masterGain) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.exponentialRampToValueAtTime(180, now + 0.06);
+
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(1200, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.05, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+
+    osc.start(now);
+    osc.stop(now + 0.08);
+  }
+
+  function playClearSound(){
+    if(!audioCtx || !masterGain) return;
+
+    const now = audioCtx.currentTime;
+
+    [
+      {f:1040, t:now, v:0.06},
+      {f:1320, t:now + 0.035, v:0.055},
+      {f:1760, t:now + 0.07, v:0.05}
+    ].forEach(({f, t, v})=>{
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "square";
+      osc.frequency.setValueAtTime(f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(v, t + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + 0.09);
+    });
+  }
+
+  function clearRepeatTimer(){
+    if(state.repeatTimer){
+      clearTimeout(state.repeatTimer);
+      state.repeatTimer = null;
+    }
+  }
+
+  function updateModeButtons(mode){
+    [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
+      btn.classList.toggle("active", btn.dataset.mode === mode);
+    });
+  }
+
+  function syncActiveMode(mode){
+    state.activeMode = mode;
+    state.activeModeLabel = getModeLabel(mode);
+    el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
+    updateModeButtons(mode);
+  }
+
+  function setMode(mode, startImmediately = true){
+    state.mode = mode;
+    syncActiveMode(mode);
+
+    if(startImmediately){
+      stopGame(true);
+      beginGame();
+    }
+  }
+
+  function buildQueue(){
+    if(isRowChainMode(state.mode)){
+      const startIndex = ROW_ORDER.indexOf(state.mode);
+      const items = [];
+      for(let i=startIndex;i<ROW_ORDER.length;i++){
+        const mode = ROW_ORDER[i];
+        const list = ROW_SETS[mode] || [];
+        list.forEach(kana=>{
+          items.push({kana, groupMode:mode});
         });
       }
-      if(audioCtx.state === "suspended"){
-        audioCtx.resume();
-      }
+      return items;
     }
 
-    function warmupAudio(){
-      if(!audioCtx) return;
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "square";
-      osc.frequency.value = 440;
-      gain.gain.setValueAtTime(0.00001, now);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.01);
+    if(state.mode === "twochar-noun"){
+      return shuffle(TWO_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
     }
 
-    function playSimpleTone({
-      freq = 880,
-      type = "square",
-      gainValue = 0.03,
-      duration = 0.03,
-      attack = 0.001,
-      release = 0.03
-    } = {}){
-      if(!audioCtx) return;
-
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(gainValue, now + attack);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(duration, attack + 0.002));
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + Math.max(duration + release, 0.04));
+    const count = Number(state.mode);
+    const pool = [];
+    while(pool.length < count){
+      pool.push(...shuffle(WORDS.map(w => ({kana:w.kana, groupMode:state.mode}))));
     }
+    return pool.slice(0, count);
+  }
 
-    function playTypeSound(){
-      if(!audioCtx) return;
-      const freqs = [980, 1040, 920];
-      const idx = state.soundStep % freqs.length;
-      state.soundStep++;
-      playSimpleTone({
-        freq:freqs[idx],
-        type:"square",
-        gainValue:0.028,
-        duration:0.024,
-        attack:0.001,
-        release:0.02
-      });
-    }
+  function beginGame(){
+    clearRepeatTimer();
 
-    function playMissSound(){
-      if(!audioCtx) return;
-      playSimpleTone({
-        freq:220,
-        type:"sawtooth",
-        gainValue:0.02,
-        duration:0.05,
-        attack:0.001,
-        release:0.04
-      });
-    }
+    state.queue = buildQueue();
+    state.currentIndex = 0;
+    state.typed = "";
+    state.misses = 0;
+    state.totalKeys = 0;
+    state.correctKeys = 0;
+    state.soundStep = 0;
+    state.isRunning = true;
+    state.isFinished = false;
+    state.startTime = performance.now();
+    state.endTime = 0;
 
-    function playClearSound(){
-      if(!audioCtx) return;
-      const now = audioCtx.currentTime;
+    if(state.timerId) cancelAnimationFrame(state.timerId);
+    tickTimer();
 
-      const osc1 = audioCtx.createOscillator();
-      const gain1 = audioCtx.createGain();
-      osc1.type = "square";
-      osc1.frequency.setValueAtTime(880, now);
-      gain1.gain.setValueAtTime(0.0001, now);
-      gain1.gain.linearRampToValueAtTime(0.022, now + 0.001);
-      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
-      osc1.connect(gain1);
-      gain1.connect(audioCtx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.07);
+    el.runLabel.textContent = "プレイ中";
+    el.resultPanel.classList.remove("show");
+    nextWord(true);
+    updateStats();
+  }
 
-      const osc2 = audioCtx.createOscillator();
-      const gain2 = audioCtx.createGain();
-      osc2.type = "square";
-      osc2.frequency.setValueAtTime(1320, now + 0.02);
-      gain2.gain.setValueAtTime(0.0001, now + 0.02);
-      gain2.gain.linearRampToValueAtTime(0.018, now + 0.021);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
-      osc2.connect(gain2);
-      gain2.connect(audioCtx.destination);
-      osc2.start(now + 0.02);
-      osc2.stop(now + 0.09);
-    }
+  function stopGame(resetTime = false){
+    clearRepeatTimer();
+    state.isRunning = false;
 
-    function clearRepeatTimer(){
-      if(state.repeatTimer){
-        clearTimeout(state.repeatTimer);
-        state.repeatTimer = null;
-      }
-    }
-
-    function updateModeButtons(mode){
-      [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
-        btn.classList.toggle("active", btn.dataset.mode === mode);
-      });
-    }
-
-    function syncActiveMode(mode){
-      state.activeMode = mode;
-      state.activeModeLabel = getModeLabel(mode);
-      el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
-      updateModeButtons(mode);
-    }
-
-    function setMode(mode, startImmediately = true){
-      state.mode = mode;
-      syncActiveMode(mode);
-
-      if(startImmediately){
-        stopGame(true);
-        beginGame();
-      }
-    }
-
-    function buildQueue(){
-      if(isRowChainMode(state.mode)){
-        const startIndex = ROW_ORDER.indexOf(state.mode);
-        const items = [];
-        for(let i=startIndex;i<ROW_ORDER.length;i++){
-          const mode = ROW_ORDER[i];
-          const list = ROW_SETS[mode] || [];
-          list.forEach(kana=>{
-            items.push({kana, groupMode:mode});
-          });
-        }
-        return items;
-      }
-
-      if(state.mode === "twochar-noun"){
-        return shuffle(TWO_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
-      }
-
-      const count = Number(state.mode);
-      const pool = [];
-      while(pool.length < count){
-        pool.push(...shuffle(WORDS.map(w => ({kana:w.kana, groupMode:state.mode}))));
-      }
-      return pool.slice(0, count);
-    }
-
-    function beginGame(){
-      clearRepeatTimer();
-
-      state.queue = buildQueue();
-      state.currentIndex = 0;
-      state.typed = "";
-      state.misses = 0;
-      state.totalKeys = 0;
-      state.correctKeys = 0;
-      state.soundStep = 0;
-      state.isRunning = true;
-      state.isFinished = false;
-      state.startTime = performance.now();
+    if(resetTime){
       state.endTime = 0;
-
-      if(state.timerId) cancelAnimationFrame(state.timerId);
-      tickTimer();
-
-      el.runLabel.textContent = "プレイ中";
-      el.resultPanel.classList.remove("show");
-      nextWord(true);
-      updateStats();
-    }
-
-    function stopGame(resetTime = false){
-      clearRepeatTimer();
-      state.isRunning = false;
-
-      if(resetTime){
-        state.endTime = 0;
-      }else{
-        state.endTime = performance.now();
-      }
-
-      if(state.timerId) cancelAnimationFrame(state.timerId);
-    }
-
-    function finishGame(){
-      clearRepeatTimer();
-      state.isRunning = false;
-      state.isFinished = true;
+    }else{
       state.endTime = performance.now();
-
-      if(state.timerId) cancelAnimationFrame(state.timerId);
-      el.runLabel.textContent = "終了";
-      setMessage("おつかれさまでした。モードを選ぶと再スタート", "ok");
-
-      const cleared = state.currentIndex;
-      const acc = calcAccuracy();
-      const time = elapsedSec();
-
-      el.resultClear.textContent = String(cleared);
-      el.resultAcc.textContent = `${acc}%`;
-      el.resultTime.textContent = `${time.toFixed(1)}s`;
-      el.resultPanel.classList.add("show");
-      updateStats();
-      updateKeyboardGuide("");
     }
 
-    function tickTimer(){
-      if(!state.isRunning) return;
-      el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
-      state.timerId = requestAnimationFrame(tickTimer);
+    if(state.timerId) cancelAnimationFrame(state.timerId);
+  }
+
+  function finishGame(){
+    clearRepeatTimer();
+    state.isRunning = false;
+    state.isFinished = true;
+    state.endTime = performance.now();
+
+    if(state.timerId) cancelAnimationFrame(state.timerId);
+    el.runLabel.textContent = "終了";
+    setMessage("おつかれさまでした。モードを選ぶと再スタート", "ok");
+
+    const cleared = state.currentIndex;
+    const acc = calcAccuracy();
+    const time = elapsedSec();
+
+    el.resultClear.textContent = String(cleared);
+    el.resultAcc.textContent = `${acc}%`;
+    el.resultTime.textContent = `${time.toFixed(1)}s`;
+    el.resultPanel.classList.add("show");
+    updateStats();
+    updateKeyboardGuide("");
+  }
+
+  function tickTimer(){
+    if(!state.isRunning) return;
+    el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
+    state.timerId = requestAnimationFrame(tickTimer);
+  }
+
+  function elapsedSec(){
+    if(!state.startTime) return 0;
+    const end = state.isRunning ? performance.now() : (state.endTime || performance.now());
+    return (end - state.startTime) / 1000;
+  }
+
+  function nextWord(initial = false){
+    clearRepeatTimer();
+
+    if(state.currentIndex >= state.queue.length){
+      finishGame();
+      return;
     }
 
-    function elapsedSec(){
-      if(!state.startTime) return 0;
-      const end = state.isRunning ? performance.now() : (state.endTime || performance.now());
-      return (end - state.startTime) / 1000;
-    }
+    state.current = state.queue[state.currentIndex];
+    state.current.roman = kanaToRomajiStrict(state.current.kana);
+    state.typed = "";
 
-    function nextWord(initial = false){
-      clearRepeatTimer();
+    const currentGroup = state.current.groupMode || state.mode;
+    const previousGroup = state.currentIndex > 0 ? state.queue[state.currentIndex - 1].groupMode : null;
+    syncActiveMode(currentGroup);
 
-      if(state.currentIndex >= state.queue.length){
-        finishGame();
-        return;
-      }
+    el.promptView.textContent = state.current.kana;
+    el.reading.textContent = state.current.roman;
+    renderRomaji();
+    updateStats();
+    updateKeyboardGuide(state.current.roman[0] || "");
 
-      state.current = state.queue[state.currentIndex];
-      state.current.roman = kanaToRomajiStrict(state.current.kana);
-      state.typed = "";
-
-      const currentGroup = state.current.groupMode || state.mode;
-      const previousGroup = state.currentIndex > 0 ? state.queue[state.currentIndex - 1].groupMode : null;
-      syncActiveMode(currentGroup);
-
-      el.promptView.textContent = state.current.kana;
-      el.reading.textContent = state.current.roman;
-      renderRomaji();
-      updateStats();
-      updateKeyboardGuide(state.current.roman[0] || "");
-
-      if(isRowChainMode(state.mode)){
-        const changedGroup = initial || previousGroup !== currentGroup;
-        if(changedGroup && currentGroup !== state.mode){
-          setMessage(`${getModeLabel(currentGroup)}へ移行`, "ok");
-        }else{
-          setMessage("入力開始", "");
-        }
+    if(isRowChainMode(state.mode)){
+      const changedGroup = initial || previousGroup !== currentGroup;
+      if(changedGroup && currentGroup !== state.mode){
+        setMessage(`${getModeLabel(currentGroup)}へ移行`, "ok");
       }else{
         setMessage("入力開始", "");
       }
+    }else{
+      setMessage("入力開始", "");
     }
+  }
 
-    function renderRomaji(initialText = null){
-      const target = initialText !== null ? initialText : (state.current?.roman || "");
-      const done = escapeHtml(target.slice(0, state.typed.length));
-      const rest = escapeHtml(target.slice(state.typed.length));
+  function renderRomaji(initialText = null){
+    const target = initialText !== null ? initialText : (state.current?.roman || "");
+    const done = escapeHtml(target.slice(0, state.typed.length));
+    const rest = escapeHtml(target.slice(state.typed.length));
 
-      el.romajiView.innerHTML = `
-        <span class="done">${done}</span><span class="cursor">|</span><span class="rest">${rest}</span>
-      `;
-      updateKeyboardGuide(target[state.typed.length] || "");
-    }
+    el.romajiView.innerHTML = `
+      <span class="done">${done}</span><span class="cursor">|</span><span class="rest">${rest}</span>
+    `;
+    updateKeyboardGuide(target[state.typed.length] || "");
+  }
 
-    function escapeHtml(str){
-      return str
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;");
-    }
+  function escapeHtml(str){
+    return str
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
 
-    function setMessage(text, type=""){
-      el.message.textContent = text;
-      el.message.className = "message" + (type ? ` ${type}` : "");
-    }
+  function setMessage(text, type=""){
+    el.message.textContent = text;
+    el.message.className = "message" + (type ? ` ${type}` : "");
+  }
 
-    function calcAccuracy(){
-      if(state.totalKeys === 0) return 100;
-      return Math.max(0, Math.round((state.correctKeys / state.totalKeys) * 100));
-    }
+  function calcAccuracy(){
+    if(state.totalKeys === 0) return 100;
+    return Math.max(0, Math.round((state.correctKeys / state.totalKeys) * 100));
+  }
 
-    function getProgressText(){
-      return `${state.currentIndex} / ${state.queue.length || 0}`;
-    }
+  function getProgressText(){
+    return `${state.currentIndex} / ${state.queue.length || 0}`;
+  }
 
-    function updateStats(){
-      el.missValue.textContent = String(state.misses);
-      el.accValue.textContent = `${calcAccuracy()}%`;
-      el.progressValue.textContent = getProgressText();
+  function updateStats(){
+    el.missValue.textContent = String(state.misses);
+    el.accValue.textContent = `${calcAccuracy()}%`;
+    el.progressValue.textContent = getProgressText();
 
-      if(!state.isRunning){
-        if(state.isFinished || state.endTime){
-          el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
-        }else{
-          el.timeValue.textContent = "0.0s";
-        }
-      }
-    }
-
-    function advanceWord(){
-      clearRepeatTimer();
-      state.currentIndex++;
-      if(state.currentIndex >= state.queue.length){
-        finishGame();
+    if(!state.isRunning){
+      if(state.isFinished || state.endTime){
+        el.timeValue.textContent = `${elapsedSec().toFixed(1)}s`;
       }else{
-        nextWord();
+        el.timeValue.textContent = "0.0s";
       }
-      updateStats();
     }
+  }
 
-    function onCorrectComplete(){
-      clearRepeatTimer();
-      playClearSound();
-      setMessage("正解", "ok");
-      updateKeyboardGuide("");
-
-      state.repeatTimer = setTimeout(()=>{
-        if(state.isRunning){
-          advanceWord();
-        }
-      }, 260);
+  function advanceWord(){
+    clearRepeatTimer();
+    state.currentIndex++;
+    if(state.currentIndex >= state.queue.length){
+      finishGame();
+    }else{
+      nextWord();
     }
+    updateStats();
+  }
 
-    function keyNameToDataKey(ch){
-      if(!ch) return "";
-      if(ch === "Enter") return "Enter";
-      if(ch === " ") return "Space";
-      if(ch === "-") return "Minus";
-      if(/[A-Z]/.test(ch)) return `Key${ch}`;
-      if(/[0-9]/.test(ch)) return `Digit${ch}`;
-      return "";
-    }
+  function onCorrectComplete(){
+    clearRepeatTimer();
+    playClearSound();
+    setMessage("正解", "ok");
+    updateKeyboardGuide("");
 
-    function updateKeyboardGuide(ch){
-      const targetDataKey = keyNameToDataKey(ch);
-      el.keys.forEach(key=>{
-        key.classList.toggle("active", key.dataset.key === targetDataKey);
-      });
-    }
+    state.repeatTimer = setTimeout(()=>{
+      if(state.isRunning){
+        advanceWord();
+      }
+    }, 260);
+  }
 
-    function isAllowedInputKey(key){
-      return /^[a-zA-Z\-]$/.test(key);
-    }
+  function keyNameToDataKey(ch){
+    if(!ch) return "";
+    if(ch === "Enter") return "Enter";
+    if(ch === " ") return "Space";
+    if(ch === "-") return "Minus";
+    if(/[A-Z]/.test(ch)) return `Key${ch}`;
+    if(/[0-9]/.test(ch)) return `Digit${ch}`;
+    return "";
+  }
 
-    function normalizeInputKey(key){
-      if(key === "-") return "-";
-      return key.toUpperCase();
-    }
+  function updateKeyboardGuide(ch){
+    const targetDataKey = keyNameToDataKey(ch);
+    el.keys.forEach(key=>{
+      key.classList.toggle("active", key.dataset.key === targetDataKey);
+    });
+  }
 
-    function handleTypingKey(key){
-      if(!state.current) return;
-      const target = state.current.roman;
+  function isAllowedInputKey(key){
+    return /^[a-zA-Z\-]$/.test(key);
+  }
 
-      if(!isAllowedInputKey(key)) return;
+  function normalizeInputKey(key){
+    if(key === "-") return "-";
+    return key.toUpperCase();
+  }
 
-      ensureAudio();
+  function handleTypingKey(key){
+    if(!state.current) return;
+    const target = state.current.roman;
 
-      const inputKey = normalizeInputKey(key);
-      state.totalKeys++;
-      const expected = target[state.typed.length];
+    if(!isAllowedInputKey(key)) return;
 
-      if(inputKey === expected){
-        state.correctKeys++;
-        state.typed += inputKey;
-        playTypeSound();
-        renderRomaji();
+    const inputKey = normalizeInputKey(key);
+    state.totalKeys++;
+    const expected = target[state.typed.length];
 
-        if(state.typed === target){
-          onCorrectComplete();
-        }else{
-          setMessage("入力中", "");
-        }
+    if(inputKey === expected){
+      state.correctKeys++;
+      state.typed += inputKey;
+      playTypeSound();
+      renderRomaji();
+
+      if(state.typed === target){
+        onCorrectComplete();
       }else{
-        state.misses++;
-        playMissSound();
-        setMessage("ミス", "miss");
-        updateKeyboardGuide(expected || "");
+        setMessage("入力中", "");
       }
-
-      updateStats();
+    }else{
+      state.misses++;
+      playMissSound();
+      setMessage("ミス", "miss");
+      updateKeyboardGuide(expected || "");
     }
 
-    document.addEventListener("keydown",(e)=>{
-      const key = e.key;
+    updateStats();
+  }
 
-      if(key === " " || key === "Spacebar"){
-        if(state.isRunning){
-          e.preventDefault();
-          stopGame(false);
-          el.runLabel.textContent = "中断";
-          setMessage("停止しました。モードを選ぶと再スタート", "");
-          updateKeyboardGuide("");
-          updateStats();
-        }
-        return;
-      }
+  document.addEventListener("pointerdown", ()=>{
+    ensureAudio();
+    warmupAudio();
+  }, { once:true });
 
-      if(!state.isRunning) return;
+  document.addEventListener("touchstart", ()=>{
+    ensureAudio();
+    warmupAudio();
+  }, { once:true, passive:true });
 
-      if(isAllowedInputKey(key)){
+  document.addEventListener("keydown",(e)=>{
+    const key = e.key;
+
+    if(key === " " || key === "Spacebar"){
+      if(state.isRunning){
         e.preventDefault();
-        handleTypingKey(key);
+        stopGame(false);
+        el.runLabel.textContent = "中断";
+        setMessage("停止しました。モードを選ぶと再スタート", "");
+        updateKeyboardGuide("");
+        updateStats();
       }
-    });
+      return;
+    }
 
-    el.modeButtons.addEventListener("click",(e)=>{
-      const btn = e.target.closest(".mode-btn");
-      if(!btn) return;
+    if(!state.isRunning) return;
+
+    if(isAllowedInputKey(key)){
+      e.preventDefault();
       ensureAudio();
-      warmupAudio();
-      setMode(btn.dataset.mode, true);
-    });
+      handleTypingKey(key);
+    }
+  });
 
-    setMode("10", true);
-  </script>
+  el.modeButtons.addEventListener("click",(e)=>{
+    const btn = e.target.closest(".mode-btn");
+    if(!btn) return;
+    ensureAudio();
+    warmupAudio();
+    setMode(btn.dataset.mode, true);
+  });
+
+  ensureAudio();
+  warmupAudio();
+  setMode("10", true);
+</script>
 </body>
 </html>
