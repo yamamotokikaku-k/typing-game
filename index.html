@@ -133,6 +133,37 @@
       box-shadow:0 8px 18px rgba(255,126,182,.28);
     }
 
+    .sound-control{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.74);
+      box-shadow:0 3px 10px rgba(74,95,180,.10);
+    }
+
+    .sound-label{
+      font-size:13px;
+      font-weight:900;
+      color:#23306b;
+      letter-spacing:.04em;
+      white-space:nowrap;
+    }
+
+    .sound-select{
+      appearance:none;
+      -webkit-appearance:none;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:#23306b;
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      padding-right:4px;
+    }
+
     .main{
       display:grid;
       place-items:center;
@@ -481,6 +512,10 @@
       .help{
         line-height:1.45;
       }
+      .sound-control{
+        width:100%;
+        justify-content:center;
+      }
     }
   </style>
 </head>
@@ -510,6 +545,17 @@
         <button class="mode-btn" data-mode="row-daku">濁音</button>
         <button class="mode-btn" data-mode="row-pa">ぱぴぷぺぽ</button>
         <button class="mode-btn" data-mode="row-youon">しゃしゅしょ等</button>
+
+        <div class="sound-control">
+          <span class="sound-label">効果音</span>
+          <select class="sound-select" id="soundSelect" aria-label="効果音を選ぶ">
+            <option value="dry">1 ドライ</option>
+            <option value="pop">2 ポップ</option>
+            <option value="soft">3 ソフト</option>
+            <option value="retro">4 レトロ</option>
+            <option value="bright">5 ブライト</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -518,6 +564,7 @@
         <div class="status-line">
           <div class="badge" id="modeLabel">モード：10問</div>
           <div class="badge" id="runLabel">プレイ中</div>
+          <div class="badge" id="soundLabel">効果音：ドライ</div>
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
@@ -893,6 +940,84 @@
     "ぴゃ":"PYA","ぴゅ":"PYU","ぴょ":"PYO"
   };
 
+  const SOUND_PRESETS = {
+    dry: {
+      label:"ドライ",
+      typeVariants:[
+        {kind:"dry", pitch:1.00, brightness:1.00, volume:0.36},
+        {kind:"dry", pitch:0.96, brightness:0.92, volume:0.34},
+        {kind:"dry", pitch:1.04, brightness:1.05, volume:0.35},
+        {kind:"dry", pitch:0.99, brightness:0.97, volume:0.34}
+      ],
+      miss:{kind:"buzz", volume:0.30},
+      clear:[
+        {kind:"tone", freq:1320, duration:0.050, volume:0.16, delay:0.000},
+        {kind:"tone", freq:1660, duration:0.050, volume:0.13, delay:0.028},
+        {kind:"tone", freq:2090, duration:0.060, volume:0.11, delay:0.054}
+      ]
+    },
+    pop: {
+      label:"ポップ",
+      typeVariants:[
+        {kind:"pop", pitch:1.00, body:1.00, volume:0.34},
+        {kind:"pop", pitch:1.08, body:0.96, volume:0.33},
+        {kind:"pop", pitch:0.94, body:1.04, volume:0.33},
+        {kind:"pop", pitch:1.03, body:1.02, volume:0.34}
+      ],
+      miss:{kind:"bonk", volume:0.28},
+      clear:[
+        {kind:"tone", freq:1560, duration:0.045, volume:0.13, delay:0.000},
+        {kind:"tone", freq:1960, duration:0.048, volume:0.12, delay:0.024},
+        {kind:"tone", freq:2470, duration:0.058, volume:0.11, delay:0.050}
+      ]
+    },
+    soft: {
+      label:"ソフト",
+      typeVariants:[
+        {kind:"soft", pitch:1.00, softness:1.00, volume:0.30},
+        {kind:"soft", pitch:0.97, softness:1.10, volume:0.29},
+        {kind:"soft", pitch:1.04, softness:0.95, volume:0.30},
+        {kind:"soft", pitch:1.01, softness:1.02, volume:0.29}
+      ],
+      miss:{kind:"softMiss", volume:0.24},
+      clear:[
+        {kind:"tone", freq:1180, duration:0.060, volume:0.12, delay:0.000},
+        {kind:"tone", freq:1480, duration:0.060, volume:0.10, delay:0.030},
+        {kind:"tone", freq:1860, duration:0.070, volume:0.09, delay:0.060}
+      ]
+    },
+    retro: {
+      label:"レトロ",
+      typeVariants:[
+        {kind:"retro", pitch:1.00, grit:1.00, volume:0.29},
+        {kind:"retro", pitch:1.06, grit:0.96, volume:0.28},
+        {kind:"retro", pitch:0.92, grit:1.06, volume:0.29},
+        {kind:"retro", pitch:1.02, grit:1.00, volume:0.28}
+      ],
+      miss:{kind:"retroMiss", volume:0.26},
+      clear:[
+        {kind:"tone", freq:1040, duration:0.050, volume:0.11, delay:0.000},
+        {kind:"tone", freq:1310, duration:0.052, volume:0.10, delay:0.028},
+        {kind:"tone", freq:1560, duration:0.058, volume:0.09, delay:0.052}
+      ]
+    },
+    bright: {
+      label:"ブライト",
+      typeVariants:[
+        {kind:"bright", pitch:1.00, shine:1.00, volume:0.34},
+        {kind:"bright", pitch:1.10, shine:0.95, volume:0.33},
+        {kind:"bright", pitch:0.95, shine:1.05, volume:0.33},
+        {kind:"bright", pitch:1.04, shine:1.02, volume:0.34}
+      ],
+      miss:{kind:"tickMiss", volume:0.25},
+      clear:[
+        {kind:"tone", freq:1720, duration:0.042, volume:0.12, delay:0.000},
+        {kind:"tone", freq:2160, duration:0.045, volume:0.11, delay:0.022},
+        {kind:"tone", freq:2720, duration:0.052, volume:0.10, delay:0.046}
+      ]
+    }
+  };
+
   function kanaTokenize(str){
     const arr = [];
     for(let i=0;i<str.length;i++){
@@ -1008,7 +1133,8 @@
     endTime:0,
     timerId:null,
     repeatTimer:null,
-    soundStep:0
+    soundStep:0,
+    soundPreset:"dry"
   };
 
   const el = {
@@ -1027,15 +1153,15 @@
     resultClear:document.getElementById("resultClear"),
     resultAcc:document.getElementById("resultAcc"),
     resultTime:document.getElementById("resultTime"),
+    soundSelect:document.getElementById("soundSelect"),
+    soundLabel:document.getElementById("soundLabel"),
     keys:[...document.querySelectorAll(".key")]
   };
 
   let audioCtx = null;
   let masterGain = null;
   let audioUnlocked = false;
-  let typeBuffers = [];
-  let missBuffer = null;
-  let clearBuffers = [];
+  let soundBank = {};
 
   function createNoiseBuffer(ctx, durationSec, generator){
     const length = Math.max(1, Math.floor(ctx.sampleRate * durationSec));
@@ -1048,26 +1174,19 @@
     return buffer;
   }
 
-  function buildAudioBuffers(){
-    if(!audioCtx) return;
-
-    typeBuffers = [
-      createTypeBuffer(1.00, 1.00),
-      createTypeBuffer(0.96, 0.92),
-      createTypeBuffer(1.04, 1.05),
-      createTypeBuffer(0.99, 0.97)
-    ];
-
-    missBuffer = createMissBuffer();
-
-    clearBuffers = [
-      createClearToneBuffer(1320, 0.050),
-      createClearToneBuffer(1660, 0.050),
-      createClearToneBuffer(2090, 0.060)
-    ];
+  function createToneBuffer(ctx, freq, durationSec, harmonics = []){
+    return createNoiseBuffer(ctx, durationSec, (i, t, length) => {
+      const fade = Math.exp(-t * 18);
+      let out = Math.sin(2 * Math.PI * freq * t);
+      for(const h of harmonics){
+        out += Math.sin(2 * Math.PI * freq * h.mult * t) * h.gain;
+      }
+      const tail = i > length - 64 ? (length - i) / 64 : 1;
+      return out * fade * Math.max(0, tail);
+    });
   }
 
-  function createTypeBuffer(pitch = 1, brightness = 1){
+  function createTypeBufferDry(pitch = 1, brightness = 1){
     return createNoiseBuffer(audioCtx, 0.018, (i, t, length) => {
       const decay = Math.exp(-t * 170);
       const n = (Math.random() * 2 - 1);
@@ -1079,8 +1198,49 @@
     });
   }
 
-  function createMissBuffer(){
-    return createNoiseBuffer(audioCtx, 0.065, (i, t) => {
+  function createTypeBufferPop(pitch = 1, body = 1){
+    return createNoiseBuffer(audioCtx, 0.030, (_i, t) => {
+      const env = Math.exp(-t * 95);
+      const hit = Math.sin(2 * Math.PI * 820 * pitch * t) * 0.50;
+      const top = Math.sin(2 * Math.PI * 1760 * pitch * t) * 0.22;
+      const n = (Math.random() * 2 - 1) * 0.11;
+      return (hit * body + top + n) * env;
+    });
+  }
+
+  function createTypeBufferSoft(pitch = 1, softness = 1){
+    return createNoiseBuffer(audioCtx, 0.026, (_i, t) => {
+      const env = Math.exp(-t * 72);
+      const low = Math.sin(2 * Math.PI * 980 * pitch * t) * 0.32;
+      const mid = Math.sin(2 * Math.PI * 1540 * pitch * t) * 0.16;
+      const air = (Math.random() * 2 - 1) * 0.05 * softness;
+      return (low + mid + air) * env;
+    });
+  }
+
+  function createTypeBufferRetro(pitch = 1, grit = 1){
+    return createNoiseBuffer(audioCtx, 0.024, (_i, t) => {
+      const env = Math.exp(-t * 105);
+      const sq1 = Math.sign(Math.sin(2 * Math.PI * 620 * pitch * t)) * 0.18 * grit;
+      const sq2 = Math.sign(Math.sin(2 * Math.PI * 1240 * pitch * t)) * 0.08;
+      const n = (Math.random() * 2 - 1) * 0.04;
+      return (sq1 + sq2 + n) * env;
+    });
+  }
+
+  function createTypeBufferBright(pitch = 1, shine = 1){
+    return createNoiseBuffer(audioCtx, 0.022, (_i, t) => {
+      const env = Math.exp(-t * 120);
+      const a = Math.sin(2 * Math.PI * 1900 * pitch * t) * 0.22;
+      const b = Math.sin(2 * Math.PI * 3100 * pitch * t) * 0.18 * shine;
+      const c = Math.sin(2 * Math.PI * 4700 * pitch * t) * 0.08;
+      const n = (Math.random() * 2 - 1) * 0.10;
+      return (a + b + c + n) * env;
+    });
+  }
+
+  function createMissBufferBuzz(){
+    return createNoiseBuffer(audioCtx, 0.065, (_i, t) => {
       const env = Math.exp(-t * 34);
       const low = Math.sin(2 * Math.PI * (240 - t * 900) * t) * 0.55;
       const noise = (Math.random() * 2 - 1) * 0.10;
@@ -1088,15 +1248,89 @@
     });
   }
 
-  function createClearToneBuffer(freq, durationSec){
-    return createNoiseBuffer(audioCtx, durationSec, (i, t, length) => {
-      const fade = Math.exp(-t * 22);
-      const soft = Math.sin(2 * Math.PI * freq * t);
-      const sparkle = Math.sin(2 * Math.PI * freq * 2 * t) * 0.20;
-      const out = (soft + sparkle) * fade;
-      const tail = i > length - 64 ? (length - i) / 64 : 1;
-      return out * Math.max(0, tail);
+  function createMissBufferBonk(){
+    return createNoiseBuffer(audioCtx, 0.052, (_i, t) => {
+      const env = Math.exp(-t * 58);
+      const tone = Math.sin(2 * Math.PI * 220 * t) * 0.40;
+      const knock = Math.sin(2 * Math.PI * 480 * t) * 0.18;
+      return (tone + knock) * env;
     });
+  }
+
+  function createMissBufferSoft(){
+    return createNoiseBuffer(audioCtx, 0.060, (_i, t) => {
+      const env = Math.exp(-t * 48);
+      const tone = Math.sin(2 * Math.PI * 180 * t) * 0.26;
+      const noise = (Math.random() * 2 - 1) * 0.04;
+      return (tone + noise) * env;
+    });
+  }
+
+  function createMissBufferRetro(){
+    return createNoiseBuffer(audioCtx, 0.050, (_i, t) => {
+      const env = Math.exp(-t * 68);
+      const sq = Math.sign(Math.sin(2 * Math.PI * 190 * t)) * 0.20;
+      const dip = Math.sin(2 * Math.PI * 140 * t) * 0.14;
+      return (sq + dip) * env;
+    });
+  }
+
+  function createMissBufferTick(){
+    return createNoiseBuffer(audioCtx, 0.035, (_i, t) => {
+      const env = Math.exp(-t * 140);
+      const a = Math.sin(2 * Math.PI * 620 * t) * 0.18;
+      const b = (Math.random() * 2 - 1) * 0.08;
+      return (a + b) * env;
+    });
+  }
+
+  function createTypeVariantBuffer(def){
+    switch(def.kind){
+      case "dry": return createTypeBufferDry(def.pitch, def.brightness);
+      case "pop": return createTypeBufferPop(def.pitch, def.body);
+      case "soft": return createTypeBufferSoft(def.pitch, def.softness);
+      case "retro": return createTypeBufferRetro(def.pitch, def.grit);
+      case "bright": return createTypeBufferBright(def.pitch, def.shine);
+      default: return createTypeBufferDry(1, 1);
+    }
+  }
+
+  function createMissVariantBuffer(def){
+    switch(def.kind){
+      case "buzz": return createMissBufferBuzz();
+      case "bonk": return createMissBufferBonk();
+      case "softMiss": return createMissBufferSoft();
+      case "retroMiss": return createMissBufferRetro();
+      case "tickMiss": return createMissBufferTick();
+      default: return createMissBufferBuzz();
+    }
+  }
+
+  function buildAudioBuffers(){
+    if(!audioCtx) return;
+
+    soundBank = {};
+
+    for(const [presetKey, preset] of Object.entries(SOUND_PRESETS)){
+      soundBank[presetKey] = {
+        typeVariants: preset.typeVariants.map(def => ({
+          buffer:createTypeVariantBuffer(def),
+          volume:def.volume
+        })),
+        miss: {
+          buffer:createMissVariantBuffer(preset.miss),
+          volume:preset.miss.volume
+        },
+        clear: preset.clear.map(def => ({
+          buffer:createToneBuffer(audioCtx, def.freq, def.duration, [
+            {mult:2, gain:0.20},
+            {mult:3, gain:0.08}
+          ]),
+          volume:def.volume,
+          delay:def.delay
+        }))
+      };
+    }
   }
 
   function ensureAudioContext(){
@@ -1143,26 +1377,46 @@
     gain.gain.value = volume;
     source.connect(gain);
     gain.connect(masterGain);
-    const startAt = audioCtx.currentTime + when;
-    source.start(startAt);
+    source.start(audioCtx.currentTime + when);
+  }
+
+  function getCurrentSoundPack(){
+    return soundBank[state.soundPreset] || soundBank.dry || null;
+  }
+
+  function updateSoundLabel(){
+    const label = SOUND_PRESETS[state.soundPreset]?.label || "ドライ";
+    el.soundLabel.textContent = `効果音：${label}`;
+    el.soundSelect.value = state.soundPreset;
+  }
+
+  function setSoundPreset(presetKey){
+    if(!SOUND_PRESETS[presetKey]) return;
+    state.soundPreset = presetKey;
+    updateSoundLabel();
   }
 
   function playTypeSound(){
-    if(!typeBuffers.length) return;
-    const idx = state.soundStep % typeBuffers.length;
+    const pack = getCurrentSoundPack();
+    if(!pack || !pack.typeVariants.length) return;
+    const idx = state.soundStep % pack.typeVariants.length;
     state.soundStep++;
-    playBuffer(typeBuffers[idx], 0.36);
+    const item = pack.typeVariants[idx];
+    playBuffer(item.buffer, item.volume);
   }
 
   function playMissSound(){
-    playBuffer(missBuffer, 0.30);
+    const pack = getCurrentSoundPack();
+    if(!pack?.miss?.buffer) return;
+    playBuffer(pack.miss.buffer, pack.miss.volume);
   }
 
   function playClearSound(){
-    if(!clearBuffers.length) return;
-    playBuffer(clearBuffers[0], 0.16, 0.000);
-    playBuffer(clearBuffers[1], 0.13, 0.028);
-    playBuffer(clearBuffers[2], 0.11, 0.054);
+    const pack = getCurrentSoundPack();
+    if(!pack?.clear?.length) return;
+    pack.clear.forEach(item=>{
+      playBuffer(item.buffer, item.volume, item.delay);
+    });
   }
 
   function clearRepeatTimer(){
@@ -1498,7 +1752,16 @@
     setMode(btn.dataset.mode, true);
   });
 
+  el.soundSelect.addEventListener("change", async (e)=>{
+    if(!audioUnlocked){
+      await unlockAudio();
+    }
+    setSoundPreset(e.target.value);
+    playTypeSound();
+  });
+
   installAudioUnlockEvents();
+  setSoundPreset("dry");
   setMode("10", true);
 </script>
 </body>
