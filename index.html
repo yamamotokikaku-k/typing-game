@@ -3,47 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ひらがなローマ字タイピング練習</title>
+  <title>はじめてのタイピング</title>
   <style>
     :root{
-      --bg:#c9ad46;
-      --bg-deep:#b5942f;
-      --bg-light:#d8bf63;
-      --panel:rgba(255,255,255,.14);
-      --panel-strong:rgba(255,255,255,.22);
-      --line:rgba(255,255,255,.16);
-      --text:#111111;
-      --sub:#2d2610;
+      --bg:#7fd8ff;
+      --bg-deep:#5fb8ff;
+      --bg-light:#fff59d;
+      --bg-accent:#ffb3de;
 
-      --display-white:#fffdf6;
-      --display-white-soft:#f8f3e6;
-      --typed-black:#111111;
-      --typed-black-soft:#1e1a10;
-      --typed-bg:rgba(0,0,0,.12);
+      --panel:rgba(255,255,255,.28);
+      --panel-strong:rgba(255,255,255,.42);
+      --line:rgba(255,255,255,.32);
+
+      --text:#1e2a56;
+      --sub:#31417d;
+
+      --display-white:#ffffff;
+      --display-white-soft:#fdfcff;
+
+      --typed-black:#ff6b6b;
+      --typed-bg:rgba(255,255,255,.42);
 
       --accent:#ffffff;
-      --ok:#ffffff;
-      --miss:#2b0000;
+      --ok:#14a44d;
+      --miss:#d9366e;
 
-      --shadow:0 16px 40px rgba(0,0,0,.16);
+      --shadow:0 14px 34px rgba(58,83,166,.16);
 
-      --f-lp:#ef8d86;
-      --f-lr:#f4b06c;
-      --f-lm:#f6d67a;
-      --f-li:#d8ee8a;
-      --f-ri:#8fdcb8;
-      --f-rm:#87cde9;
-      --f-rr:#a8b1f2;
-      --f-rp:#d2a0ef;
-      --f-thumb:#f2b9d7;
+      --f-lp:#ff9aa2;
+      --f-lr:#ffb86b;
+      --f-lm:#ffe26f;
+      --f-li:#c5f07d;
+      --f-ri:#88e4c4;
+      --f-rm:#7fd8ff;
+      --f-rr:#9eb2ff;
+      --f-rp:#d8a5ff;
+      --f-thumb:#ffb3de;
 
-      --key-base:rgba(255,255,255,.36);
-      --key-border:rgba(0,0,0,.08);
-      --key-text:#1a1407;
-      --key-shadow:0 6px 12px rgba(0,0,0,.08);
-      --key-active:#1b160c;
-      --key-active-text:#f5e9b1;
-      --key-glow:0 0 0 3px rgba(255,255,255,.55), 0 10px 22px rgba(0,0,0,.18);
+      --key-base:rgba(255,255,255,.72);
+      --key-border:rgba(54,84,173,.12);
+      --key-text:#22316d;
+      --key-shadow:0 5px 10px rgba(74,95,180,.10);
+      --key-active:#ff7eb6;
+      --key-active-text:#ffffff;
+      --key-glow:0 0 0 4px rgba(255,255,255,.6), 0 10px 20px rgba(74,95,180,.22);
     }
 
     *{box-sizing:border-box}
@@ -53,8 +56,10 @@
       min-height:100%;
       font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.14), transparent 32%),
-        linear-gradient(180deg, var(--bg-light) 0%, var(--bg) 45%, var(--bg-deep) 100%);
+        radial-gradient(circle at 12% 14%, rgba(255,255,255,.45), transparent 18%),
+        radial-gradient(circle at 84% 18%, rgba(255,255,255,.34), transparent 16%),
+        radial-gradient(circle at 78% 82%, rgba(255,255,255,.24), transparent 18%),
+        linear-gradient(135deg, var(--bg-light) 0%, var(--bg) 45%, var(--bg-deep) 78%, var(--bg-accent) 100%);
       color:var(--text);
     }
 
@@ -62,15 +67,15 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:24px;
+      padding:16px;
     }
 
     .app{
-      width:min(1200px,100%);
-      min-height:86vh;
+      width:min(1240px,100%);
+      min-height:calc(100vh - 32px);
       display:grid;
       grid-template-rows:auto 1fr auto;
-      gap:18px;
+      gap:14px;
     }
 
     .topbar{
@@ -78,51 +83,54 @@
       flex-wrap:wrap;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
+      gap:12px;
       background:var(--panel);
       border:1px solid var(--line);
       border-radius:22px;
-      padding:16px 18px;
+      padding:14px 16px;
       box-shadow:var(--shadow);
-      backdrop-filter:blur(6px);
+      backdrop-filter:blur(8px);
     }
 
     .title{
-      font-size:clamp(20px,2.6vw,30px);
+      font-size:clamp(19px,2.3vw,28px);
       font-weight:900;
       letter-spacing:.05em;
-      color:#1a1407;
+      color:#23306b;
+      text-shadow:0 2px 0 rgba(255,255,255,.45);
     }
 
     .controls{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
+      gap:8px;
       align-items:center;
+      justify-content:flex-end;
     }
 
     .mode-btn{
       border:none;
-      background:rgba(255,255,255,.42);
-      color:#1a1407;
-      padding:10px 16px;
+      background:rgba(255,255,255,.78);
+      color:#243373;
+      padding:8px 13px;
       border-radius:999px;
       cursor:pointer;
       font-weight:900;
       letter-spacing:.04em;
-      box-shadow:0 3px 10px rgba(0,0,0,.08);
-      transition:.15s transform,.15s background,.15s box-shadow;
+      box-shadow:0 3px 10px rgba(74,95,180,.10);
+      transition:.15s transform,.15s background,.15s box-shadow,.15s color;
+      font-size:14px;
     }
 
     .mode-btn:hover{
       transform:translateY(-1px);
-      background:rgba(255,255,255,.56);
+      background:rgba(255,255,255,.92);
     }
 
     .mode-btn.active{
-      background:#1b160c;
-      color:#f5e9b1;
-      box-shadow:0 8px 18px rgba(0,0,0,.18);
+      background:#ff7eb6;
+      color:#ffffff;
+      box-shadow:0 8px 18px rgba(255,126,182,.28);
     }
 
     .main{
@@ -130,18 +138,40 @@
       place-items:center;
       background:var(--panel);
       border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px 20px;
+      border-radius:28px;
+      padding:18px 16px;
       box-shadow:var(--shadow);
       position:relative;
       overflow:hidden;
     }
 
+    .main::before{
+      content:"";
+      position:absolute;
+      inset:auto auto -40px -40px;
+      width:220px;
+      height:220px;
+      background:radial-gradient(circle, rgba(255,255,255,.30), transparent 70%);
+      pointer-events:none;
+    }
+
+    .main::after{
+      content:"";
+      position:absolute;
+      inset:-60px -30px auto auto;
+      width:240px;
+      height:240px;
+      background:radial-gradient(circle, rgba(255,255,255,.25), transparent 72%);
+      pointer-events:none;
+    }
+
     .center{
-      width:min(980px,100%);
+      width:min(1000px,100%);
       text-align:center;
       display:grid;
-      gap:18px;
+      gap:12px;
+      position:relative;
+      z-index:1;
     }
 
     .status-line{
@@ -152,62 +182,60 @@
     }
 
     .badge{
-      background:rgba(255,255,255,.26);
-      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.48);
+      border:1px solid rgba(255,255,255,.38);
       border-radius:999px;
-      padding:8px 14px;
+      padding:7px 13px;
       font-weight:800;
-      color:#241d0d;
+      color:#2d3d80;
+      font-size:14px;
+      box-shadow:0 2px 8px rgba(74,95,180,.08);
     }
 
     .prompt{
-      font-size:clamp(44px,8vw,96px);
+      font-size:clamp(34px,6vw,72px);
       font-weight:900;
-      letter-spacing:.14em;
-      line-height:1.12;
-      min-height:1.2em;
+      letter-spacing:.12em;
+      line-height:1.08;
+      min-height:1.16em;
       color:var(--display-white);
       text-shadow:
-        0 2px 0 rgba(0,0,0,.08),
-        0 6px 18px rgba(0,0,0,.12);
-      font-family:
-        "Hiragino Sans",
-        "Yu Gothic",
-        "Meiryo",
-        sans-serif;
+        0 3px 0 rgba(61,89,178,.18),
+        0 8px 18px rgba(61,89,178,.20);
+      font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
       font-feature-settings:"palt";
     }
 
     .reading{
-      font-size:clamp(20px,2.6vw,34px);
+      font-size:clamp(17px,2vw,28px);
       font-weight:900;
-      color:var(--display-white-soft);
-      letter-spacing:.14em;
-      min-height:1.4em;
+      color:#6b4fe5;
+      letter-spacing:.12em;
+      min-height:1.35em;
       word-break:break-all;
       text-shadow:
-        0 2px 0 rgba(0,0,0,.07),
-        0 4px 12px rgba(0,0,0,.08);
+        0 2px 0 rgba(255,255,255,.35),
+        0 4px 12px rgba(61,89,178,.08);
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       text-transform:uppercase;
     }
 
     .typing{
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:24px;
-      padding:20px;
-      min-height:96px;
+      background:rgba(255,255,255,.26);
+      border:1px solid rgba(255,255,255,.28);
+      border-radius:22px;
+      padding:14px 16px;
+      min-height:76px;
       display:grid;
       align-items:center;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
     }
 
     .romaji{
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-      font-size:clamp(24px,3vw,40px);
-      line-height:1.5;
-      letter-spacing:.06em;
+      font-size:clamp(22px,2.5vw,34px);
+      line-height:1.45;
+      letter-spacing:.05em;
       word-break:break-all;
       font-weight:900;
       text-transform:uppercase;
@@ -218,23 +246,24 @@
       background:var(--typed-bg);
       border-radius:10px;
       padding:0 .08em;
+      text-shadow:none;
     }
 
     .rest{
-      color:var(--display-white);
+      color:#ffffff;
       text-shadow:
-        0 2px 0 rgba(0,0,0,.07),
-        0 4px 12px rgba(0,0,0,.08);
+        0 2px 0 rgba(61,89,178,.16),
+        0 4px 12px rgba(61,89,178,.14);
     }
 
     .cursor{
       display:inline-block;
       width:.65em;
       text-align:center;
-      color:var(--display-white);
+      color:#ffffff;
       animation:blink 1s step-end infinite;
       font-weight:900;
-      text-shadow:0 2px 8px rgba(0,0,0,.18);
+      text-shadow:0 2px 8px rgba(74,95,180,.22);
     }
 
     @keyframes blink{
@@ -242,15 +271,15 @@
     }
 
     .message{
-      min-height:1.6em;
-      font-size:clamp(16px,2vw,22px);
+      min-height:1.5em;
+      font-size:clamp(15px,1.7vw,20px);
       font-weight:900;
-      color:#251e0e;
+      color:#31417d;
     }
 
     .message.ok{
-      color:#ffffff;
-      text-shadow:0 2px 8px rgba(0,0,0,.18);
+      color:var(--ok);
+      text-shadow:0 2px 8px rgba(255,255,255,.28);
     }
 
     .message.miss{
@@ -260,22 +289,22 @@
     .keyboard-wrap{
       width:min(940px,100%);
       margin:0 auto;
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:26px;
-      padding:16px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      background:rgba(255,255,255,.26);
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:24px;
+      padding:12px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
     }
 
     .keyboard{
       display:grid;
-      gap:8px;
+      gap:6px;
       width:100%;
     }
 
     .kb-row{
       display:grid;
-      gap:8px;
+      gap:6px;
       align-items:stretch;
     }
 
@@ -287,17 +316,17 @@
 
     .key{
       position:relative;
-      min-height:52px;
+      min-height:44px;
       display:flex;
       align-items:center;
       justify-content:center;
-      border-radius:14px;
+      border-radius:12px;
       background:var(--key-base);
       border:1px solid var(--key-border);
       color:var(--key-text);
       font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
       font-weight:900;
-      font-size:clamp(14px,1.8vw,20px);
+      font-size:clamp(12px,1.55vw,18px);
       letter-spacing:.05em;
       box-shadow:var(--key-shadow);
       user-select:none;
@@ -306,7 +335,7 @@
     }
 
     .key.small{
-      font-size:clamp(12px,1.4vw,16px);
+      font-size:clamp(11px,1.2vw,14px);
     }
 
     .key::after{
@@ -314,7 +343,7 @@
       position:absolute;
       inset:0;
       border-radius:inherit;
-      background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0));
+      background:linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0));
       pointer-events:none;
     }
 
@@ -331,81 +360,54 @@
     .key.active{
       background:var(--key-active) !important;
       color:var(--key-active-text);
-      transform:translateY(-2px);
+      transform:translateY(-2px) scale(1.02);
       box-shadow:var(--key-glow);
-      border-color:rgba(255,255,255,.5);
+      border-color:rgba(255,255,255,.64);
     }
 
     .bottom{
       display:grid;
       grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:14px;
+      gap:12px;
     }
 
     .stat{
       background:var(--panel);
       border:1px solid var(--line);
-      border-radius:22px;
-      padding:16px 14px;
+      border-radius:20px;
+      padding:14px 12px;
       box-shadow:var(--shadow);
       text-align:center;
     }
 
     .stat .label{
-      font-size:13px;
-      color:#322911;
+      font-size:12px;
+      color:#4c5ca0;
       font-weight:900;
       letter-spacing:.08em;
     }
 
     .stat .value{
-      margin-top:8px;
-      font-size:clamp(22px,3vw,36px);
+      margin-top:6px;
+      font-size:clamp(20px,2.5vw,32px);
       font-weight:900;
-      color:#171208;
-    }
-
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:none;
-      place-items:center;
-      background:rgba(0,0,0,.20);
-      backdrop-filter:blur(2px);
-      z-index:5;
-    }
-
-    .overlay.show{
-      display:grid;
-    }
-
-    .count{
-      width:160px;
-      height:160px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      font-size:72px;
-      font-weight:900;
-      background:rgba(255,255,255,.78);
-      color:#1a1407;
-      box-shadow:0 18px 40px rgba(0,0,0,.24);
+      color:#22316d;
     }
 
     .help{
-      font-size:14px;
-      color:#2c2410;
+      font-size:13px;
+      color:#425292;
       margin-top:4px;
-      line-height:1.7;
-      font-weight:700;
+      line-height:1.6;
+      font-weight:800;
     }
 
     .result-panel{
-      margin-top:8px;
-      background:rgba(255,255,255,.24);
-      border:1px solid rgba(255,255,255,.16);
+      margin-top:4px;
+      background:rgba(255,255,255,.34);
+      border:1px solid rgba(255,255,255,.22);
       border-radius:20px;
-      padding:16px;
+      padding:14px;
       display:none;
     }
 
@@ -414,20 +416,20 @@
     }
 
     .result-title{
-      font-size:24px;
+      font-size:22px;
       font-weight:900;
-      margin-bottom:10px;
-      color:#1a1407;
+      margin-bottom:8px;
+      color:#22316d;
     }
 
     .result-grid{
       display:grid;
       grid-template-columns:repeat(3,minmax(0,1fr));
-      gap:12px;
+      gap:10px;
     }
 
     .result-card{
-      background:rgba(255,255,255,.28);
+      background:rgba(255,255,255,.44);
       border-radius:16px;
       padding:12px;
     }
@@ -435,38 +437,31 @@
     .result-card .r-label{
       font-size:13px;
       font-weight:900;
-      color:#30270f;
+      color:#4b5b9d;
     }
 
     .result-card .r-value{
       margin-top:6px;
-      font-size:30px;
+      font-size:28px;
       font-weight:900;
-      color:#140f07;
+      color:#1f2d68;
     }
 
-    @media (max-width:960px){
+    @media (max-width:980px){
       .bottom{
         grid-template-columns:repeat(2,minmax(0,1fr));
       }
       .result-grid{
         grid-template-columns:1fr;
       }
-      .keyboard-wrap{
-        padding:12px;
-      }
-      .kb-row{
-        gap:6px;
-      }
       .key{
-        min-height:44px;
-        border-radius:12px;
+        min-height:40px;
       }
     }
 
     @media (max-width:640px){
       body{
-        padding:14px;
+        padding:10px;
       }
       .topbar{
         justify-content:center;
@@ -481,10 +476,10 @@
         overflow-x:auto;
       }
       .keyboard{
-        min-width:720px;
+        min-width:700px;
       }
       .help{
-        line-height:1.5;
+        line-height:1.45;
       }
     }
   </style>
@@ -493,31 +488,40 @@
   <div class="app">
     <div class="topbar">
       <div>
-        <div class="title">ひらがなローマ字タイピング練習</div>
-        <div class="help">スペースキーで 3 秒後に開始　/　プレイ中にスペースキーで中断　/　無限モードは正解後 Enter で次へ</div>
+        <div class="title">はじめてのタイピング</div>
+        <div class="help">モードを選択で開始　/　プレイ中にスペースキーで中断　/　モードボタンは途中でも即切り替え</div>
       </div>
 
       <div class="controls" id="modeButtons">
         <button class="mode-btn active" data-mode="10">10問</button>
+        <button class="mode-btn" data-mode="20">20問</button>
         <button class="mode-btn" data-mode="30">30問</button>
-        <button class="mode-btn" data-mode="50">50問</button>
-        <button class="mode-btn" data-mode="infinite">無限</button>
+        <button class="mode-btn" data-mode="twochar-noun">二文字名詞100</button>
+        <button class="mode-btn" data-mode="row-a">あ行</button>
+        <button class="mode-btn" data-mode="row-ka">か行</button>
+        <button class="mode-btn" data-mode="row-sa">さ行</button>
+        <button class="mode-btn" data-mode="row-ta">た行</button>
+        <button class="mode-btn" data-mode="row-na">な行</button>
+        <button class="mode-btn" data-mode="row-ha">は行</button>
+        <button class="mode-btn" data-mode="row-ma">ま行</button>
+        <button class="mode-btn" data-mode="row-ya">や行</button>
+        <button class="mode-btn" data-mode="row-ra">ら行</button>
+        <button class="mode-btn" data-mode="row-wa">わ行</button>
+        <button class="mode-btn" data-mode="row-daku">濁音</button>
+        <button class="mode-btn" data-mode="row-pa">ぱぴぷぺぽ</button>
+        <button class="mode-btn" data-mode="row-youon">しゃしゅしょ等</button>
       </div>
     </div>
 
     <div class="main">
-      <div class="overlay" id="overlay">
-        <div class="count" id="countText">3</div>
-      </div>
-
       <div class="center">
         <div class="status-line">
           <div class="badge" id="modeLabel">モード：10問</div>
-          <div class="badge" id="runLabel">待機中</div>
+          <div class="badge" id="runLabel">プレイ中</div>
         </div>
 
         <div class="prompt" id="promptView">ひらがな</div>
-        <div class="reading" id="reading">HIRAGANA</div>
+        <div class="reading" id="reading">ROMAJI</div>
 
         <div class="typing">
           <div class="romaji" id="romajiView"></div>
@@ -604,7 +608,7 @@
           </div>
         </div>
 
-        <div class="message" id="message">スペースキーで開始</div>
+        <div class="message" id="message">入力開始</div>
 
         <div class="result-panel" id="resultPanel">
           <div class="result-title">結果</div>
@@ -705,6 +709,153 @@
       {kana:"おもちゃ"}
     ];
 
+    const TWO_CHAR_NOUNS = [
+      {kana:"あめ"},
+      {kana:"いぬ"},
+      {kana:"うみ"},
+      {kana:"えき"},
+      {kana:"おに"},
+      {kana:"かさ"},
+      {kana:"かに"},
+      {kana:"かわ"},
+      {kana:"くま"},
+      {kana:"くつ"},
+      {kana:"くに"},
+      {kana:"けし"},
+      {kana:"こえ"},
+      {kana:"こめ"},
+      {kana:"さけ"},
+      {kana:"さる"},
+      {kana:"しか"},
+      {kana:"しま"},
+      {kana:"すし"},
+      {kana:"すず"},
+      {kana:"せみ"},
+      {kana:"そら"},
+      {kana:"たい"},
+      {kana:"たこ"},
+      {kana:"たね"},
+      {kana:"つき"},
+      {kana:"つる"},
+      {kana:"てら"},
+      {kana:"とら"},
+      {kana:"なし"},
+      {kana:"なつ"},
+      {kana:"にわ"},
+      {kana:"ぬの"},
+      {kana:"ねこ"},
+      {kana:"のり"},
+      {kana:"はな"},
+      {kana:"はる"},
+      {kana:"ひげ"},
+      {kana:"ふね"},
+      {kana:"へや"},
+      {kana:"ほし"},
+      {kana:"まど"},
+      {kana:"まめ"},
+      {kana:"みず"},
+      {kana:"みみ"},
+      {kana:"むし"},
+      {kana:"むね"},
+      {kana:"めし"},
+      {kana:"もも"},
+      {kana:"やま"},
+      {kana:"ゆめ"},
+      {kana:"よる"},
+      {kana:"りす"},
+      {kana:"るす"},
+      {kana:"れき"},
+      {kana:"わに"},
+      {kana:"わた"},
+      {kana:"がら"},
+      {kana:"ぐみ"},
+      {kana:"げた"},
+      {kana:"ごま"},
+      {kana:"ざる"},
+      {kana:"ぜに"},
+      {kana:"ぞう"},
+      {kana:"だし"},
+      {kana:"でこ"},
+      {kana:"どろ"},
+      {kana:"ばら"},
+      {kana:"びわ"},
+      {kana:"ぶた"},
+      {kana:"ぼう"},
+      {kana:"ぱん"},
+      {kana:"ぺん"},
+      {kana:"きり"},
+      {kana:"くも"},
+      {kana:"こま"},
+      {kana:"さめ"},
+      {kana:"しお"},
+      {kana:"すな"},
+      {kana:"せき"},
+      {kana:"たき"},
+      {kana:"たに"},
+      {kana:"つの"},
+      {kana:"てつ"},
+      {kana:"とし"},
+      {kana:"なべ"},
+      {kana:"ぬま"},
+      {kana:"ねつ"},
+      {kana:"はし"},
+      {kana:"ひざ"},
+      {kana:"ふで"},
+      {kana:"へび"},
+      {kana:"ほね"},
+      {kana:"まき"},
+      {kana:"みせ"},
+      {kana:"むぎ"},
+      {kana:"もち"},
+      {kana:"やぎ"},
+      {kana:"ゆか"},
+      {kana:"ろば"}
+    ];
+
+    const ROW_ORDER = [
+      "row-a",
+      "row-ka",
+      "row-sa",
+      "row-ta",
+      "row-na",
+      "row-ha",
+      "row-ma",
+      "row-ya",
+      "row-ra",
+      "row-wa",
+      "row-daku",
+      "row-pa",
+      "row-youon"
+    ];
+
+    const ROW_SETS = {
+      "row-a": ["あ","い","う","え","お"],
+      "row-ka": ["か","き","く","け","こ"],
+      "row-sa": ["さ","し","す","せ","そ"],
+      "row-ta": ["た","ち","つ","て","と"],
+      "row-na": ["な","に","ぬ","ね","の"],
+      "row-ha": ["は","ひ","ふ","へ","ほ"],
+      "row-ma": ["ま","み","む","め","も"],
+      "row-ya": ["や","ゆ","よ"],
+      "row-ra": ["ら","り","る","れ","ろ"],
+      "row-wa": ["わ","を","ん"],
+      "row-daku": ["が","ぎ","ぐ","げ","ご","ざ","じ","ず","ぜ","ぞ","だ","ぢ","づ","で","ど","ば","び","ぶ","べ","ぼ"],
+      "row-pa": ["ぱ","ぴ","ぷ","ぺ","ぽ"],
+      "row-youon": [
+        "きゃ","きゅ","きょ",
+        "しゃ","しゅ","しょ",
+        "ちゃ","ちゅ","ちょ",
+        "にゃ","にゅ","にょ",
+        "ひゃ","ひゅ","ひょ",
+        "みゃ","みゅ","みょ",
+        "りゃ","りゅ","りょ",
+        "ぎゃ","ぎゅ","ぎょ",
+        "じゃ","じゅ","じょ",
+        "びゃ","びゅ","びょ",
+        "ぴゃ","ぴゅ","ぴょ"
+      ]
+    };
+
     const BASIC = {
       "あ":"A","い":"I","う":"U","え":"E","お":"O",
       "か":"KA","き":"KI","く":"KU","け":"KE","こ":"KO",
@@ -715,14 +866,16 @@
       "ま":"MA","み":"MI","む":"MU","め":"ME","も":"MO",
       "や":"YA","ゆ":"YU","よ":"YO",
       "ら":"RA","り":"RI","る":"RU","れ":"RE","ろ":"RO",
-      "わ":"WA","を":"O",
+      "わ":"WA","を":"WO",
       "が":"GA","ぎ":"GI","ぐ":"GU","げ":"GE","ご":"GO",
       "ざ":"ZA","じ":"ZI","ず":"ZU","ぜ":"ZE","ぞ":"ZO",
       "だ":"DA","ぢ":"DI","づ":"DU","で":"DE","ど":"DO",
       "ば":"BA","び":"BI","ぶ":"BU","べ":"BE","ぼ":"BO",
       "ぱ":"PA","ぴ":"PI","ぷ":"PU","ぺ":"PE","ぽ":"PO",
       "ぁ":"A","ぃ":"I","ぅ":"U","ぇ":"E","ぉ":"O",
-      "ゔ":"VU"
+      "ゃ":"YA","ゅ":"YU","ょ":"YO",
+      "ゔ":"VU",
+      "ー":"-"
     };
 
     const DIGRAPHS = {
@@ -757,13 +910,12 @@
     function getRomanForToken(token){
       if(DIGRAPHS[token]) return DIGRAPHS[token];
       if(BASIC[token]) return BASIC[token];
-      if(token === "ー") return "-";
       return token.toUpperCase();
     }
 
     function getInitialConsonant(roman){
       if(!roman) return "";
-      const m = roman.match(/^[^AEIOU]+/);
+      const m = roman.match(/^[^AEIOU\-]+/);
       return m ? m[0][0] : "";
     }
 
@@ -812,14 +964,39 @@
       return a;
     }
 
+    function isRowChainMode(mode){
+      return ROW_ORDER.includes(mode);
+    }
+
+    function getModeLabel(mode){
+      const map = {
+        "10":"10問",
+        "20":"20問",
+        "30":"30問",
+        "twochar-noun":"二文字名詞100",
+        "row-a":"あ行",
+        "row-ka":"か行",
+        "row-sa":"さ行",
+        "row-ta":"た行",
+        "row-na":"な行",
+        "row-ha":"は行",
+        "row-ma":"ま行",
+        "row-ya":"や行",
+        "row-ra":"ら行",
+        "row-wa":"わ行",
+        "row-daku":"濁音",
+        "row-pa":"ぱぴぷぺぽ",
+        "row-youon":"しゃしゅしょ等"
+      };
+      return map[mode] || mode;
+    }
+
     const state = {
       mode:"10",
-      isCounting:false,
+      activeMode:"10",
+      activeModeLabel:"10問",
       isRunning:false,
       isFinished:false,
-      isInfinite:false,
-      awaitingEnter:false,
-      canAdvanceInfinite:false,
       queue:[],
       current:null,
       currentIndex:0,
@@ -830,9 +1007,8 @@
       startTime:0,
       endTime:0,
       timerId:null,
-      countdownTimers:[],
-      repeatCount:0,
-      repeatTimer:null
+      repeatTimer:null,
+      soundStep:0
     };
 
     const el = {
@@ -847,8 +1023,6 @@
       missValue:document.getElementById("missValue"),
       accValue:document.getElementById("accValue"),
       timeValue:document.getElementById("timeValue"),
-      overlay:document.getElementById("overlay"),
-      countText:document.getElementById("countText"),
       resultPanel:document.getElementById("resultPanel"),
       resultClear:document.getElementById("resultClear"),
       resultAcc:document.getElementById("resultAcc"),
@@ -857,7 +1031,6 @@
     };
 
     let audioCtx = null;
-    let punchBuffer = null;
 
     function ensureAudio(){
       if(!audioCtx){
@@ -865,51 +1038,107 @@
           latencyHint:"interactive"
         });
       }
-      if(!punchBuffer){
-        punchBuffer = createPunchBuffer(audioCtx);
-      }
       if(audioCtx.state === "suspended"){
         audioCtx.resume();
       }
     }
 
-    function createPunchBuffer(ctx){
-      const duration = 0.055;
-      const sampleRate = ctx.sampleRate;
-      const length = Math.floor(sampleRate * duration);
-      const buffer = ctx.createBuffer(1, length, sampleRate);
-      const data = buffer.getChannelData(0);
-
-      for(let i=0;i<length;i++){
-        const t = i / sampleRate;
-        const env = Math.exp(-42 * t);
-        const tone =
-          Math.sin(2 * Math.PI * 115 * t) * 0.82 +
-          Math.sin(2 * Math.PI * 78 * t) * 0.42;
-        const noise = (Math.random() * 2 - 1) * 0.18;
-        data[i] = (tone + noise) * env * 0.92;
-      }
-      return buffer;
+    function warmupAudio(){
+      if(!audioCtx) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 440;
+      gain.gain.setValueAtTime(0.00001, now);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.01);
     }
 
-    function playPunch(){
-      if(!audioCtx || !punchBuffer) return;
+    function playSimpleTone({
+      freq = 880,
+      type = "square",
+      gainValue = 0.03,
+      duration = 0.03,
+      attack = 0.001,
+      release = 0.03
+    } = {}){
+      if(!audioCtx) return;
 
-      const src = audioCtx.createBufferSource();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
 
-      filter.type = "lowpass";
-      filter.frequency.value = 1450;
-      filter.Q.value = 0.65;
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
 
-      gain.gain.value = 0.74;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(gainValue, now + attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + Math.max(duration, attack + 0.002));
 
-      src.buffer = punchBuffer;
-      src.connect(filter);
-      filter.connect(gain);
+      osc.connect(gain);
       gain.connect(audioCtx.destination);
-      src.start(audioCtx.currentTime + 0.0005);
+
+      osc.start(now);
+      osc.stop(now + Math.max(duration + release, 0.04));
+    }
+
+    function playTypeSound(){
+      if(!audioCtx) return;
+      const freqs = [980, 1040, 920];
+      const idx = state.soundStep % freqs.length;
+      state.soundStep++;
+      playSimpleTone({
+        freq:freqs[idx],
+        type:"square",
+        gainValue:0.028,
+        duration:0.024,
+        attack:0.001,
+        release:0.02
+      });
+    }
+
+    function playMissSound(){
+      if(!audioCtx) return;
+      playSimpleTone({
+        freq:220,
+        type:"sawtooth",
+        gainValue:0.02,
+        duration:0.05,
+        attack:0.001,
+        release:0.04
+      });
+    }
+
+    function playClearSound(){
+      if(!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      const osc1 = audioCtx.createOscillator();
+      const gain1 = audioCtx.createGain();
+      osc1.type = "square";
+      osc1.frequency.setValueAtTime(880, now);
+      gain1.gain.setValueAtTime(0.0001, now);
+      gain1.gain.linearRampToValueAtTime(0.022, now + 0.001);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+      osc1.connect(gain1);
+      gain1.connect(audioCtx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.07);
+
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.type = "square";
+      osc2.frequency.setValueAtTime(1320, now + 0.02);
+      gain2.gain.setValueAtTime(0.0001, now + 0.02);
+      gain2.gain.linearRampToValueAtTime(0.018, now + 0.021);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.085);
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.start(now + 0.02);
+      osc2.stop(now + 0.09);
     }
 
     function clearRepeatTimer(){
@@ -919,98 +1148,65 @@
       }
     }
 
-    function setMode(mode){
-      if(state.isRunning || state.isCounting) return;
-      state.mode = mode;
-      state.isInfinite = mode === "infinite";
-
+    function updateModeButtons(mode){
       [...el.modeButtons.querySelectorAll(".mode-btn")].forEach(btn=>{
         btn.classList.toggle("active", btn.dataset.mode === mode);
       });
-
-      el.modeLabel.textContent = `モード：${mode === "infinite" ? "無限" : mode + "問"}`;
-      resetIdleScreen();
     }
 
-    function resetIdleScreen(){
-      clearRepeatTimer();
-      state.isFinished = false;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
-      state.current = null;
-      state.currentIndex = 0;
-      state.typed = "";
-      state.misses = 0;
-      state.totalKeys = 0;
-      state.correctKeys = 0;
-      state.repeatCount = 0;
-      state.startTime = 0;
-      state.endTime = 0;
-      updateStats();
-      el.runLabel.textContent = "待機中";
-      el.promptView.textContent = "ひらがな";
-      el.reading.textContent = "ROMAJI";
-      renderRomaji("");
-      setMessage("スペースキーで開始", "");
-      el.resultPanel.classList.remove("show");
-      updateKeyboardGuide("");
+    function syncActiveMode(mode){
+      state.activeMode = mode;
+      state.activeModeLabel = getModeLabel(mode);
+      el.modeLabel.textContent = `モード：${state.activeModeLabel}`;
+      updateModeButtons(mode);
+    }
+
+    function setMode(mode, startImmediately = true){
+      state.mode = mode;
+      syncActiveMode(mode);
+
+      if(startImmediately){
+        stopGame(true);
+        beginGame();
+      }
     }
 
     function buildQueue(){
-      const shuffled = shuffle(WORDS);
-      if(state.isInfinite) return shuffled;
+      if(isRowChainMode(state.mode)){
+        const startIndex = ROW_ORDER.indexOf(state.mode);
+        const items = [];
+        for(let i=startIndex;i<ROW_ORDER.length;i++){
+          const mode = ROW_ORDER[i];
+          const list = ROW_SETS[mode] || [];
+          list.forEach(kana=>{
+            items.push({kana, groupMode:mode});
+          });
+        }
+        return items;
+      }
+
+      if(state.mode === "twochar-noun"){
+        return shuffle(TWO_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
+      }
 
       const count = Number(state.mode);
       const pool = [];
       while(pool.length < count){
-        pool.push(...shuffle(WORDS));
+        pool.push(...shuffle(WORDS.map(w => ({kana:w.kana, groupMode:state.mode}))));
       }
       return pool.slice(0, count);
     }
 
-    function startCountdown(){
-      if(state.isCounting || state.isRunning) return;
-
-      clearRepeatTimer();
-      ensureAudio();
-      state.isCounting = true;
-      el.resultPanel.classList.remove("show");
-      el.overlay.classList.add("show");
-      el.runLabel.textContent = "カウントダウン";
-      setMessage("開始します", "");
-
-      const seq = ["3","2","1","START"];
-      el.countText.textContent = seq[0];
-
-      state.countdownTimers.forEach(id=>clearTimeout(id));
-      state.countdownTimers = [];
-
-      seq.forEach((text,idx)=>{
-        const id = setTimeout(()=>{
-          el.countText.textContent = text;
-        }, idx * 700);
-        state.countdownTimers.push(id);
-      });
-
-      const endId = setTimeout(()=>{
-        el.overlay.classList.remove("show");
-        state.isCounting = false;
-        beginGame();
-      }, seq.length * 700);
-      state.countdownTimers.push(endId);
-    }
-
     function beginGame(){
       clearRepeatTimer();
+
       state.queue = buildQueue();
       state.currentIndex = 0;
       state.typed = "";
       state.misses = 0;
       state.totalKeys = 0;
       state.correctKeys = 0;
-      state.repeatCount = 0;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
+      state.soundStep = 0;
       state.isRunning = true;
       state.isFinished = false;
       state.startTime = performance.now();
@@ -1020,43 +1216,33 @@
       tickTimer();
 
       el.runLabel.textContent = "プレイ中";
+      el.resultPanel.classList.remove("show");
       nextWord(true);
       updateStats();
     }
 
-    function stopGame(manual = true){
+    function stopGame(resetTime = false){
       clearRepeatTimer();
-      state.isCounting = false;
       state.isRunning = false;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
-      state.endTime = performance.now();
 
-      state.countdownTimers.forEach(id=>clearTimeout(id));
-      state.countdownTimers = [];
-      el.overlay.classList.remove("show");
+      if(resetTime){
+        state.endTime = 0;
+      }else{
+        state.endTime = performance.now();
+      }
 
       if(state.timerId) cancelAnimationFrame(state.timerId);
-      el.runLabel.textContent = manual ? "中断" : "終了";
-
-      if(manual){
-        setMessage("停止しました。スペースキーで最初から再開", "");
-      }
-      updateStats();
-      updateKeyboardGuide("");
     }
 
     function finishGame(){
       clearRepeatTimer();
       state.isRunning = false;
       state.isFinished = true;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
       state.endTime = performance.now();
 
       if(state.timerId) cancelAnimationFrame(state.timerId);
       el.runLabel.textContent = "終了";
-      setMessage("おつかれさまでした。スペースキーで再スタート", "ok");
+      setMessage("おつかれさまでした。モードを選ぶと再スタート", "ok");
 
       const cleared = state.currentIndex;
       const acc = calcAccuracy();
@@ -1085,49 +1271,35 @@
     function nextWord(initial = false){
       clearRepeatTimer();
 
-      if(state.isInfinite){
-        if(initial || !state.current){
-          if(state.currentIndex === 0){
-            state.queue = shuffle(WORDS);
-          }
-          const idx = state.currentIndex % state.queue.length;
-          state.current = state.queue[idx];
-          state.currentIndex = state.currentIndex || 0;
-        }
-      }else{
-        if(state.currentIndex >= state.queue.length){
-          finishGame();
-          return;
-        }
-        state.current = state.queue[state.currentIndex];
+      if(state.currentIndex >= state.queue.length){
+        finishGame();
+        return;
       }
 
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
+      state.current = state.queue[state.currentIndex];
       state.current.roman = kanaToRomajiStrict(state.current.kana);
       state.typed = "";
+
+      const currentGroup = state.current.groupMode || state.mode;
+      const previousGroup = state.currentIndex > 0 ? state.queue[state.currentIndex - 1].groupMode : null;
+      syncActiveMode(currentGroup);
+
       el.promptView.textContent = state.current.kana;
       el.reading.textContent = state.current.roman;
       renderRomaji();
       updateStats();
       updateKeyboardGuide(state.current.roman[0] || "");
 
-      if(state.isInfinite){
-        setMessage("入力して練習", "");
+      if(isRowChainMode(state.mode)){
+        const changedGroup = initial || previousGroup !== currentGroup;
+        if(changedGroup && currentGroup !== state.mode){
+          setMessage(`${getModeLabel(currentGroup)}へ移行`, "ok");
+        }else{
+          setMessage("入力開始", "");
+        }
       }else{
         setMessage("入力開始", "");
       }
-    }
-
-    function repeatCurrentWord(){
-      clearRepeatTimer();
-      state.awaitingEnter = false;
-      state.typed = "";
-      renderRomaji();
-      state.repeatCount++;
-      updateStats();
-      updateKeyboardGuide(state.current?.roman?.[0] || "");
-      setMessage("もういちど", "");
     }
 
     function renderRomaji(initialText = null){
@@ -1158,15 +1330,14 @@
       return Math.max(0, Math.round((state.correctKeys / state.totalKeys) * 100));
     }
 
+    function getProgressText(){
+      return `${state.currentIndex} / ${state.queue.length || 0}`;
+    }
+
     function updateStats(){
       el.missValue.textContent = String(state.misses);
       el.accValue.textContent = `${calcAccuracy()}%`;
-
-      if(state.isInfinite){
-        el.progressValue.textContent = `${state.currentIndex} 語クリア / 反復 ${state.repeatCount}`;
-      }else{
-        el.progressValue.textContent = `${state.currentIndex} / ${state.mode}`;
-      }
+      el.progressValue.textContent = getProgressText();
 
       if(!state.isRunning){
         if(state.isFinished || state.endTime){
@@ -1177,7 +1348,7 @@
       }
     }
 
-    function advanceWordFinite(){
+    function advanceWord(){
       clearRepeatTimer();
       state.currentIndex++;
       if(state.currentIndex >= state.queue.length){
@@ -1188,49 +1359,24 @@
       updateStats();
     }
 
-    function advanceWordInfinite(){
-      clearRepeatTimer();
-      state.currentIndex++;
-      state.awaitingEnter = false;
-      state.canAdvanceInfinite = false;
-
-      const idx = state.currentIndex % state.queue.length;
-      if(idx === 0){
-        state.queue = shuffle(WORDS);
-      }
-
-      state.current = state.queue[idx];
-      state.current.roman = kanaToRomajiStrict(state.current.kana);
-      state.typed = "";
-      el.promptView.textContent = state.current.kana;
-      el.reading.textContent = state.current.roman;
-      renderRomaji();
-      updateStats();
-      setMessage("入力して練習", "");
-    }
-
     function onCorrectComplete(){
       clearRepeatTimer();
-      updateKeyboardGuide("Enter");
+      playClearSound();
+      setMessage("正解", "ok");
+      updateKeyboardGuide("");
 
-      if(state.isInfinite){
-        state.awaitingEnter = true;
-        state.canAdvanceInfinite = true;
-        setMessage("正解", "ok");
-      }else{
-        setMessage("正解", "ok");
-        state.repeatTimer = setTimeout(()=>{
-          if(state.isRunning){
-            advanceWordFinite();
-          }
-        }, 220);
-      }
+      state.repeatTimer = setTimeout(()=>{
+        if(state.isRunning){
+          advanceWord();
+        }
+      }, 260);
     }
 
     function keyNameToDataKey(ch){
       if(!ch) return "";
       if(ch === "Enter") return "Enter";
       if(ch === " ") return "Space";
+      if(ch === "-") return "Minus";
       if(/[A-Z]/.test(ch)) return `Key${ch}`;
       if(/[0-9]/.test(ch)) return `Digit${ch}`;
       return "";
@@ -1243,26 +1389,31 @@
       });
     }
 
+    function isAllowedInputKey(key){
+      return /^[a-zA-Z\-]$/.test(key);
+    }
+
+    function normalizeInputKey(key){
+      if(key === "-") return "-";
+      return key.toUpperCase();
+    }
+
     function handleTypingKey(key){
       if(!state.current) return;
       const target = state.current.roman;
 
-      if(state.awaitingEnter && state.isInfinite && /^[a-z]$/.test(key)){
-        repeatCurrentWord();
-      }
-
-      if(!/^[a-z]$/.test(key)) return;
+      if(!isAllowedInputKey(key)) return;
 
       ensureAudio();
-      playPunch();
 
-      const upperKey = key.toUpperCase();
+      const inputKey = normalizeInputKey(key);
       state.totalKeys++;
       const expected = target[state.typed.length];
 
-      if(upperKey === expected){
+      if(inputKey === expected){
         state.correctKeys++;
-        state.typed += upperKey;
+        state.typed += inputKey;
+        playTypeSound();
         renderRomaji();
 
         if(state.typed === target){
@@ -1272,7 +1423,8 @@
         }
       }else{
         state.misses++;
-        setMessage(`ミス`, "miss");
+        playMissSound();
+        setMessage("ミス", "miss");
         updateKeyboardGuide(expected || "");
       }
 
@@ -1283,46 +1435,34 @@
       const key = e.key;
 
       if(key === " " || key === "Spacebar"){
-        e.preventDefault();
-        ensureAudio();
-
-        if(state.isCounting){
-          stopGame(true);
-          return;
-        }
-
         if(state.isRunning){
-          stopGame(true);
-          return;
+          e.preventDefault();
+          stopGame(false);
+          el.runLabel.textContent = "中断";
+          setMessage("停止しました。モードを選ぶと再スタート", "");
+          updateKeyboardGuide("");
+          updateStats();
         }
-
-        startCountdown();
         return;
       }
 
       if(!state.isRunning) return;
 
-      if(key === "Enter"){
+      if(isAllowedInputKey(key)){
         e.preventDefault();
-        if(state.isInfinite && state.canAdvanceInfinite){
-          advanceWordInfinite();
-        }
-        return;
-      }
-
-      if(key.length === 1 && /^[a-zA-Z]$/.test(key)){
-        e.preventDefault();
-        handleTypingKey(key.toLowerCase());
+        handleTypingKey(key);
       }
     });
 
     el.modeButtons.addEventListener("click",(e)=>{
       const btn = e.target.closest(".mode-btn");
       if(!btn) return;
-      setMode(btn.dataset.mode);
+      ensureAudio();
+      warmupAudio();
+      setMode(btn.dataset.mode, true);
     });
 
-    setMode("10");
+    setMode("10", true);
   </script>
 </body>
 </html>
