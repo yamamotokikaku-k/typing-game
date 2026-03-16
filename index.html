@@ -532,7 +532,6 @@
         <button class="mode-btn" data-mode="20">20問</button>
         <button class="mode-btn" data-mode="30">30問</button>
         <button class="mode-btn" data-mode="twochar-noun">二文字名詞100</button>
-        <button class="mode-btn" data-mode="threechar-noun">三文字名詞100</button>
         <button class="mode-btn" data-mode="row-a">あ行</button>
         <button class="mode-btn" data-mode="row-ka">か行</button>
         <button class="mode-btn" data-mode="row-sa">さ行</button>
@@ -860,109 +859,6 @@
     {kana:"ろば"}
   ];
 
-  const THREE_CHAR_NOUNS = [
-    {kana:"あひる"},
-    {kana:"あさひ"},
-    {kana:"あくま"},
-    {kana:"あなご"},
-    {kana:"あずき"},
-    {kana:"いちご"},
-    {kana:"いとこ"},
-    {kana:"いるか"},
-    {kana:"いわし"},
-    {kana:"いぐさ"},
-    {kana:"うさぎ"},
-    {kana:"うきわ"},
-    {kana:"うろこ"},
-    {kana:"うでわ"},
-    {kana:"うつわ"},
-    {kana:"えのぐ"},
-    {kana:"えほん"},
-    {kana:"えくぼ"},
-    {kana:"えまき"},
-    {kana:"えがお"},
-    {kana:"おかし"},
-    {kana:"おさら"},
-    {kana:"おちゃ"},
-    {kana:"おつり"},
-    {kana:"おばけ"},
-    {kana:"かがみ"},
-    {kana:"かもめ"},
-    {kana:"かいこ"},
-    {kana:"かるた"},
-    {kana:"かばん"},
-    {kana:"きつね"},
-    {kana:"きもの"},
-    {kana:"きのみ"},
-    {kana:"きりん"},
-    {kana:"きせつ"},
-    {kana:"くじら"},
-    {kana:"くすり"},
-    {kana:"くもり"},
-    {kana:"くるみ"},
-    {kana:"くさり"},
-    {kana:"けしき"},
-    {kana:"けむり"},
-    {kana:"けいと"},
-    {kana:"けだま"},
-    {kana:"けもの"},
-    {kana:"こあら"},
-    {kana:"こいぬ"},
-    {kana:"こぐま"},
-    {kana:"こむぎ"},
-    {kana:"こよみ"},
-    {kana:"さくら"},
-    {kana:"さかな"},
-    {kana:"さとう"},
-    {kana:"さいふ"},
-    {kana:"さなぎ"},
-    {kana:"しずく"},
-    {kana:"しおり"},
-    {kana:"しかく"},
-    {kana:"しらす"},
-    {kana:"しるし"},
-    {kana:"すいか"},
-    {kana:"すずめ"},
-    {kana:"すもう"},
-    {kana:"すなば"},
-    {kana:"すだち"},
-    {kana:"せなか"},
-    {kana:"せかい"},
-    {kana:"せんろ"},
-    {kana:"せいざ"},
-    {kana:"せんす"},
-    {kana:"そふと"},
-    {kana:"そざい"},
-    {kana:"たまご"},
-    {kana:"たぬき"},
-    {kana:"たいや"},
-    {kana:"たから"},
-    {kana:"たきび"},
-    {kana:"ちまき"},
-    {kana:"ちくわ"},
-    {kana:"ちから"},
-    {kana:"ちょこ"},
-    {kana:"つみき"},
-    {kana:"つばめ"},
-    {kana:"つくえ"},
-    {kana:"つりわ"},
-    {kana:"つづら"},
-    {kana:"てがみ"},
-    {kana:"てまり"},
-    {kana:"てすり"},
-    {kana:"てんぐ"},
-    {kana:"とまと"},
-    {kana:"とけい"},
-    {kana:"とんぼ"},
-    {kana:"とびら"},
-    {kana:"とかげ"},
-    {kana:"なまず"},
-    {kana:"なみだ"},
-    {kana:"なすび"},
-    {kana:"なたね"},
-    {kana:"にぼし"}
-  ];
-
   const ROW_ORDER = [
     "row-a",
     "row-ka",
@@ -1203,7 +1099,6 @@
       "20":"20問",
       "30":"30問",
       "twochar-noun":"二文字名詞100",
-      "threechar-noun":"三文字名詞100",
       "row-a":"あ行",
       "row-ka":"か行",
       "row-sa":"さ行",
@@ -1570,10 +1465,6 @@
 
     if(state.mode === "twochar-noun"){
       return shuffle(TWO_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
-    }
-
-    if(state.mode === "threechar-noun"){
-      return shuffle(THREE_CHAR_NOUNS.map(w => ({kana:w.kana, groupMode:state.mode})));
     }
 
     const count = Number(state.mode);
