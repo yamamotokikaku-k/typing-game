@@ -357,11 +357,6 @@
       border-color:rgba(101,214,255,.35);
     }
 
-    .actionBtn.primary{
-      background:linear-gradient(135deg, rgba(101,214,255,.24), rgba(140,255,199,.18));
-      border-color:rgba(101,214,255,.35);
-    }
-
     .actionBtn.danger{
       background:linear-gradient(135deg, rgba(255,123,157,.15), rgba(255,123,157,.08));
       border-color:rgba(255,123,157,.22);
@@ -668,7 +663,6 @@
         <div class="controlRow">
           <span class="label">出題順</span>
           <div class="modes" id="orderModeButtons"></div>
-          <button class="actionBtn primary" id="startBtn" type="button">ゲーム開始</button>
           <button class="actionBtn danger" id="resetRankingBtn" type="button">ランキング初期化</button>
         </div>
       </div>
@@ -677,7 +671,7 @@
     <div class="grid">
       <section class="infoGrid">
         <h2 class="panelTitle">プレイ情報</h2>
-        <div class="panelSub">タイム計測はなくし、正確率のみを表示します。</div>
+        <div class="panelSub">モードを選ぶと即スタートします。タイム計測はなくし、正確率のみを表示します。</div>
 
         <div class="cards">
           <div class="card">
@@ -725,7 +719,8 @@
       <input id="playerNameInput" type="text" maxlength="16" placeholder="ランキング名を入力（省略で NO NAME）" />
       <div class="modalBtns">
         <button class="actionBtn" id="closeResultBtn" type="button">閉じる</button>
-        <button class="actionBtn primary" id="saveResultBtn" type="button">ランキング保存</button>
+        <button class="actionBtn" id="retryBtn" type="button">もう一回</button>
+        <button class="actionBtn" id="saveResultBtn" type="button">ランキング保存</button>
       </div>
     </div>
   </div>
@@ -895,7 +890,6 @@
     const soundBtn = $("soundBtn");
     const soundTypeSelect = $("soundTypeSelect");
     const soundTypeLabel = $("soundTypeLabel");
-    const startBtn = $("startBtn");
     const resetRankingBtn = $("resetRankingBtn");
     const resultOverlay = $("resultOverlay");
     const resultSummary = $("resultSummary");
@@ -903,6 +897,7 @@
     const playerNameInput = $("playerNameInput");
     const saveResultBtn = $("saveResultBtn");
     const closeResultBtn = $("closeResultBtn");
+    const retryBtn = $("retryBtn");
     const notice = $("notice");
 
     const soundNames = {
@@ -985,10 +980,7 @@
 
     function buildProblemList(){
       const base = getProblemSet();
-      if(state.orderMode === "random"){
-        return shuffle(base);
-      }
-      return [...base];
+      return state.orderMode === "random" ? shuffle(base) : [...base];
     }
 
     function getBaseChunk(chars, index){
@@ -1076,7 +1068,6 @@
 
           if(nextBase && nextBase.inputs.length){
             const doubledHeads = [];
-
             for(const opt of nextBase.inputs){
               const first = (opt[0] || "").toLowerCase();
               if(first && consonants.includes(first) && first !== "n"){
@@ -1086,13 +1077,8 @@
 
             if(doubledHeads.length){
               inputs = [...new Set([...doubledHeads, "xtu", "ltu"])];
-
               const firstDisplay = (nextBase.display[0] || "").toLowerCase();
-              if(firstDisplay && consonants.includes(firstDisplay) && firstDisplay !== "n"){
-                display = firstDisplay;
-              }else{
-                display = "tu";
-              }
+              display = (firstDisplay && consonants.includes(firstDisplay) && firstDisplay !== "n") ? firstDisplay : "tu";
             }
           }
 
@@ -1254,7 +1240,12 @@
       stateLabel.textContent = "プレイ中";
       loadProblem(0);
       updateStats();
-      showNotice("ゲームを開始しました");
+    }
+
+    function restartCurrentMode(){
+      resultOverlay.classList.remove("show");
+      startGame();
+      showNotice("再スタートしました");
     }
 
     function loadProblem(index){
@@ -1266,7 +1257,7 @@
       state.currentChunkIndex = 0;
 
       kanjiDisplay.textContent = item;
-      kanaDisplay.textContent = "ひらがな";
+      kanaDisplay.textContent = state.selectedRowKey === "all" ? "全部通し" : state.selectedRowLabel;
       ghostInput.textContent = "入力待機中";
       candidateText.textContent = shortenText(state.currentChunks.map(c => c.display).join(""), 28);
       renderRoman();
@@ -1276,10 +1267,8 @@
     function updateStats(){
       const totalAttempts = state.totalAcceptedChars + state.totalMiss;
       const acc = totalAttempts === 0 ? 100 : (state.totalAcceptedChars / totalAttempts) * 100;
-      const totalCount = state.problems.length;
-      const currentCount = state.playing
-        ? Math.min(state.currentProblemIndex + 1, totalCount)
-        : 0;
+      const totalCount = state.problems.length || getProblemSet().length;
+      const currentCount = state.playing ? Math.min(state.currentProblemIndex + 1, totalCount) : 0;
       const progressPct = totalCount ? (state.currentProblemIndex / totalCount) * 100 : 0;
 
       progressText.textContent = `${currentCount} / ${totalCount}`;
@@ -1417,8 +1406,6 @@
       if(key.length !== 1) return;
       if(!/^[a-zA-Z\-]$/.test(key)) return;
 
-      unlockAudio();
-
       const ch = key.toLowerCase();
       const chunk = state.currentChunks[state.currentChunkIndex];
       if(!chunk) return;
@@ -1428,6 +1415,8 @@
       const exactPatterns = chunk.patterns.filter(p => p.seq === nextTyped);
 
       if(exactPatterns.length){
+        playTypeSound();
+
         chunk.typed = nextTyped;
         chunk.accepted = nextTyped;
         chunk.paintedCount = chunk.display.length;
@@ -1435,7 +1424,6 @@
         chunk.missFlash = false;
         state.currentChunkIndex++;
         state.totalAcceptedChars++;
-        playTypeSound();
         renderRoman();
         updateStats();
 
@@ -1446,19 +1434,21 @@
       }
 
       if(matchingPatterns.length){
+        playTypeSound();
+
         const best = chooseBestPattern(matchingPatterns, nextTyped) || matchingPatterns[0];
         chunk.typed = nextTyped;
         chunk.accepted = nextTyped;
         chunk.paintedCount = paintToCount(best.paint, nextTyped.length);
         chunk.missFlash = false;
         state.totalAcceptedChars++;
-        playTypeSound();
         renderRoman();
         updateStats();
         return;
       }
 
       playMissSound();
+
       state.totalMiss++;
       chunk.missFlash = true;
       renderRoman();
@@ -1479,11 +1469,13 @@
         btn.className = "modeBtn" + (m.key === state.selectedRowKey ? " active" : "");
         btn.textContent = m.label;
         btn.addEventListener("click", () => {
+          unlockAudio();
           state.selectedRowKey = m.key;
           state.selectedRowLabel = m.label;
           rowLabel.textContent = state.selectedRowLabel;
           buildRowModeButtons();
-          if(!state.playing) previewSelection();
+          startGame();
+          showNotice(`「${m.label}」で開始`);
         });
         rowModeButtons.appendChild(btn);
       });
@@ -1497,10 +1489,13 @@
         btn.className = "modeBtn" + (m.key === state.orderMode ? " active" : "");
         btn.textContent = m.label;
         btn.addEventListener("click", () => {
+          unlockAudio();
           state.orderMode = m.key;
           state.orderModeLabel = m.label;
           orderLabel.textContent = state.orderModeLabel;
           buildOrderModeButtons();
+          startGame();
+          showNotice(`「${m.label}」で開始`);
         });
         orderModeButtons.appendChild(btn);
       });
@@ -1518,12 +1513,18 @@
       progressText.textContent = `0 / ${set.length}`;
       totalProblemsText.textContent = set.length;
       progressBar.style.width = "0%";
+      accText.textContent = "100.00%";
+      typedText.textContent = "0";
+      missText.textContent = "0";
+      ghostInput.textContent = "入力待機中";
     }
 
     const audioCtxHolder = {
       ctx:null,
       master:null,
-      unlocked:false
+      unlocked:false,
+      clickBuffer:null,
+      missBuffer:null
     };
 
     function getAudioCtx(){
@@ -1532,7 +1533,7 @@
           latencyHint:"interactive"
         });
         const master = ctx.createGain();
-        master.gain.value = 1.05;
+        master.gain.value = 1.0;
         master.connect(ctx.destination);
         audioCtxHolder.ctx = ctx;
         audioCtxHolder.master = master;
@@ -1540,25 +1541,71 @@
       return audioCtxHolder.ctx;
     }
 
+    function createNoiseBuffer(durationSec, highpassLike = false){
+      const ctx = getAudioCtx();
+      const length = Math.max(1, Math.floor(ctx.sampleRate * durationSec));
+      const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for(let i = 0; i < length; i++){
+        const t = i / length;
+        let v = (Math.random() * 2 - 1) * (1 - t);
+        if(highpassLike){
+          v *= (0.3 + 0.7 * t);
+        }
+        data[i] = v;
+      }
+      return buffer;
+    }
+
+    function prepareAudioBuffers(){
+      if(!audioCtxHolder.clickBuffer){
+        audioCtxHolder.clickBuffer = createNoiseBuffer(0.008, true);
+      }
+      if(!audioCtxHolder.missBuffer){
+        audioCtxHolder.missBuffer = createNoiseBuffer(0.02, false);
+      }
+    }
+
     function unlockAudio(){
       const ctx = getAudioCtx();
       if(ctx.state === "suspended"){
         ctx.resume();
       }
+      prepareAudioBuffers();
+
       if(!audioCtxHolder.unlocked){
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.001);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.01);
+        osc.frequency.setValueAtTime(880, now);
         osc.connect(gain);
         gain.connect(audioCtxHolder.master);
         osc.start(now);
-        osc.stop(now + 0.001);
+        osc.stop(now + 0.012);
         audioCtxHolder.unlocked = true;
       }
     }
 
-    function tone(freq=440, duration=.03, type="square", gainAmount=.05, freqEnd=null){
+    function playBuffer(buffer, gainValue){
+      if(!state.soundOn) return;
+      const ctx = getAudioCtx();
+      if(ctx.state !== "running" || !buffer) return;
+
+      const now = ctx.currentTime;
+      const src = ctx.createBufferSource();
+      const gain = ctx.createGain();
+      src.buffer = buffer;
+      gain.gain.setValueAtTime(gainValue, now);
+      src.connect(gain);
+      gain.connect(audioCtxHolder.master);
+      src.start(now);
+    }
+
+    function tone(freq=440, duration=.02, type="square", gainAmount=.04, freqEnd=null){
       if(!state.soundOn) return;
       const ctx = getAudioCtx();
       if(ctx.state !== "running") return;
@@ -1573,63 +1620,29 @@
         osc.frequency.exponentialRampToValueAtTime(Math.max(40, freqEnd), now + duration);
       }
 
-      gain.gain.cancelScheduledValues(now);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(gainAmount, now + 0.0015);
+      gain.gain.setValueAtTime(gainAmount, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
       osc.connect(gain);
       gain.connect(audioCtxHolder.master);
       osc.start(now);
-      osc.stop(now + duration + 0.005);
-    }
-
-    function noise(duration=.012, gainAmount=.02, highpass=2400){
-      if(!state.soundOn) return;
-      const ctx = getAudioCtx();
-      if(ctx.state !== "running") return;
-
-      const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for(let i = 0; i < bufferSize; i++){
-        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-      }
-
-      const source = ctx.createBufferSource();
-      const filter = ctx.createBiquadFilter();
-      filter.type = "highpass";
-      filter.frequency.value = highpass;
-
-      const gain = ctx.createGain();
-      const now = ctx.currentTime;
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(gainAmount, now + 0.001);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-      source.buffer = buffer;
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtxHolder.master);
-      source.start(now);
-      source.stop(now + duration + 0.005);
+      osc.stop(now + duration + 0.003);
     }
 
     function playTypeSound(){
       switch(state.soundType){
         case "arcade":
-          tone(900, 0.018, "square", 0.065, 780);
-          noise(0.006, 0.012, 3200);
+          tone(980, 0.015, "square", 0.05, 820);
+          playBuffer(audioCtxHolder.clickBuffer, 0.015);
           break;
         case "crystal":
-          tone(1200, 0.02, "triangle", 0.05, 980);
-          noise(0.005, 0.008, 4200);
+          tone(1320, 0.02, "triangle", 0.038, 1020);
+          playBuffer(audioCtxHolder.clickBuffer, 0.008);
           break;
         case "click":
         default:
-          tone(1500, 0.012, "square", 0.055, 1300);
-          noise(0.004, 0.016, 3600);
+          tone(1650, 0.009, "square", 0.04, 1400);
+          playBuffer(audioCtxHolder.clickBuffer, 0.02);
           break;
       }
     }
@@ -1637,16 +1650,16 @@
     function playMissSound(){
       switch(state.soundType){
         case "arcade":
-          tone(220, 0.028, "square", 0.07, 150);
-          noise(0.01, 0.012, 1500);
+          tone(220, 0.03, "square", 0.055, 150);
+          playBuffer(audioCtxHolder.missBuffer, 0.012);
           break;
         case "crystal":
-          tone(260, 0.03, "sawtooth", 0.06, 180);
+          tone(250, 0.03, "sawtooth", 0.045, 180);
           break;
         case "click":
         default:
-          tone(180, 0.02, "square", 0.06, 120);
-          noise(0.006, 0.014, 1800);
+          tone(180, 0.02, "square", 0.05, 120);
+          playBuffer(audioCtxHolder.missBuffer, 0.012);
           break;
       }
     }
@@ -1671,15 +1684,14 @@
 
     document.addEventListener("pointerdown", unlockAudio, {passive:true});
     document.addEventListener("touchstart", unlockAudio, {passive:true});
+
     document.addEventListener("keydown", (e) => {
       unlockAudio();
       if(resultOverlay.classList.contains("show")) return;
+      if(/^[a-zA-Z\-]$/.test(e.key)){
+        e.preventDefault();
+      }
       handleKeyInput(e.key);
-    });
-
-    startBtn.addEventListener("click", () => {
-      unlockAudio();
-      startGame();
     });
 
     soundBtn.addEventListener("click", () => {
@@ -1700,6 +1712,8 @@
     resetRankingBtn.addEventListener("click", resetRanking);
     closeResultBtn.addEventListener("click", () => resultOverlay.classList.remove("show"));
     saveResultBtn.addEventListener("click", saveRanking);
+    retryBtn.addEventListener("click", restartCurrentMode);
+
     playerNameInput.addEventListener("keydown", (e) => {
       if(e.key === "Enter") saveRanking();
     });
@@ -1717,10 +1731,6 @@
       stateLabel.textContent = "待機中";
       renderRanking();
       previewSelection();
-      accText.textContent = "100.00%";
-      typedText.textContent = "0";
-      missText.textContent = "0";
-      ghostInput.textContent = "入力待機中";
     }
 
     init();
