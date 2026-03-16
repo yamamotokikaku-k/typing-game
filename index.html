@@ -317,152 +317,6 @@
       color:var(--miss);
     }
 
-    .finger-guide-wrap{
-      width:min(940px,100%);
-      margin:0 auto;
-      background:rgba(255,255,255,.26);
-      border:1px solid rgba(255,255,255,.25);
-      border-radius:24px;
-      padding:14px 16px 12px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
-    }
-
-    .finger-guide-head{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      gap:8px;
-      margin-bottom:10px;
-    }
-
-    .finger-guide-title{
-      font-size:15px;
-      font-weight:900;
-      color:#253571;
-      letter-spacing:.06em;
-    }
-
-    .finger-name{
-      font-size:14px;
-      font-weight:900;
-      color:#4b5b9d;
-      background:rgba(255,255,255,.52);
-      border:1px solid rgba(255,255,255,.34);
-      border-radius:999px;
-      padding:6px 11px;
-      box-shadow:0 2px 8px rgba(74,95,180,.08);
-    }
-
-    .hands{
-      display:flex;
-      justify-content:center;
-      align-items:flex-end;
-      gap:22px;
-      flex-wrap:wrap;
-    }
-
-    .hand-card{
-      background:rgba(255,255,255,.20);
-      border:1px solid rgba(255,255,255,.22);
-      border-radius:18px;
-      padding:10px 12px 8px;
-      min-width:220px;
-    }
-
-    .hand-label{
-      font-size:13px;
-      font-weight:900;
-      color:#425292;
-      margin-bottom:6px;
-      letter-spacing:.05em;
-    }
-
-    .hand{
-      position:relative;
-      width:190px;
-      height:130px;
-      margin:0 auto;
-    }
-
-    .palm{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:8px;
-      width:116px;
-      height:70px;
-      border-radius:34px 34px 24px 24px;
-      background:rgba(255,255,255,.54);
-      border:1px solid rgba(54,84,173,.12);
-      box-shadow:0 6px 14px rgba(74,95,180,.08);
-    }
-
-    .digits{
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:66px;
-      display:flex;
-      gap:9px;
-      align-items:flex-end;
-    }
-
-    .guide-digit{
-      width:22px;
-      border-radius:18px 18px 12px 12px;
-      background:rgba(255,255,255,.54);
-      border:1px solid rgba(54,84,173,.12);
-      box-shadow:0 4px 10px rgba(74,95,180,.08);
-      transition:.16s transform,.16s box-shadow,.16s background,.16s border-color;
-    }
-
-    .guide-digit.pinky{ height:62px; }
-    .guide-digit.ring{ height:78px; }
-    .guide-digit.middle{ height:90px; }
-    .guide-digit.index{ height:82px; }
-
-    .guide-thumb{
-      position:absolute;
-      bottom:14px;
-      width:24px;
-      height:62px;
-      border-radius:18px 18px 12px 12px;
-      background:rgba(255,255,255,.54);
-      border:1px solid rgba(54,84,173,.12);
-      box-shadow:0 4px 10px rgba(74,95,180,.08);
-      transition:.16s transform,.16s box-shadow,.16s background,.16s border-color;
-    }
-
-    .hand.left .guide-thumb{
-      right:18px;
-      transform:rotate(42deg);
-      transform-origin:bottom center;
-    }
-
-    .hand.right .guide-thumb{
-      left:18px;
-      transform:rotate(-42deg);
-      transform-origin:bottom center;
-    }
-
-    .guide-digit.active,
-    .guide-thumb.active{
-      transform:translateY(-4px) scale(1.03);
-      border-color:rgba(255,255,255,.72);
-      box-shadow:0 0 0 4px rgba(255,255,255,.56), 0 10px 20px rgba(74,95,180,.22);
-    }
-
-    .guide-digit[data-finger="finger-lp"].active{ background:color-mix(in srgb, var(--f-lp) 78%, white 22%); }
-    .guide-digit[data-finger="finger-lr"].active{ background:color-mix(in srgb, var(--f-lr) 78%, white 22%); }
-    .guide-digit[data-finger="finger-lm"].active{ background:color-mix(in srgb, var(--f-lm) 78%, white 22%); }
-    .guide-digit[data-finger="finger-li"].active{ background:color-mix(in srgb, var(--f-li) 78%, white 22%); }
-    .guide-digit[data-finger="finger-ri"].active{ background:color-mix(in srgb, var(--f-ri) 78%, white 22%); }
-    .guide-digit[data-finger="finger-rm"].active{ background:color-mix(in srgb, var(--f-rm) 78%, white 22%); }
-    .guide-digit[data-finger="finger-rr"].active{ background:color-mix(in srgb, var(--f-rr) 78%, white 22%); }
-    .guide-digit[data-finger="finger-rp"].active{ background:color-mix(in srgb, var(--f-rp) 78%, white 22%); }
-    .guide-thumb[data-finger="finger-thumb"].active{ background:color-mix(in srgb, var(--f-thumb) 78%, white 22%); }
-
     .keyboard-wrap{
       width:min(940px,100%);
       margin:0 auto;
@@ -634,12 +488,6 @@
       .key{
         min-height:40px;
       }
-      .hands{
-        gap:14px;
-      }
-      .hand-card{
-        min-width:200px;
-      }
     }
 
     @media (max-width:640px){
@@ -667,13 +515,6 @@
       .sound-control{
         width:100%;
         justify-content:center;
-      }
-      .finger-guide-head{
-        justify-content:center;
-      }
-      .hand-card{
-        width:100%;
-        min-width:0;
       }
     }
   </style>
@@ -732,43 +573,6 @@
 
         <div class="typing">
           <div class="romaji" id="romajiView"></div>
-        </div>
-
-        <div class="finger-guide-wrap">
-          <div class="finger-guide-head">
-            <div class="finger-guide-title">つかうゆびガイド</div>
-            <div class="finger-name" id="fingerName">つかうゆび：-</div>
-          </div>
-
-          <div class="hands">
-            <div class="hand-card">
-              <div class="hand-label">ひだりて</div>
-              <div class="hand left">
-                <div class="digits">
-                  <div class="guide-digit pinky" data-finger="finger-lp" aria-label="左手小指"></div>
-                  <div class="guide-digit ring" data-finger="finger-lr" aria-label="左手薬指"></div>
-                  <div class="guide-digit middle" data-finger="finger-lm" aria-label="左手中指"></div>
-                  <div class="guide-digit index" data-finger="finger-li" aria-label="左手人差し指"></div>
-                </div>
-                <div class="guide-thumb" data-finger="finger-thumb" aria-label="親指"></div>
-                <div class="palm"></div>
-              </div>
-            </div>
-
-            <div class="hand-card">
-              <div class="hand-label">みぎて</div>
-              <div class="hand right">
-                <div class="digits">
-                  <div class="guide-digit index" data-finger="finger-ri" aria-label="右手人差し指"></div>
-                  <div class="guide-digit middle" data-finger="finger-rm" aria-label="右手中指"></div>
-                  <div class="guide-digit ring" data-finger="finger-rr" aria-label="右手薬指"></div>
-                  <div class="guide-digit pinky" data-finger="finger-rp" aria-label="右手小指"></div>
-                </div>
-                <div class="guide-thumb" data-finger="finger-thumb" aria-label="親指"></div>
-                <div class="palm"></div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="keyboard-wrap">
@@ -1318,18 +1122,6 @@
     }
   };
 
-  const FINGER_LABELS = {
-    "finger-lp":"左手 小指",
-    "finger-lr":"左手 薬指",
-    "finger-lm":"左手 中指",
-    "finger-li":"左手 人さし指",
-    "finger-ri":"右手 人さし指",
-    "finger-rm":"右手 中指",
-    "finger-rr":"右手 薬指",
-    "finger-rp":"右手 小指",
-    "finger-thumb":"親指"
-  };
-
   function kanaTokenize(str){
     const arr = [];
     for(let i=0;i<str.length;i++){
@@ -1468,9 +1260,7 @@
     resultTime:document.getElementById("resultTime"),
     soundSelect:document.getElementById("soundSelect"),
     soundLabel:document.getElementById("soundLabel"),
-    fingerName:document.getElementById("fingerName"),
-    keys:[...document.querySelectorAll(".key")],
-    guideDigits:[...document.querySelectorAll(".guide-digit, .guide-thumb")]
+    keys:[...document.querySelectorAll(".key")]
   };
 
   let audioCtx = null;
@@ -1979,37 +1769,11 @@
     return "";
   }
 
-  function getFingerClassFromDataKey(dataKey){
-    if(!dataKey) return "";
-    const targetKey = el.keys.find(key => key.dataset.key === dataKey);
-    if(!targetKey) return "";
-
-    const fingerClasses = [
-      "finger-lp","finger-lr","finger-lm","finger-li",
-      "finger-ri","finger-rm","finger-rr","finger-rp","finger-thumb"
-    ];
-
-    return fingerClasses.find(cls => targetKey.classList.contains(cls)) || "";
-  }
-
-  function updateFingerGuideByDataKey(dataKey){
-    const fingerClass = getFingerClassFromDataKey(dataKey);
-
-    el.guideDigits.forEach(digit=>{
-      digit.classList.toggle("active", !!fingerClass && digit.dataset.finger === fingerClass);
-    });
-
-    el.fingerName.textContent = fingerClass
-      ? `つかうゆび：${FINGER_LABELS[fingerClass]}`
-      : "つかうゆび：-";
-  }
-
   function updateKeyboardGuide(ch){
     const targetDataKey = keyNameToDataKey(ch);
     el.keys.forEach(key=>{
       key.classList.toggle("active", key.dataset.key === targetDataKey);
     });
-    updateFingerGuideByDataKey(targetDataKey);
   }
 
   function isAllowedInputKey(key){
